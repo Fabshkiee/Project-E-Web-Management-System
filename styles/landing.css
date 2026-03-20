@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  /* =========================================
+     LANDING PAGE DESIGN TOKENS
+     ========================================= */
+  /* Colors */
+  --color-land-red: #d60000; /* Red600 */
+  --color-land-crimson: #f20d33; /* Crimson500 */
+  --color-land-border: #39282b; /* Crimson800 */
+  --color-land-card-hover: #221a1b; /* Crimson900 Lighter */
+  --color-land-bg: #181112; /* Crimson900 Mid */
+  --color-land-dark: #120c0d; /* Crimson900 Dark Base */
+
+  /* Fonts */
+  --font-space: var(--font-space), sans-serif;
+  --font-inter: var(--font-inter), sans-serif;
+}
+
+@layer components {
+  /* =========================================
+     LANDING PAGE TYPOGRAPHY
+     ========================================= */
+
+  /* Display Headings */
+  .landing-h1 {
+    @apply font-space font-bold text-[72px] leading-[72px];
+  }
+  .landing-h2 {
+    @apply font-space font-bold text-[36px] leading-[40px];
+  }
+
+  /* Section Headings */
+  .landing-h3 {
+    @apply font-space font-bold text-[24px] leading-[32px];
+  }
+  .landing-h4 {
+    @apply font-space font-bold text-[20px] leading-[28px];
+  }
+
+  /* Body Text */
+  .landing-p-lg {
+    @apply font-space font-normal text-[18px] leading-[28px];
+  }
+  .landing-p-md {
+    @apply font-space font-normal text-[16px] leading-[24px];
+  }
+  .landing-p-sm {
+    @apply font-space font-normal text-[14px] leading-[20px];
+  }
+
+  /* Inter Accents (used for small labels/metadata) */
+  .landing-inter-md {
+    @apply font-inter font-normal text-[18px] leading-[28px];
+  }
+  .landing-inter-sm {
+    @apply font-inter font-bold text-[12px] leading-[16px];
+  }
+
+  /* Landing Page specific container */
+  .landing-wrapper {
+    @apply bg-land-bg text-white min-h-screen selection:bg-land-crimson selection:text-white;
+  }
+}
