@@ -56,18 +56,22 @@ export default function Login() {
     //check if member
     const { data: memberData } = await supabase
       .from("members")
-      .select("status")
+      .select("valid_until")
       .eq("user_id", user_id)
       .maybeSingle();
 
     if (memberData) {
-      if (memberData.status === "Active") {
+      const isExpired = new Date(memberData.valid_until) < new Date();
+
+      if (!isExpired) {
         router.push("/portal/");
         router.refresh();
         return;
       } else {
         await supabase.auth.signOut();
-        setError("Your account is not active. Please contact staff.");
+        setError(
+          "Access Denied: Your membership has expired. Please visit the front desk.",
+        );
         setLoading(false);
         return;
       }
