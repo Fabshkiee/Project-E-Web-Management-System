@@ -1,7 +1,8 @@
 export default function Portal() {
   return (
-    <div>
+    <main>
       <h1>Portal</h1>
-    </div>
+      <p>Welcome to your personal fitness portal.</p>
+    </main>
   );
 }
