@@ -89,26 +89,40 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="flex flex-col gap-2">
-            <label className="p-xs-sb text-muted uppercase tracking-widest pl-1">
+            <label
+              htmlFor="userId"
+              className="p-xs-sb text-muted uppercase tracking-widest pl-1"
+            >
               Member ID
             </label>
             <input
+              id="userId"
+              name="userId"
+              autoComplete="off"
               required
               className="w-full bg-background border border-stroke rounded-lg p-3 text-white focus:border-primary outline-none transition-all"
               placeholder="0001"
+              value={loginId}
               onChange={(e) => setLoginId(e.target.value)}
             />
           </div>
 
           <div className="flex flex-col gap-2 relative">
-            <label className="p-xs-sb text-muted uppercase tracking-widest pl-1">
+            <label
+              htmlFor="password"
+              className="p-xs-sb text-muted uppercase tracking-widest pl-1"
+            >
               Password
             </label>
             <input
+              id="password"
+              name="password"
+              autoComplete="off"
               required
               type={showPassword ? "text" : "password"}
               className="w-full bg-background border border-stroke rounded-lg p-3 text-white focus:border-primary outline-none transition-all pr-12"
               placeholder="••••••••"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
             <button
