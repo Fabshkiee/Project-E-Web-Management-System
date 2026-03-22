@@ -10,33 +10,116 @@ export default function Login() {
   const supabase = createClient();
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setSHowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   //Login Logic
-  const handleLogin = async (e: React.SubmitEvent) => {
-    e.preventDefault(); //prevent from refreshing
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError("");
 
-    //fake email for supabaseuath
-    const fakeEmail = `${loginId.trim()}@projecte.local`;
+    let user_id = null;
+
+    //fake email for supabaseuath (0001@projecte.local)
+    const formattedId = loginId.trim().toLowerCase();
+    const fakeEmail = `${formattedId}@projecte.local`;
 
     //call supabase
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
       email: fakeEmail,
       password,
     });
+
+    if (authError || !data.user) {
+      setError(authError?.message || "Invalid Login Credentials");
+      setLoading(false);
+      return;
+    }
+
+    user_id = data.user.id;
+
+    //check if staff
+    const { data: StaffData } = await supabase
+      .from("staff")
+      .select("role")
+      .eq("user_id", user_id)
+      .maybeSingle();
+
+    if (StaffData) {
+      router.push("/dashboard/");
+      router.refresh();
+      return;
+    }
+
+    //check if member
+    const { data: memberData } = await supabase
+      .from("members")
+      .select("status")
+      .eq("user_id", user_id)
+      .maybeSingle();
+
+    if (memberData) {
+      router.push("/portal/");
+      router.refresh();
+      return;
+    }
+
+    setError("User profile not found. Please contact staff.");
+    setLoading(false);
   };
 
   return (
-    <section>
-      <div className="flex items-center justify-center h-screen">
-        <div className="flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-bold">Login</h1>
-        </div>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-surface border border-stroke rounded-2xl p-8 shadow-xl">
+        <h1 className="h2-b text-center mb-6">LOGIN</h1>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="p-xs-sb text-muted uppercase ml-1">
+              Member ID
+            </label>
+            <input
+              required
+              className="w-full bg-background border border-stroke rounded-lg p-3 text-white focus:border-primary outline-none"
+              placeholder="0001"
+              onChange={(e) => setLoginId(e.target.value)}
+            />
+          </div>
+          <div className="relative">
+            <label className="p-xs-sb text-muted uppercase ml-1">
+              Password
+            </label>
+            <input
+              required
+              type={showPassword ? "text" : "password"}
+              className="w-full bg-background border border-stroke rounded-lg p-3 text-white focus:border-primary outline-none"
+              placeholder="••••••••"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-9 text-muted hover:text-white"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </button>
+          </div>
+          {error && (
+            <p className="text-primary text-sm text-center font-medium">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary text-white font-teko text-2xl py-3 rounded-xl disabled:opacity-50 hover:brightness-110 transition-all uppercase"
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </button>
+        </form>
       </div>
-    </section>
+    </div>
   );
 }
