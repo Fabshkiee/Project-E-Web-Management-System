@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Teko, Lexend, Space_Grotesk, Inter } from "next/font/google";
 import "../styles/globals.css";
-import "../styles/landing.css";
+// landing.css is now imported inside globals.css
+
 
 // Dashboard Fonts
 const teko = Teko({ variable: "--font-teko", subsets: ["latin"] });

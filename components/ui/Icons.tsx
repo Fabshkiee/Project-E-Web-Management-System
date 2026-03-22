@@ -98,9 +98,9 @@ export function EyeClosedIcon(props: SVGProps<SVGSVGElement>) {
       <path
         d="M11.2969 10.2656L12 12.375"
         stroke="#9CA3AF"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

@@ -4,8 +4,6 @@ import Hero from "@/components/landing/Hero";
 import Why from "@/components/landing/Why";
 import Trainers from "@/components/landing/Trainers";
 import Membership from "@/components/landing/Membership";
-// landing.css is imported in the root layout
-
 
 export default function LandingPage() {
   return (
