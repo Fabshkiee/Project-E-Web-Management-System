@@ -99,9 +99,21 @@ export default function Login() {
 
       <button
         onClick={() => router.push("/")}
-        className="hover:cursor-pointer absolute top-8 left-8 bg-primary text-white px-4 py-2 rounded-lg font-lexend text-xs font-bold hover:brightness-110 transition-all uppercase z-10"
+        className="hover:cursor-pointer flex flex-row items-center gap-2 absolute top-8 left-8 bg-primary text-white px-6 py-3 rounded-lg font-inter text-sm font-semibold hover:brightness-110 transition-all uppercase z-10"
       >
-        ← Back to Home
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+        >
+          <path
+            d="M3.1875 7.5L7.85417 12.1667L6.66667 13.3333L0 6.66667L6.66667 0L7.85417 1.16667L3.1875 5.83333H13.3333V7.5H3.1875V7.5"
+            fill="white"
+          />
+        </svg>
+        Back to Home
       </button>
 
       <section className="w-full max-w-md bg-surface border border-stroke rounded-2xl p-8 shadow-xl z-10">
