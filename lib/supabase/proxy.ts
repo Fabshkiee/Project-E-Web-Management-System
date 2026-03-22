@@ -89,12 +89,11 @@ export async function updateSession(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
+     * Run only on paths that REQUIRE authentication or session handling.
+     * Avoid matching the root ('/') if the landing page is public.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/dashboard/:path*",
+    "/portal/:path*",
+    "/login",
   ],
 };
