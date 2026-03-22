@@ -1,4 +1,6 @@
-@import "tailwindcss";
+/* Styles for the landing page */
+/* Tailwind is imported in globals.css */
+
 
 @theme {
   /* =========================================

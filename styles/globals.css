@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./landing.css";
+
 
 @theme {
   /* 1. Core Colors mapped to dynamic CSS variables */
@@ -24,7 +26,7 @@
     --bg-base: #f7f9fb; /* Light Base */
     --bg-surface: #ffffff; /* Surface White */
     --text-main: #111111; /* Midnight Base */
-    --text-muted: #64748b; /* Slate Grey */
+    --text-muted: #9ca3af; /* Silver Grey */
     --border-stroke: #e2e8f0;
   }
 
