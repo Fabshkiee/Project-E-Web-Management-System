@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Login() {
   //State: Track user types
@@ -84,11 +85,17 @@ export default function Login() {
 
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute right-0 bottom-0 opacity-5 pointer-events-none translate-x-1/4 translate-y-1/4 select-none">
-        <h1 className="text-[30rem] lg:text-[40rem] font-teko leading-none uppercase text-white">
-          PE
-        </h1>
-      </div>
+      {/*Background Logo*/}
+      <section className="absolute right-0 bottom-0 pointer-events-none translate-x-1/4 translate-y-1/4 select-none">
+        <Image
+          src="/assets/proje_logo.svg"
+          alt="Logo"
+          width={600}
+          height={600}
+          className="opacity-10"
+        />
+        <div className="absolute inset-0 bg-primary opacity-8 blur-3xl z-0 rounded-full"></div>
+      </section>
 
       <button
         onClick={() => router.push("/")}
