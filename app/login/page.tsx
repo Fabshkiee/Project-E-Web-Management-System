@@ -83,8 +83,21 @@ export default function Login() {
   };
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center p-4">
-      <section className="w-full max-w-md bg-surface border border-stroke rounded-2xl p-8 shadow-xl">
+    <main className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute right-0 bottom-0 opacity-5 pointer-events-none translate-x-1/4 translate-y-1/4 select-none">
+        <h1 className="text-[30rem] lg:text-[40rem] font-teko leading-none uppercase text-white">
+          PE
+        </h1>
+      </div>
+
+      <button
+        onClick={() => router.push("/")}
+        className="hover:cursor-pointer absolute top-8 left-8 bg-primary text-white px-4 py-2 rounded-lg font-lexend text-xs font-bold hover:brightness-110 transition-all uppercase z-10"
+      >
+        ← Back to Home
+      </button>
+
+      <section className="w-full max-w-md bg-surface border border-stroke rounded-2xl p-8 shadow-xl z-10">
         <h1 className="h2-b text-center mb-6 uppercase">Sign In</h1>
 
         <form onSubmit={handleLogin} className="space-y-4">
