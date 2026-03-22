@@ -49,14 +49,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user) {
-    // Check if they are a staff member
-    const { data: staffData } = await supabase
-      .from("staff")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    const isStaff = !!staffData; // True if they are staff, false if they are a member
+    //Check if they are a staff member
+    const isStaff = user.app_metadata?.role === "staff";
 
     // Prevent Members from accessing the Staff Dashboard
     if (!isStaff && isDashboard) {
@@ -65,7 +59,7 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    //Prevent Staff from accessing the Member Portal
+    // Prevent Staff from accessing the Member Portal
     if (isStaff && isPortal) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
