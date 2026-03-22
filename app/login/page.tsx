@@ -61,11 +61,19 @@ export default function Login() {
       .maybeSingle();
 
     if (memberData) {
-      router.push("/portal/");
-      router.refresh();
-      return;
+      if (memberData.status === "Active") {
+        router.push("/portal/");
+        router.refresh();
+        return;
+      } else {
+        await supabase.auth.signOut();
+        setError("Your account is not active. Please contact staff.");
+        setLoading(false);
+        return;
+      }
     }
 
+    await supabase.auth.signOut();
     setError("User profile not found. Please contact staff.");
     setLoading(false);
   };
