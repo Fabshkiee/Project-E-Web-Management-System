@@ -200,7 +200,7 @@ export default function Login() {
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <EyeClosedIcon className="w-5 h-5" />
+                  <EyeClosedIcon className="w-5 h-5 opacity-30" />
                 ) : (
                   <EyeOpenIcon className="w-5 h-5" />
                 )}

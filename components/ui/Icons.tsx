@@ -64,7 +64,7 @@ export function EyeClosedIcon(props: SVGProps<SVGSVGElement>) {
       height="18"
       viewBox="0 0 18 18"
       fill="none"
-      className="opacity-30"
+      {...props}
     >
       <path
         d="M1.5 7.5C1.5 7.5 4.125 10.5 9 10.5C13.875 10.5 16.5 7.5 16.5 7.5"

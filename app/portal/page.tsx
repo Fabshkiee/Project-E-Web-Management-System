@@ -42,13 +42,20 @@ export default function Portal() {
         const { data: profileData, error: profileError } = await supabase
           .from("members")
           .select(
-            "full_name, member_id, nickname, valid_until, status, coach_id, qr_token",
+            "full_name, member_id, nickname, valid_until, status, staff:coach_id (full_name), qr_token",
           )
           .eq("user_id", user.id)
           .single();
 
-        if (!profileError) {
-          setProfile(profileData);
+        if (!profileError && profileData) {
+          const coach = Array.isArray(profileData.staff)
+            ? profileData.staff[0]
+            : profileData.staff;
+
+          setProfile({
+            ...profileData,
+            coach_name: coach?.full_name,
+          });
         }
       } finally {
         setLoading(false);
@@ -157,14 +164,24 @@ export default function Portal() {
                 <span className="p-sm-md text-muted font-lexend">Password</span>
               </div>
               <div className="bg-background pl-4 pr-3 py-2 rounded-lg border border-stroke flex items-center gap-2 text-white">
-                <span className="text-sm tracking-widest leading-none">
-                  {"Member" + profile?.member_id}
-                </span>
-                <button className="text-muted hover:text-white transition-colors">
+                {/*hide password first then show once onclick*/}
+                {showPassword ? (
+                  <span className="text-sm tracking-widest leading-none">
+                    ••••••••
+                  </span>
+                ) : (
+                  <span className="text-sm tracking-widest leading-none">
+                    {"Member" + profile?.member_id}
+                  </span>
+                )}
+                <button
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-muted hover:text-white transition-colors"
+                >
                   {showPassword ? (
-                    <EyeClosedIcon className="w-4 h-4" />
-                  ) : (
                     <EyeOpenIcon className="w-4 h-4" />
+                  ) : (
+                    <EyeClosedIcon className="w-3 h-3 opacity-30" />
                   )}
                 </button>
               </div>
@@ -180,7 +197,9 @@ export default function Portal() {
                   Valid Until
                 </span>
               </div>
-              <span className="p-sm-sb text-white font-bold">12 Dec, 2024</span>
+              <span className="p-sm-sb text-white font-bold">
+                {validUntilDate}
+              </span>
             </div>
 
             {/* Status */}
@@ -191,7 +210,7 @@ export default function Portal() {
                 </div>
                 <span className="p-sm-md text-muted font-lexend">Status</span>
               </div>
-              <StatusTag status="Expired" />
+              <StatusTag status={profile?.status} />
             </div>
 
             {/* Coach */}
@@ -204,7 +223,8 @@ export default function Portal() {
               </div>
               <div className="px-5 py-2 rounded-full border border-stroke bg-[#1B1B1B]">
                 <span className="text-sm font-semibold text-white">
-                  Coach Eric
+                  {/*fetch coach name from coach_id*/}
+                  {profile?.coach_name}
                 </span>
               </div>
             </div>
