@@ -181,7 +181,7 @@ export default function Login() {
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
-                <LockIcon />
+                <LockIcon className="opacity-30" />
               </span>
               <input
                 id="password"
