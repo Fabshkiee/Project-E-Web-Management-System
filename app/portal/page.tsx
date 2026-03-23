@@ -12,11 +12,13 @@ import {
   StatusIcon,
 } from "@/components/ui/Icons";
 import { StatusTag } from "@/components/ui/StatusTag";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
 
 export default function Portal() {
+  const router = useRouter();
+
   const [profile, setProfile] = useState<any>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ export default function Portal() {
         } = await supabase.auth.getUser();
 
         if (authError || !user) {
-          window.location.href = "/login";
+          router.push("/login");
           return;
         }
 
@@ -64,7 +66,7 @@ export default function Portal() {
       })
     : "N/A";
 
-  if (loading) return <div className="min-h-screen bg-black" />;
+  if (loading) return <div className="min-h-screen bg-black">Loading</div>;
 
   return (
     <div
