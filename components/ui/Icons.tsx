@@ -105,3 +105,20 @@ export function EyeClosedIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function BackIcon(props: SVGProps<SVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="15"
+      viewBox="0 0 18 15"
+      fill="none"
+    >
+      <path
+        d="M18 6.52686H3.74194L8.91593 1.37602L7.53372 0L0 7.5L7.53372 15L8.91593 13.624L3.74194 8.47314H18V6.52686Z"
+        fill="#A1A1A1"
+      />
+    </svg>
+  );
+}

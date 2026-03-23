@@ -1,11 +1,13 @@
 import { QRCodeSVG } from "qrcode.react";
+import { BackIcon } from "@/components/ui/Icons";
 
 export default function Portal() {
   return (
-    <main>
-      {/**Exit Button */}
-      <div>
-        <button>Exit</button>
+    <main className="m-10">
+      {/**Back Button */}
+      <div className="hover:cursor-pointer hover:opacity-80 items-center rounded-full gap-2 w-fit bg-surface px-8 py-4 flex flex-row">
+        <BackIcon />
+        <button className="p-sm-md text-[#a1a1a1]">Exit</button>
       </div>
       {/**Greet User Section */}
       <div className="flex justify-center flex-col items-center gap-2">
