@@ -1,39 +1,59 @@
+"use client";
 import { QRCodeSVG } from "qrcode.react";
 import {
   BackIcon,
   FingerprintIcon,
   LockIcon,
   EyeOpenIcon,
+  EyeClosedIcon,
   CalendarIcon,
   BadgeIcon,
   CoachIcon,
   StatusIcon,
 } from "@/components/ui/Icons";
-import { createClient } from "@/lib/supabase/server";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { useState, useEffect } from "react";
 
-export default async function Portal() {
-  const supabase = await createClient();
+export default function Portal() {
+  const [profile, setProfile] = useState<any>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  //get auth user
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  useEffect(() => {
+    async function getData() {
+      try {
+        const supabase = await createClient();
+        // get auth user
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
 
-  if (error || !user) {
-    redirect("/login"); //proxy.tsx checks if bypassed
-  }
+        if (authError || !user) {
+          window.location.href = "/login";
+          return;
+        }
 
-  //fetch member profile
-  const { data: profile } = await supabase
-    .from("members")
-    .select(
-      "full_name, member_id, nickname, valid_until, status, coach_id, qr_token",
-    )
-    .eq("user_id", user.id)
-    .single();
+        // fetch member profile
+        const { data: profileData, error: profileError } = await supabase
+          .from("members")
+          .select(
+            "full_name, member_id, nickname, valid_until, status, coach_id, qr_token",
+          )
+          .eq("user_id", user.id)
+          .single();
+
+        if (!profileError) {
+          setProfile(profileData);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    getData();
+  }, []);
 
   // Format the date if it exists
   const validUntilDate = profile?.valid_until
@@ -43,6 +63,8 @@ export default async function Portal() {
         year: "numeric",
       })
     : "N/A";
+
+  if (loading) return <div className="min-h-screen bg-black" />;
 
   return (
     <div
@@ -116,7 +138,7 @@ export default async function Portal() {
               </div>
               <div className="bg-background px-4 py-2 rounded-lg border border-stroke">
                 <span className="font-lexend text-sm text-white font-bold tracking-wider">
-                  #8492 - AX
+                  {profile?.member_id}
                 </span>
               </div>
             </div>
@@ -131,10 +153,14 @@ export default async function Portal() {
               </div>
               <div className="bg-background pl-4 pr-3 py-2 rounded-lg border border-stroke flex items-center gap-2 text-white">
                 <span className="text-sm tracking-widest leading-none">
-                  ••••••••
+                  {"Member" + profile?.member_id}
                 </span>
                 <button className="text-muted hover:text-white transition-colors">
-                  <EyeOpenIcon className="w-4 h-4" />
+                  {showPassword ? (
+                    <EyeClosedIcon className="w-4 h-4" />
+                  ) : (
+                    <EyeOpenIcon className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
