@@ -78,9 +78,12 @@ export default function Portal() {
       }}
     >
       {/**Back Button */}
-      <div className="absolute top-8 left-8 hover:cursor-pointer hover:opacity-80 items-center rounded-full gap-2 w-fit bg-surface px-6 py-3 flex flex-row shadow-lg z-50">
+      <div
+        onClick={() => router.push("/")}
+        className="absolute top-8 left-8 hover:cursor-pointer hover:opacity-80 items-center rounded-full gap-2 w-fit bg-surface px-6 py-3 flex flex-row shadow-lg z-50"
+      >
         <BackIcon />
-        <button className="p-sm-md text-[#a1a1a1] uppercase tracking-wider">
+        <button className="hover:cursor-pointer p-sm-md text-[#a1a1a1] uppercase tracking-wider">
           Exit
         </button>
       </div>
