@@ -14,8 +14,15 @@ import { StatusTag } from "@/components/ui/StatusTag";
 
 export default function Portal() {
   return (
-    <div className="min-h-screen relative p-10 overflow-hidden">
-      {/**Back Button - Now truly independent of the main layout flow */}
+    <div
+      className="min-h-screen relative p-10 overflow-hidden"
+      style={{
+        backgroundImage: "url(/assets/portal_bg.webp)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/**Back Button */}
       <div className="absolute top-8 left-8 hover:cursor-pointer hover:opacity-80 items-center rounded-full gap-2 w-fit bg-surface px-6 py-3 flex flex-row shadow-lg z-50">
         <BackIcon />
         <button className="p-sm-md text-[#a1a1a1] uppercase tracking-wider">
@@ -33,7 +40,6 @@ export default function Portal() {
         {/**QR Code Section */}
         <section className="flex justify-center flex-col items-center">
           <div className="bg-surface rounded-2xl p-8 relative">
-            {/* fix: must be a bit rounded at the corners */}
             <div className="rounded-tl-lg absolute top-5 left-5 w-8 h-8 border-t-2 border-l-2 border-primary"></div>
             <div className="rounded-tr-lg absolute top-5 right-5 w-8 h-8 border-t-2 border-r-2 border-primary"></div>
             <div className="rounded-bl-lg absolute bottom-5 left-5 w-8 h-8 border-b-2 border-l-2 border-primary"></div>
@@ -82,7 +88,6 @@ export default function Portal() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-[#1B1B1B] rounded-lg flex items-center justify-center text-muted border border-stroke/50">
-                  {/* should be color red */}
                   <LockIcon className="w-4 h-4 text-[#A1A1AA]" />
                 </div>
                 <span className="p-sm-md text-muted font-lexend">Password</span>
