@@ -9,10 +9,23 @@ import {
   CoachIcon,
   StatusIcon,
 } from "@/components/ui/Icons";
-
+import { createClient } from "@/lib/supabase/client";
 import { StatusTag } from "@/components/ui/StatusTag";
+import { redirect } from "next/navigation";
 
-export default function Portal() {
+export default async function Portal() {
+  const supabase = await createClient();
+
+  //get auth user
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    redirect("/login"); //proxy.tsx checks if bypassed
+  }
+
   return (
     <div
       className="min-h-screen relative p-10 overflow-hidden"
