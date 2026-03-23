@@ -167,11 +167,11 @@ export default function Portal() {
                 {/*hide password first then show once onclick*/}
                 {showPassword ? (
                   <span className="text-sm tracking-widest leading-none">
-                    ••••••••
+                    {"Member" + profile?.member_id}
                   </span>
                 ) : (
                   <span className="text-sm tracking-widest leading-none">
-                    {"Member" + profile?.member_id}
+                    ••••••••
                   </span>
                 )}
                 <button
@@ -179,9 +179,9 @@ export default function Portal() {
                   className="text-muted hover:text-white transition-colors"
                 >
                   {showPassword ? (
-                    <EyeOpenIcon className="w-4 h-4" />
+                    <EyeClosedIcon className="w-4 h-4 opacity-30" />
                   ) : (
-                    <EyeClosedIcon className="w-3 h-3 opacity-30" />
+                    <EyeOpenIcon className="w-4 h-4" />
                   )}
                 </button>
               </div>
