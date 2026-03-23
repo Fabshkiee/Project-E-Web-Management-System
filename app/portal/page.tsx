@@ -29,8 +29,10 @@ export default async function Portal() {
   //fetch member profile
   const { data: profile } = await supabase
     .from("members")
-    .select("full_name, member_id, nickname, valid_until, status, coach_id")
-    .eq("id", user.id)
+    .select(
+      "full_name, member_id, nickname, valid_until, status, coach_id, qr_token",
+    )
+    .eq("user_id", user.id)
     .single();
 
   // Format the date if it exists
@@ -63,7 +65,9 @@ export default async function Portal() {
         {/**Greet User Section */}
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="h3-b-lexend text-white mb-2">
-            Welcome, {profile?.nickname}
+            Welcome,{" "}
+            {profile?.nickname || profile?.full_name?.split(" ")[0] || "Member"}
+            {/*Nickname then first name then member*/}
           </h1>
           <p className="p-sm-md text-muted">Ready to train today?</p>
         </div>
@@ -76,7 +80,9 @@ export default async function Portal() {
             <div className="rounded-bl-lg absolute bottom-5 left-5 w-8 h-8 border-b-2 border-l-2 border-primary"></div>
             <div className="rounded-br-lg absolute bottom-5 right-5 w-8 h-8 border-b-2 border-r-2 border-primary"></div>
             <QRCodeSVG
-              value="https://google.com"
+              value={
+                "PROJE:MEM:" + profile?.member_id + ":" + profile?.qr_token
+              }
               size={200}
               level={"M"}
               marginSize={1}
