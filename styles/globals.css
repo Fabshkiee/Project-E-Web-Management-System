@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "./landing.css";
 
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
 
 @theme {
   /* 1. Core Colors mapped to dynamic CSS variables */
@@ -118,6 +125,15 @@
   }
   .p-xs-sb {
     @apply font-lexend font-semibold text-[12px] leading-[20px];
+  }
+
+  /* Hide scrollbar but allow scrolling */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   /* Global Layout Utilities */
