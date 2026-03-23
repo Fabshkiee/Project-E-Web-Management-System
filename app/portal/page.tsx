@@ -1,18 +1,80 @@
+"use client";
 import { QRCodeSVG } from "qrcode.react";
 import {
   BackIcon,
   FingerprintIcon,
   LockIcon,
   EyeOpenIcon,
+  EyeClosedIcon,
   CalendarIcon,
   BadgeIcon,
   CoachIcon,
   StatusIcon,
 } from "@/components/ui/Icons";
-
 import { StatusTag } from "@/components/ui/StatusTag";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { useState, useEffect } from "react";
 
 export default function Portal() {
+  const router = useRouter();
+
+  const [profile, setProfile] = useState<any>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const supabase = await createClient();
+        // get auth user
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+          router.push("/login");
+          return;
+        }
+
+        // fetch member profile
+        const { data: profileData, error: profileError } = await supabase
+          .from("members")
+          .select(
+            "full_name, member_id, nickname, valid_until, status, staff:coach_id (full_name), qr_token",
+          )
+          .eq("user_id", user.id)
+          .single();
+
+        if (!profileError && profileData) {
+          const coach = Array.isArray(profileData.staff)
+            ? profileData.staff[0]
+            : profileData.staff;
+
+          setProfile({
+            ...profileData,
+            coach_name: coach?.full_name,
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    getData();
+  }, []);
+
+  // Format the date if it exists
+  const validUntilDate = profile?.valid_until
+    ? new Date(profile.valid_until).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "N/A";
+
+  if (loading) return <div className="min-h-screen bg-black">Loading</div>;
+
   return (
     <div
       className="min-h-screen relative p-10 overflow-hidden"
@@ -23,9 +85,12 @@ export default function Portal() {
       }}
     >
       {/**Back Button */}
-      <div className="absolute top-8 left-8 hover:cursor-pointer hover:opacity-80 items-center rounded-full gap-2 w-fit bg-surface px-6 py-3 flex flex-row shadow-lg z-50">
+      <div
+        onClick={() => router.push("/")}
+        className="absolute top-8 left-8 hover:cursor-pointer hover:opacity-80 items-center rounded-full gap-2 w-fit bg-surface px-6 py-3 flex flex-row shadow-lg z-50"
+      >
         <BackIcon />
-        <button className="p-sm-md text-[#a1a1a1] uppercase tracking-wider">
+        <button className="hover:cursor-pointer p-sm-md text-[#a1a1a1] uppercase tracking-wider">
           Exit
         </button>
       </div>
@@ -33,7 +98,11 @@ export default function Portal() {
       <main className="flex flex-col items-center justify-center gap-8 mt-15">
         {/**Greet User Section */}
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="h3-b-lexend text-white mb-2">Welcome, Alex</h1>
+          <h1 className="h3-b-lexend text-white mb-2">
+            Welcome,{" "}
+            {profile?.nickname || profile?.full_name?.split(" ")[0] || "Member"}
+            {/*Nickname then first name then member*/}
+          </h1>
           <p className="p-sm-md text-muted">Ready to train today?</p>
         </div>
 
@@ -45,7 +114,9 @@ export default function Portal() {
             <div className="rounded-bl-lg absolute bottom-5 left-5 w-8 h-8 border-b-2 border-l-2 border-primary"></div>
             <div className="rounded-br-lg absolute bottom-5 right-5 w-8 h-8 border-b-2 border-r-2 border-primary"></div>
             <QRCodeSVG
-              value="https://google.com"
+              value={
+                "PROJE:MEM:" + profile?.member_id + ":" + profile?.qr_token
+              }
               size={200}
               level={"M"}
               marginSize={1}
@@ -79,7 +150,7 @@ export default function Portal() {
               </div>
               <div className="bg-background px-4 py-2 rounded-lg border border-stroke">
                 <span className="font-lexend text-sm text-white font-bold tracking-wider">
-                  #8492 - AX
+                  {profile?.member_id}
                 </span>
               </div>
             </div>
@@ -93,11 +164,25 @@ export default function Portal() {
                 <span className="p-sm-md text-muted font-lexend">Password</span>
               </div>
               <div className="bg-background pl-4 pr-3 py-2 rounded-lg border border-stroke flex items-center gap-2 text-white">
-                <span className="text-sm tracking-widest leading-none">
-                  ••••••••
-                </span>
-                <button className="text-muted hover:text-white transition-colors">
-                  <EyeOpenIcon className="w-4 h-4" />
+                {/*hide password first then show once onclick*/}
+                {showPassword ? (
+                  <span className="text-sm tracking-widest leading-none">
+                    {"Member" + profile?.member_id}
+                  </span>
+                ) : (
+                  <span className="text-sm tracking-widest leading-none">
+                    ••••••••
+                  </span>
+                )}
+                <button
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-muted hover:text-white transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeClosedIcon className="w-4 h-4 opacity-30" />
+                  ) : (
+                    <EyeOpenIcon className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -112,7 +197,9 @@ export default function Portal() {
                   Valid Until
                 </span>
               </div>
-              <span className="p-sm-sb text-white font-bold">12 Dec, 2024</span>
+              <span className="p-sm-sb text-white font-bold">
+                {validUntilDate}
+              </span>
             </div>
 
             {/* Status */}
@@ -123,7 +210,7 @@ export default function Portal() {
                 </div>
                 <span className="p-sm-md text-muted font-lexend">Status</span>
               </div>
-              <StatusTag status="Expired" />
+              <StatusTag status={profile?.status} />
             </div>
 
             {/* Coach */}
@@ -136,7 +223,8 @@ export default function Portal() {
               </div>
               <div className="px-5 py-2 rounded-full border border-stroke bg-[#1B1B1B]">
                 <span className="text-sm font-semibold text-white">
-                  Coach Eric
+                  {/*fetch coach name from coach_id*/}
+                  {profile?.coach_name}
                 </span>
               </div>
             </div>
