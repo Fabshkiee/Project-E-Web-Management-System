@@ -9,7 +9,7 @@ import {
   CoachIcon,
   StatusIcon,
 } from "@/components/ui/Icons";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { redirect } from "next/navigation";
 
@@ -25,6 +25,22 @@ export default async function Portal() {
   if (error || !user) {
     redirect("/login"); //proxy.tsx checks if bypassed
   }
+
+  //fetch member profile
+  const { data: profile } = await supabase
+    .from("members")
+    .select("full_name, member_id, nickname, valid_until, status, coach_id")
+    .eq("id", user.id)
+    .single();
+
+  // Format the date if it exists
+  const validUntilDate = profile?.valid_until
+    ? new Date(profile.valid_until).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "N/A";
 
   return (
     <div
@@ -46,7 +62,9 @@ export default async function Portal() {
       <main className="flex flex-col items-center justify-center gap-8 mt-15">
         {/**Greet User Section */}
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="h3-b-lexend text-white mb-2">Welcome, Alex</h1>
+          <h1 className="h3-b-lexend text-white mb-2">
+            Welcome, {profile?.nickname}
+          </h1>
           <p className="p-sm-md text-muted">Ready to train today?</p>
         </div>
 
