@@ -17,6 +17,7 @@
   /* Fonts */
   --font-space: var(--font-space), sans-serif;
   --font-inter: var(--font-inter), sans-serif;
+  --font-teko: var(--font-teko), sans-serif;
 }
 
 @layer components {
