@@ -49,8 +49,9 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user) {
-    //Check if they are a staff member
-    const isStaff = user.app_metadata?.role === "staff";
+    //Check if they are an Admin or Staff member
+    const userRole = user.app_metadata?.role;
+    const isStaff = userRole === "Admin" || userRole === "Staff";
 
     // Prevent Members from accessing the Staff Dashboard
     if (!isStaff && isDashboard) {
