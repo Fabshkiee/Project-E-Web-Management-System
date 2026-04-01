@@ -33,7 +33,7 @@ export default function Login() {
     const formattedId = loginId.trim().toLowerCase();
     const fakeEmail = `${formattedId}@projecte.local`;
 
-    //call supabase
+    // call supabase auth
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email: fakeEmail,
       password,
@@ -45,47 +45,57 @@ export default function Login() {
       return;
     }
 
-    user_id = data.user.id;
+    const authId = data.user.id;
 
-    //check if staff
-    const { data: StaffData } = await supabase
-      .from("staff")
-      .select("role")
-      .eq("user_id", user_id)
-      .maybeSingle();
+    // 1. Fetch user role and public ID
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("id, role")
+      .eq("auth_user_id", authId)
+      .single();
 
-    if (StaffData) {
+    if (userError || !userData) {
+      await supabase.auth.signOut();
+      setError("User profile not found. Please contact staff.");
+      setLoading(false);
+      return;
+    }
+
+    // 2. Route based on role
+    if (userData.role === "Admin" || userData.role === "Staff") {
       router.push("/dashboard/");
       router.refresh();
       return;
     }
 
-    //check if member
-    const { data: memberData } = await supabase
-      .from("members")
-      .select("valid_until")
-      .eq("user_id", user_id)
-      .maybeSingle();
+    if (userData.role === "Member") {
+      // Check membership status/expiry
+      const { data: memberData } = await supabase
+        .from("members")
+        .select("valid_until, status")
+        .eq("id", userData.id)
+        .single();
 
-    if (memberData) {
-      const isExpired = new Date(memberData.valid_until) < new Date();
+      if (memberData) {
+        const isExpired =
+          new Date(memberData.valid_until) < new Date() ||
+          memberData.status === "Expired";
 
-      if (!isExpired) {
-        router.push("/portal/");
-        router.refresh();
-        return;
-      } else {
-        await supabase.auth.signOut();
-        setError(
-          "Access Denied: Your membership has expired. Please visit the front desk.",
-        );
-        setLoading(false);
-        return;
+        if (!isExpired) {
+          router.push("/portal/");
+          router.refresh();
+          return;
+        } else {
+          await supabase.auth.signOut();
+          setError("Access Denied: Your membership is expired or unpaid.");
+          setLoading(false);
+          return;
+        }
       }
     }
 
     await supabase.auth.signOut();
-    setError("User profile not found. Please contact staff.");
+    setError("Unauthorized access.");
     setLoading(false);
   };
 
