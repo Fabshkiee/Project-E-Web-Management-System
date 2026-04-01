@@ -39,22 +39,44 @@ export default function Portal() {
         }
 
         // fetch member profile
-        const { data: profileData, error: profileError } = await supabase
-          .from("members")
-          .select(
-            "full_name, member_id, nickname, valid_until, status, staff:coach_id (full_name), qr_token",
-          )
-          .eq("user_id", user.id)
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select(`
+            full_name, 
+            nickname, 
+            qr_token, 
+            short_id,
+            members (
+              valid_until,
+              status,
+              coach:staff (
+                profile:users (
+                  full_name
+                )
+              )
+            )
+          `)
+          .eq("auth_user_id", user.id)
           .single();
 
-        if (!profileError && profileData) {
-          const coach = Array.isArray(profileData.staff)
-            ? profileData.staff[0]
-            : profileData.staff;
+        if (!userError && userData) {
+          // Handle member details extraction
+          const memberInfo = Array.isArray(userData.members) 
+            ? userData.members[0] 
+            : userData.members;
+
+          const coachData = Array.isArray(memberInfo?.coach) ? memberInfo.coach[0] : memberInfo?.coach;
+          const coachProfile = Array.isArray(coachData?.profile) ? coachData.profile[0] : coachData?.profile;
+          const coachName = coachProfile?.full_name || "No Coach Assigned";
 
           setProfile({
-            ...profileData,
-            coach_name: coach?.full_name,
+            full_name: userData.full_name,
+            nickname: userData.nickname,
+            member_id: userData.short_id,
+            qr_token: userData.qr_token,
+            valid_until: memberInfo?.valid_until,
+            status: memberInfo?.status || "Guest",
+            coach_name: coachName
           });
         }
       } finally {
