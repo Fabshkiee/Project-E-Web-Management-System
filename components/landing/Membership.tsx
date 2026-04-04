@@ -1,53 +1,56 @@
 const MEMBERSHIP_PLANS = [
   {
-    id: "dayPass1",
+    id: "plan1",
     title: "Day Pass",
     price: "150",
     unit: "day",
-    description: "Perfect for first-timers or travelers.",
+    studentPrice: "100 ",
+    description: "Perfect for first-timers or travelers",
     features: [
       "Access to strength equipment",
-      "Standard shower & locker use",
+      "Standard locker use",
       "Valid for 24 hours",
     ],
   },
   {
-    id: "dayPass2",
-    title: "Student Day Pass",
-    price: "100",
-    unit: "day",
-    description: "A budget-friendly option for students.",
+    id: "plan2",
+    title: "Full-Access Coaching Pass",
+    price: "3000",
+    unit: "month",
+    studentPrice: "2500",
+    description: "The complete fitness experience",
     features: [
-      "Accesss to strength equipment",
-      "Standard shower & locker use",
-      "Valid for 24 hours",
-      "Save 33%",
+      "Personal Coaching Sessions",
+      "Full Gym Access",
+      "Private Locker Amenities",
+      "30-Day Unlimited Pass",
     ],
   },
   {
-    id: "memPlan1",
+    id: "plan3",
+    title: "Supervised Training Pass",
+    price: "1500",
+    unit: "month",
+    studentPrice: "1200",
+    description: "Train with expert guidance",
+    features: [
+      "Guided Training",
+      "Full Gym Access",
+      "Private Locker Amenities",
+      "30-Day Unlimited Pass",
+    ],
+  },
+  {
+    id: "plan4",
     title: "Monthly Pass",
     price: "900",
-    unit: "monthly",
-    description: "The complete fitness experience.",
+    unit: "month",
+    studentPrice: "700",
+    description: "Total access for independent training",
     features: [
-      "Unlimited Entry and Access",
-      "Full amenity access",
-      "Valid for 30 days",
-    ],
-  },
-  {
-    id: "memPlan2",
-    title: "Student Monthly Pass",
-    price: "700",
-    unit: "monthly",
-    description:
-      "Best option for student atheletes. Valid student ID required upon registration.",
-    features: [
-      "Unlimited Entry and Access",
-      "Full amenity access",
-      "Save 22% off from standard monthly rate.",
-      "Valid for 30 days",
+      "Full Gym Access",
+      "Private Locker Amenities",
+      "30-Day Unlimited Pass",
     ],
     isPopular: true,
   },
@@ -76,9 +79,7 @@ export default function Membership() {
       </div>
 
       {/* GRID FOR DIFFERENT MEMBER PRICES */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[40px] lg:gap-[15px] mx-[32px] py-[33px] justify-items-center mt-16 mb-[96px] items-center   ">
-        
-        
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[40px] lg:gap-[15px] mx-[32px]  py-[33px] justify-items-center mt-16 mb-[96px] items-center   ">
         {/* INDIVIDUAL CARD FOR EACH MEMBERSHIP PLAN */}
         {MEMBERSHIP_PLANS.map((plan) => (
           <div
@@ -86,7 +87,7 @@ export default function Membership() {
             className={`group relative bg-land-card-hover ring-1 justify-items-start rounded-[16px] ${
               plan.isPopular
                 ? "w-[336px] h-[387px] ring-land-crimson px-[33px]"
-                : "w-[320px] h-[366px] ring-land-border pl-[33px]"
+                : "w-[320px] h-[366px] ring-land-border px-[33px]"
             }`}
           >
             {/* POPULAR BADGE */}
@@ -102,21 +103,23 @@ export default function Membership() {
             </div>
 
             {/* PRICE */}
-            <div
-              className={`landing-h2 flex mt-4 ${plan.unit === "month" ? "items-center" : "items-baseline"}`}
-            >
-              ₱{plan.price}
-              <div
-                className={`landing-p-sm text-muted ${plan.unit === "month" ? "flex items-center ml-1" : "ml-1"}`}
-              >
-                /{" "}
-                <span
-                  className={plan.unit === "month" ? "translate-y-[12px]" : ""}
-                >
-                  {plan.unit}
-                </span>
-              </div>
+            <div className="flex items-baseline mt-4 landing-h2">
+              <span>₱{plan.price}</span>
+              <div className="landing-p-sm text-muted ml-1">/ {plan.unit}</div>
             </div>
+
+            {/* Student PRICE */}
+            {plan.studentPrice && (
+              <div
+                className="flex justify-between items-center w-full landing-p-md font-bold mt-2 border-1
+               border-dashed border-land-crimson/40  px-3 py-1 rounded-[6px] bg-land-crimson/10"
+              >
+                <span className="text-land-crimson landing-p-sm font-bold">
+                  Student Rate
+                </span>
+                <span>₱{plan.studentPrice}</span>
+              </div>
+            )}
 
             {/* DESCRIPTION */}
             <div className="landing-p-sm text-muted mt-4">
@@ -124,7 +127,7 @@ export default function Membership() {
             </div>
 
             {/* BENEFITS CONTAINER LIST */}
-            <ul className="landing-p-lg mt-[32px] gap-4 flex flex-col">
+            <ul className="landing-p-lg mt-[20px] gap-4 flex flex-col">
               {plan.features.map((feature, index) => (
                 <li key={index} className="flex items-start gap-3">
                   <img
