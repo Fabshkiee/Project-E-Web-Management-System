@@ -6,13 +6,14 @@ import React from 'react';
 export default function Hero() {
   return (
     <div className="relative min-h-screen bg-land-bg overflow-hidden flex items-center">
+      
       {/* Background Image */}
       <div className="absolute inset-0 bg-land-bg">
         <Image
           src="/assets/hero_bg.webp"
           alt="Project-E Fitness Gym"
           fill
-          className="object-cover opacity-50 brightness-[0.85] contrast-100 saturate-100"
+          className="object-cover opacity-30"
           priority
           quality={95}
           sizes="100vw"
@@ -20,49 +21,55 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-screen-2xl mx-auto px-6 lg:px-16 w-full">
-        <div className="max-w-2xl">
+      <div className="relative z-20 container ml-0 px-[32px] w-full text-left">
+        <div className="max-w-3xl mb-24 md:mb-32">
+          
           {/* Headline */}
-          <h1 className="landing-h1 text-white tracking-tight">
+          <h1 className="text-[72px] font-bold text-white tracking-tight leading-tight">
             Train With <span className="text-land-crimson">Purpose.</span>
             <br />
             Train With <span className="text-land-crimson">Passion.</span>
           </h1>
 
           {/* Description */}
-          <p className="mt-8 landing-p-lg text-gray-300 max-w-lg">
-            Step into Project-E Fitness Gym, where your ambitions become reality. 
-            We provide the elite fitness equipment and expert environment needed to 
-            push your limits. Don't wait to become your best self—start your 
+          <p className="mt-8 text-[#A1A1AA] text-[18px] inline-block">
+            Step into Project-E Fitness Gym, where your ambitions become reality.<br className="hidden sm:block" />
+            We provide the elite equipment and expert environment needed to<br className="hidden sm:block" />
+            push your limits. Don’t wait to become your best self—start your<br className="hidden sm:block" />
             journey to greatness today.
           </p>
 
           {/* Buttons */}
-          <div className="mt-12 flex flex-wrap gap-4">
+          <div className="mt-10 flex flex-wrap gap-4">
+            
             {/* View Memberships */}
             <button
-              className="px-10 py-6 bg-land-crimson hover:bg-land-red active:bg-land-border 
-                         transition-all duration-200 text-white landing-h4 
-                         rounded-3xl shadow-2xl shadow-land-crimson/60 hover:shadow-land-crimson/80 
-                         active:scale-[0.97]"
+              className="w-[207px] h-[48px] flex items-center justify-center 
+                         bg-land-crimson hover:bg-land-red active:bg-land-border 
+                         transition-all duration-200 text-white text-[16px] font-bold
+                         rounded-lg active:scale-[0.97] whitespace-nowrap
+                         hover:scale-105 hover:shadow-lg hover:shadow-land-crimson/50
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-land-crimson focus-visible:ring-offset-2 focus-visible:ring-offset-land-bg"
             >
               View Memberships
             </button>
 
             {/* Member Portal */}
             <button
-              className="group px-8 py-6 border border-white/30 hover:border-land-crimson 
-                         bg-white/10 hover:bg-land-card-hover backdrop-blur-lg transition-all 
-                         duration-200 text-white landing-h4 rounded-3xl 
-                         flex items-center gap-3 active:scale-[0.97]"
+              className="group w-[207px] h-[48px] flex items-center justify-center gap-3
+                         border border-[#1D1516] hover:border-land-crimson 
+                         bg-[#1D1516] hover:bg-land-card-hover transition-colors 
+                         duration-200 text-white text-[16px] font-bold rounded-lg 
+                         active:scale-[0.97] whitespace-nowrap
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-land-crimson focus-visible:ring-offset-2 focus-visible:ring-offset-land-bg"
             >
-              {/* Image for Icon */}
               <Image
                 src="/assets/member_portal_icon.svg"   
-                alt="Member Portal Icon"
-                width={28}
-                height={28}
-                className="transition-transform group-active:scale-110"
+                alt="Member Portal Icon" 
+                aria-hidden="true"
+                width={20}
+                height={20}
+                className="transition-transform group-hover:scale-110 group-active:scale-110 flex-shrink-0"
               />
               Member Portal
             </button>
@@ -70,8 +77,14 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Full-size gradient overlay */}
-      <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-land-bg via-land-bg/95 to-transparent pointer-events-none" />
+      {/* Full-size gradient overlays */}
+      
+      {/* 1. Left to Right (Based on Figma: 0% at 100% opacity, 50% at 0% opacity, 100% at 0% opacity) */}
+      <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-land-bg from-0% via-land-bg/0 via-50% to-transparent to-100% pointer-events-none z-10" />
+      
+      {/* 2. Bottom to Top (Based on Figma: 0% at 100% opacity, 50% at 80% opacity, 100% at 0% opacity) */}
+      <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-land-bg from-0% via-land-bg/80 via-50% to-transparent to-100% pointer-events-none z-10" />
+      
     </div>
   );
 }
