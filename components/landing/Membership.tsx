@@ -14,17 +14,17 @@ const MEMBERSHIP_PLANS = [
   },
   {
     id: "plan2",
-    title: "Full-Access Coaching Pass",
-    price: "3000",
+    title: "Monthly Pass",
+    price: "900",
     unit: "month",
-    studentPrice: "2500",
-    description: "The complete fitness experience",
+    studentPrice: "700",
+    description: "Total access for independent training",
     features: [
-      "Personal Coaching Sessions",
       "Full Gym Access",
       "Private Locker Amenities",
       "30-Day Unlimited Pass",
     ],
+  
   },
   {
     id: "plan3",
@@ -41,19 +41,21 @@ const MEMBERSHIP_PLANS = [
     ],
   },
   {
-    id: "plan4",
-    title: "Monthly Pass",
-    price: "900",
+    id: "plan2",
+    title: "Full-Access Coaching Pass",
+    price: "3000",
     unit: "month",
-    studentPrice: "700",
-    description: "Total access for independent training",
+    studentPrice: "2500",
+    description: "The complete fitness experience",
     features: [
+      "Personal Coaching Sessions",
       "Full Gym Access",
       "Private Locker Amenities",
       "30-Day Unlimited Pass",
     ],
     isPopular: true,
   },
+  
 ];
 
 export default function Membership() {
@@ -64,7 +66,7 @@ export default function Membership() {
         {/* THE BLOB OF RED BEHIND THE TEXT */}
         <div
           className="absolute inset-0 bg-land-crimson/10 rounded-[9999px] w-[800px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-        blur-[200px]   "
+        blur-[200px]  -z-1 "
         />
 
         {/* Title CARD: MEMBERSHIP RATES */}
