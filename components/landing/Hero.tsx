@@ -104,9 +104,13 @@ export default function Hero() {
                   src={img.src}
                   alt={img.alt}
                   fill
-                  className="object-cover"
+                  className={
+                    img.fit === "contain"
+                      ? "object-contain scale-180"
+                      : "object-cover"
+                  }
                   priority={i === 0}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 480px"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 440px"
                 />
 
                 {/* Gradient overlay for text readability */}
@@ -157,6 +161,7 @@ const HERO_IMAGES = [
     src: "/assets/community.webp",
     alt: "Strong Community",
     badge: "Strong Community",
+    fit: "contain",
   },
   {
     src: "/assets/gym.webp",
