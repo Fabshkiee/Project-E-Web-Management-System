@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const MEMBERSHIP_PLANS = [
   {
     id: "plan1",
@@ -131,10 +133,12 @@ export default function Membership() {
             <ul className="landing-p-lg mt-[20px] gap-4 flex flex-col">
               {plan.features.map((feature, index) => (
                 <li key={index} className="flex items-start gap-3">
-                  <img
+                  <Image
                     src="/assets/Checkmark.svg"
                     alt=""
                     aria-hidden="true"
+                    width={16}
+                    height={16}
                     className="w-[16px] h-[16px] mt-1 object-cover"
                   />
                   <p className="pl-[12px] landing-p-sm text-muted">{feature}</p>
