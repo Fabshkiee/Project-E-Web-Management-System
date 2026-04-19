@@ -14,7 +14,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <div className="relative min-h-[90vh] lg:min-h-screen bg-land-bg overflow-hidden flex items-center">
+    <div id="hero" className="relative min-h-[90vh] lg:min-h-screen bg-land-bg overflow-hidden flex items-center">
       {/* Background Image */}
       <div className="absolute inset-0 bg-land-bg">
         <Image
@@ -32,19 +32,23 @@ export default function Hero() {
       <div className="relative z-20 w-full max-w-[1400px] mx-auto px-6 sm:px-10 md:px-16 flex flex-col lg:flex-row items-center justify-between text-center lg:text-left gap-12 lg:gap-16 pt-24 lg:pt-0">
         {/* Left Text Column */}
         <div className="max-w-2xl lg:max-w-3xl flex-1 mb-8 lg:mb-0">
+          {/* Overline - Prime the Eye */}
+          <p className="text-land-crimson/90 brightness-150 text-sm md:text-base font-bold tracking-[0.3em] uppercase mb-4">
+            Evolution of Fitness
+          </p>
+
           {/* Headline */}
-          <h1 className="text-[44px] leading-[1.05] sm:text-[64px] lg:text-[72px] xl:text-[80px] font-bold text-white tracking-tight">
+          <h1 className="text-[44px] leading-[1] sm:text-[64px] lg:text-[72px] xl:text-[84px] font-bold text-white tracking-tight">
             Train With <span className="text-land-crimson">Purpose.</span>
             <br className="hidden sm:block" /> Train With{" "}
             <span className="text-land-crimson">Passion.</span>
           </h1>
 
           {/* Description */}
-          <p className="mt-6 md:mt-8 text-[#A1A1AA] text-base sm:text-lg md:text-xl lg:max-w-[600px] mx-auto lg:mx-0 leading-relaxed font-inter">
+          <p className="mt-8 md:mt-10 text-[#D1D1D6] text-base sm:text-lg md:text-xl lg:max-w-[580px] mx-auto lg:mx-0 leading-relaxed line-height-[1.8]">
             Step into Project-E Fitness Gym, where your ambitions become
             reality. We provide the elite equipment and expert environment
-            needed to push your limits. Don’t wait to become your best self —
-            start your journey to greatness today.
+            needed to push your limits and redefine your best self.
           </p>
 
           {/* Buttons */}
@@ -82,7 +86,7 @@ export default function Hero() {
         </div>
 
         {/* Right Rotating Images Design */}
-        <div className="relative w-full max-w-[340px] sm:max-w-[400px] lg:max-w-[480px] aspect-[4/5] lg:aspect-[3/4] shrink-0 mt-8 md:mt-0">
+        <div className="relative w-full max-w-[340px] sm:max-w-[400px] lg:max-w-[440px] aspect-[4/5] lg:aspect-[3/4] shrink-0 mt-8 md:mt-0">
           {/* Subtle Glow Behind Card */}
           <div className="absolute inset-0 bg-land-crimson/20 blur-[100px] rounded-full pointer-events-none" />
 
@@ -100,9 +104,13 @@ export default function Hero() {
                   src={img.src}
                   alt={img.alt}
                   fill
-                  className="object-cover"
+                  className={
+                    img.fit === "contain"
+                      ? "object-contain scale-180"
+                      : "object-cover"
+                  }
                   priority={i === 0}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 480px"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 440px"
                 />
 
                 {/* Gradient overlay for text readability */}
@@ -153,6 +161,7 @@ const HERO_IMAGES = [
     src: "/assets/community.webp",
     alt: "Strong Community",
     badge: "Strong Community",
+    fit: "contain",
   },
   {
     src: "/assets/gym.webp",
