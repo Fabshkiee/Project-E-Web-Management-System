@@ -32,7 +32,7 @@ export default function Header() {
             alt="Project-E Gym Logo"
             width={28}
             height={26}
-            style={{ height: "auto" }}
+            style={{ width: "auto", height: "auto" }}
             priority
           />
           <span className="text-white font-semibold text-lg tracking-wide group-hover:text-gray-200 transition-colors duration-200">
@@ -106,28 +106,38 @@ export default function Header() {
       </div>
 
       {/* ── MOBILE DROPDOWN MENU ── */}
-      {menuOpen && (
-        <div className="md:hidden bg-land-bg border-t border-land-border">
-          {navLinks.map((link) => (
+      <div
+        className={`md:hidden absolute top-14 left-0 w-full bg-land-bg border-b border-land-border transition-all duration-300 ease-in-out ${
+          menuOpen
+            ? "opacity-100 translate-y-0 visible"
+            : "opacity-0 -translate-y-4 invisible"
+        }`}
+      >
+        <div className="flex flex-col gap-6 px-6 py-8">
+          <nav className="flex flex-col gap-5">
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="text-[#A1A1AA] hover:text-white text-base font-normal tracking-wide transition-colors duration-200"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          
+          <div className="pt-4 border-t border-land-border">
             <Link
-              key={link.label}
-              href={link.href}
+              href="/login"
               onClick={() => setMenuOpen(false)}
-              className="text-[#A1A1AA] hover:text-white text-sm font-normal tracking-wide transition-colors duration-200"
+              className="inline-flex items-center justify-center px-6 py-3 border border-white/20 text-white text-sm font-bold rounded-lg bg-land-card-hover hover:bg-white/10 transition-all duration-200 tracking-wide w-full max-w-[200px]"
             >
-              {link.label}
+              Member Portal
             </Link>
-          ))}
-          {/* ── MOBILE LOGIN BUTTON ── */}
-          <Link
-            href="/login"
-            onClick={() => setMenuOpen(false)}
-            className="self-start px-4 py-1.5 border border-white/25 text-white text-sm font-bold rounded bg-land-card-hover hover:bg-white/10 hover:text-land-bg transition-all duration-200 tracking-wide"
-          >
-            Member Portal
-          </Link>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
