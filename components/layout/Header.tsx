@@ -32,7 +32,7 @@ export default function Header() {
             alt="Project-E Gym Logo"
             width={28}
             height={26}
-            style={{ width: "auto", height: "auto" }}
+            style={{ height: "auto" }}
             priority
           />
           <span className="text-white font-semibold text-lg tracking-wide group-hover:text-gray-200 transition-colors duration-200">
@@ -126,7 +126,7 @@ export default function Header() {
               </Link>
             ))}
           </nav>
-          
+
           <div className="pt-4 border-t border-land-border">
             <Link
               href="/login"
