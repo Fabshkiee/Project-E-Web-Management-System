@@ -87,4 +87,18 @@
   .animate-blob-pulse {
     animation: blob-pulse 10s infinite ease-in-out;
   }
+
+  /* Border Beam Animation */
+  @keyframes border-beam {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-border-beam {
+    animation: border-beam 4s infinite linear;
+  }
 }

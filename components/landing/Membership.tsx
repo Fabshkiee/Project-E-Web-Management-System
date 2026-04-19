@@ -87,66 +87,80 @@ export default function Membership() {
         {MEMBERSHIP_PLANS.map((plan) => (
           <div
             key={plan.id}
-            className={`group relative bg-land-card-hover ring-1 flex flex-col items-start rounded-[16px] ${
+            className={`group relative flex flex-col items-start rounded-[16px] transition-all duration-500 ${
               plan.isPopular
-                ? "w-[336px] h-[387px] ring-land-crimson px-[33px]"
-                : "w-[320px] h-[366px] ring-land-border px-[33px]"
+                ? "w-[336px] h-[387px] ring-1 ring-land-crimson px-[33px] shadow-[0_0_40px_rgba(242,13,51,0.1)]"
+                : "w-[320px] h-[366px] bg-land-card-hover ring-1 ring-land-border px-[33px] hover:ring-land-crimson/40"
             }`}
           >
-            {/* POPULAR BADGE */}
+            {/* BORDER BEAM ANIMATION FOR POPULAR CARD */}
             {plan.isPopular && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-land-crimson text-main text-center tracking-[0.3px] text-[12px] font-bold px-[12px] py-[4px] rounded-[9999px] z-20 shadow-lg w-[121.2px] h-[25.2px] landing-p-sm flex items-center justify-center">
-                MOST POPULAR
+              <div className="absolute inset-0 pointer-events-none rounded-[16px] overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                  <div className="absolute inset-[-150%] animate-border-beam bg-[conic-gradient(from_0deg,transparent_0deg,transparent_280deg,var(--color-land-crimson)_360deg)]" />
+                </div>
+                {/* DARK INNER COVER */}
+                <div className="absolute inset-[2px] bg-land-card-hover rounded-[15px] z-0" />
               </div>
             )}
 
-            {/* TYPE OF PASS */}
-            <div className="landing-p-lg font-medium mt-[33px]">
-              {plan.title}
-            </div>
+            {/* CARD CONTENT LAYER */}
+            <div className="relative z-10 w-full flex flex-col items-start">
+              {/* POPULAR BADGE */}
+              {plan.isPopular && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-land-crimson text-main text-center tracking-[0.3px] text-[12px] font-bold px-[12px] py-[4px] rounded-[9999px] z-20 shadow-lg w-[121.2px] h-[25.2px] landing-p-sm flex items-center justify-center">
+                  MOST POPULAR
+                </div>
+              )}
 
-            {/* PRICE */}
-            <div className="flex items-baseline mt-4 landing-h2">
-              <span>₱{plan.price}</span>
-              <div className="landing-p-sm text-muted ml-1">/ {plan.unit}</div>
-            </div>
+              {/* TYPE OF PASS */}
+              <div className="landing-p-lg font-medium mt-[33px]">
+                {plan.title}
+              </div>
 
-            {/* Student PRICE */}
-            {plan.studentPrice && (
-              <div
-                className="flex justify-between items-center w-full landing-p-md font-bold mt-2 border
+              {/* PRICE */}
+              <div className="flex items-baseline mt-4 landing-h2">
+                <span>₱{plan.price}</span>
+                <div className="landing-p-sm text-muted ml-1">/ {plan.unit}</div>
+              </div>
+
+              {/* Student PRICE */}
+              {plan.studentPrice && (
+                <div
+                  className="flex justify-between items-center w-full landing-p-md font-bold mt-2 border
                border-dashed border-land-crimson/40  px-3 py-1 rounded-[6px] bg-land-crimson/10"
-              >
-                <span className="text-land-crimson landing-p-sm font-bold">
-                  Student Rate
-                </span>
-                <span>₱{plan.studentPrice}</span>
-              </div>
-            )}
-
-            {/* DESCRIPTION */}
-            <div className="landing-p-sm text-muted mt-4">
-              {plan.description}
-            </div>
-
-            {/* BENEFITS CONTAINER LIST */}
-            <ul className="mt-5 space-y-3 w-full">
-              {plan.features.map((feature, index) => (
-                <li key={index} className="flex items-start gap-4">
-                  <Image
-                    src="/assets/Checkmark.svg"
-                    alt=""
-                    aria-hidden="true"
-                    width={16}
-                    height={16}
-                    className="w-4 h-4 mt-1 shrink-0"
-                  />
-                  <span className="landing-p-sm text-muted leading-relaxed">
-                    {feature}
+                >
+                  <span className="text-land-crimson landing-p-sm font-bold">
+                    Student Rate
                   </span>
-                </li>
-              ))}
-            </ul>
+                  <span>₱{plan.studentPrice}</span>
+                </div>
+              )}
+
+              {/* DESCRIPTION */}
+              <div className="landing-p-sm text-muted mt-4">
+                {plan.description}
+              </div>
+
+              {/* BENEFITS CONTAINER LIST */}
+              <ul className="mt-5 space-y-3 w-full">
+                {plan.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-4">
+                    <Image
+                      src="/assets/Checkmark.svg"
+                      alt=""
+                      aria-hidden="true"
+                      width={16}
+                      height={16}
+                      className="w-4 h-4 mt-1 shrink-0"
+                    />
+                    <span className="landing-p-sm text-muted leading-relaxed">
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         ))}
       </div>
