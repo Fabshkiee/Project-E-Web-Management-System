@@ -63,9 +63,10 @@ export default function Membership() {
       <div className="relative isolate  ">
         {/* THE BLOB OF RED BEHIND THE TEXT */}
         <div
-          className="absolute inset-0 bg-land-crimson/10 rounded-[9999px] w-[800px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-        blur-[200px] -z-1 "
+          className="absolute bg-land-crimson/20 rounded-[9999px] w-[600px] h-[300px] top-[45%] left-[55%] -z-1 animate-blob-pulse"
+          style={{ animationDelay: "-5s", animationDuration: "12s" }}
         />
+        <div className="absolute bg-land-crimson/10 rounded-[9999px] w-[800px] h-[400px] top-1/2 left-1/2 -z-1 animate-blob-pulse" />
 
         {/* Title CARD: MEMBERSHIP RATES */}
         <div className="">
