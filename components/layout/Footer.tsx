@@ -101,7 +101,6 @@ export default function Footer() {
                 alt="Project-E Gym Logo"
                 width={28}
                 height={26}
-                style={{ width: "auto", height: "auto" }}
               />
               <span className="text-white font-bold text-sm tracking-wide">
                 Project-E Gym
