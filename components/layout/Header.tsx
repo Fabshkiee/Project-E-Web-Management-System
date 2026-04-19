@@ -26,7 +26,17 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
         {/* ── LOGO + BRAND NAME ── */}
-        <Link href="/#hero" className="flex items-center gap-2.5 group select-none">
+        <Link
+          href="/#hero"
+          onClick={(e) => {
+            e.preventDefault();
+            const element = document.getElementById("hero");
+            if (element) {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          className="flex items-center gap-2.5 group select-none"
+        >
           <Image
             src="/assets/proje_logo.svg"
             alt="Project-E Gym Logo"
@@ -49,6 +59,26 @@ export default function Header() {
             <Link
               key={link.label}
               href={link.href}
+              onClick={(e) => {
+                // If it's an anchor link on the current page, handle it smoothly
+                if (link.href.startsWith("/#")) {
+                  e.preventDefault();
+                  const id = link.href.substring(2);
+                  const element = document.getElementById(id);
+                  if (element) {
+                    const offset = 80; // Account for sticky header
+                    const bodyRect = document.body.getBoundingClientRect().top;
+                    const elementRect = element.getBoundingClientRect().top;
+                    const elementPosition = elementRect - bodyRect;
+                    const offsetPosition = elementPosition - offset;
+
+                    window.scrollTo({
+                      top: offsetPosition,
+                      behavior: "smooth",
+                    });
+                  }
+                }
+              }}
               className="text-[#A1A1AA] hover:text-white text-sm font-normal tracking-wide transition-colors duration-200"
             >
               {link.label}
@@ -119,8 +149,23 @@ export default function Header() {
               <Link
                 key={link.label}
                 href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="text-[#A1A1AA] hover:text-white text-base font-normal tracking-wide transition-colors duration-200"
+                onClick={(e) => {
+                  setMenuOpen(false);
+                  if (link.href.startsWith("/#")) {
+                    e.preventDefault();
+                    const id = link.href.substring(2);
+                    const element = document.getElementById(id);
+                    if (element) {
+                      const offset = 80;
+                      const bodyRect = document.body.getBoundingClientRect().top;
+                      const elementRect = element.getBoundingClientRect().top;
+                      const elementPosition = elementRect - bodyRect;
+                      const offsetPosition = elementPosition - offset;
+                      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                    }
+                  }
+                }}
+                className="text-[#A1A1AA] hover:text-white text-lg font-medium tracking-wide transition-colors duration-200 py-1"
               >
                 {link.label}
               </Link>

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 
@@ -86,28 +88,61 @@ export default function Footer() {
 
           {/* ── BRAND COLUMN — Logo, name, tagline ── */}
           <div className="flex flex-col gap-3">
-            <Link href="/#hero" className="flex items-center gap-2.5 select-none w-fit">
-              <Image 
-                src="/assets/proje_logo.svg" 
-                alt="Project-E Gym Logo" 
-                width={28} 
-                height={26} 
+            <Link
+              href="/#hero"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="flex items-center gap-2.5 select-none w-fit"
+            >
+              <Image
+                src="/assets/proje_logo.svg"
+                alt="Project-E Gym Logo"
+                width={28}
+                height={26}
                 style={{ width: "auto", height: "auto" }}
               />
-              <span className="text-white font-bold text-sm tracking-wide">Project-E Gym</span>
+              <span className="text-white font-bold text-sm tracking-wide">
+                Project-E Gym
+              </span>
             </Link>
             <p className="text-[#A1A1AA] text-sm leading-relaxed">
-              Affordable personalized training for bodybuilding, strength & conditioning.
+              Affordable personalized training for bodybuilding, strength &
+              conditioning.
             </p>
           </div>
 
           {/* ── QUICK LINKS COLUMN ── */}
           <div className="flex flex-col gap-4">
-            <h4 className="text-white text-xs font-bold tracking-widest uppercase">Quick Links</h4>
+            <h4 className="text-white text-xs font-bold tracking-widest uppercase">
+              Quick Links
+            </h4>
             <ul className="flex flex-col gap-3">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-[#A1A1AA] hover:text-white text-sm transition-colors duration-200">
+                  <Link
+                    href={link.href}
+                    onClick={(e) => {
+                      if (link.href.startsWith("/#")) {
+                        e.preventDefault();
+                        const id = link.href.substring(2);
+                        const element = document.getElementById(id);
+                        if (element) {
+                          const offset = 80;
+                          const bodyRect = document.body.getBoundingClientRect().top;
+                          const elementRect = element.getBoundingClientRect().top;
+                          const elementPosition = elementRect - bodyRect;
+                          const offsetPosition = elementPosition - offset;
+                          window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth",
+                          });
+                        }
+                      }
+                    }}
+                    className="text-[#A1A1AA] hover:text-white text-sm transition-colors duration-200"
+                  >
                     {link.label}
                   </Link>
                 </li>
