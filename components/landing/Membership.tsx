@@ -20,7 +20,7 @@ const MEMBERSHIP_PLANS = [
     price: "900",
     unit: "month",
     studentPrice: "700",
-    description: "Total access for independent training",
+    description: "Perfect for independent training",
     features: [
       "Full Gym Access",
       "Private Locker Amenities",
@@ -87,7 +87,7 @@ export default function Membership() {
         {MEMBERSHIP_PLANS.map((plan) => (
           <div
             key={plan.id}
-            className={`group relative bg-land-card-hover ring-1 justify-items-start rounded-[16px] ${
+            className={`group relative bg-land-card-hover ring-1 flex flex-col items-start rounded-[16px] ${
               plan.isPopular
                 ? "w-[336px] h-[387px] ring-land-crimson px-[33px]"
                 : "w-[320px] h-[366px] ring-land-border px-[33px]"
@@ -130,18 +130,20 @@ export default function Membership() {
             </div>
 
             {/* BENEFITS CONTAINER LIST */}
-            <ul className="landing-p-lg mt-[20px] gap-4 flex flex-col">
+            <ul className="mt-5 space-y-3 w-full">
               {plan.features.map((feature, index) => (
-                <li key={index} className="flex items-start gap-3">
+                <li key={index} className="flex items-start gap-4">
                   <Image
                     src="/assets/Checkmark.svg"
                     alt=""
                     aria-hidden="true"
                     width={16}
                     height={16}
-                    className="w-[16px] h-[16px] mt-1 object-cover"
+                    className="w-4 h-4 mt-1 shrink-0"
                   />
-                  <p className="pl-[12px] landing-p-sm text-muted">{feature}</p>
+                  <span className="landing-p-sm text-muted leading-relaxed">
+                    {feature}
+                  </span>
                 </li>
               ))}
             </ul>
