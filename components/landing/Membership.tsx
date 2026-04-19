@@ -24,7 +24,6 @@ const MEMBERSHIP_PLANS = [
       "Private Locker Amenities",
       "30-Day Unlimited Pass",
     ],
-  
   },
   {
     id: "plan3",
@@ -41,7 +40,7 @@ const MEMBERSHIP_PLANS = [
     ],
   },
   {
-    id: "plan2",
+    id: "plan4",
     title: "Full-Access Coaching Pass",
     price: "3000",
     unit: "month",
@@ -55,7 +54,6 @@ const MEMBERSHIP_PLANS = [
     ],
     isPopular: true,
   },
-  
 ];
 
 export default function Membership() {
@@ -66,7 +64,7 @@ export default function Membership() {
         {/* THE BLOB OF RED BEHIND THE TEXT */}
         <div
           className="absolute inset-0 bg-land-crimson/10 rounded-[9999px] w-[800px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-        blur-[200px]  -z-1 "
+        blur-[200px] -z-1 "
         />
 
         {/* Title CARD: MEMBERSHIP RATES */}
@@ -113,7 +111,7 @@ export default function Membership() {
             {/* Student PRICE */}
             {plan.studentPrice && (
               <div
-                className="flex justify-between items-center w-full landing-p-md font-bold mt-2 border-1
+                className="flex justify-between items-center w-full landing-p-md font-bold mt-2 border
                border-dashed border-land-crimson/40  px-3 py-1 rounded-[6px] bg-land-crimson/10"
               >
                 <span className="text-land-crimson landing-p-sm font-bold">
