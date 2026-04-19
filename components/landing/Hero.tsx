@@ -82,7 +82,7 @@ export default function Hero() {
         </div>
 
         {/* Right Rotating Images Design */}
-        <div className="relative w-full max-w-[340px] sm:max-w-[400px] lg:max-w-[480px] aspect-[4/5] lg:aspect-[3/4] shrink-0 hidden md:block">
+        <div className="relative w-full max-w-[340px] sm:max-w-[400px] lg:max-w-[480px] aspect-[4/5] lg:aspect-[3/4] shrink-0 mt-8 md:mt-0">
           {/* Subtle Glow Behind Card */}
           <div className="absolute inset-0 bg-land-crimson/20 blur-[100px] rounded-full pointer-events-none" />
 
