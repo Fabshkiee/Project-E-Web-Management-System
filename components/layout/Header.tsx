@@ -32,6 +32,7 @@ export default function Header() {
             alt="Project-E Gym Logo"
             width={28}
             height={26}
+            style={{ height: "auto" }}
             priority
           />
           <span className="text-white font-semibold text-lg tracking-wide group-hover:text-gray-200 transition-colors duration-200">
@@ -59,9 +60,9 @@ export default function Header() {
         <div className="hidden md:flex items-center">
           <Link
             href="/login"
-            className="px-4 py-1.5 border border-white/25 text-white text-sm font-bold rounded bg-land-card-hover hover:bg-white hover:text-land-bg transition-all duration-200 tracking-wide"
+            className="px-4 py-1.5 border border-white/25 text-white text-sm font-bold rounded bg-land-card-hover hover:bg-white/10 transition-all duration-200 tracking-wide"
           >
-            Member Login
+            Member Portal
           </Link>
         </div>
 
@@ -121,9 +122,9 @@ export default function Header() {
           <Link
             href="/login"
             onClick={() => setMenuOpen(false)}
-            className="self-start px-4 py-1.5 border border-white/25 text-white text-sm font-bold rounded bg-land-card-hover hover:bg-white hover:text-land-bg transition-all duration-200 tracking-wide"
+            className="self-start px-4 py-1.5 border border-white/25 text-white text-sm font-bold rounded bg-land-card-hover hover:bg-white/10 hover:text-land-bg transition-all duration-200 tracking-wide"
           >
-            Member Login
+            Member Portal
           </Link>
         </div>
       )}
