@@ -60,7 +60,7 @@ const MEMBERSHIP_PLANS = [
 
 export default function Membership() {
   return (
-    <section className=" relative z-0 overflow-hidden">
+    <section id="pricing" className="relative z-0 overflow-hidden scroll-mt-24">
       {/* HEADING CONTAINER */}
       <div className="relative isolate  ">
         {/* THE BLOB OF RED BEHIND THE TEXT */}

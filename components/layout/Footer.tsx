@@ -5,9 +5,9 @@ import Image from "next/image";
 // QUICK LINKS — Edit labels and hrefs here
 // ============================================================
 const quickLinks = [
-  { label: "Features", href: "#features" },
-  { label: "Trainers", href: "#trainers" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Features", href: "/#features" },
+  { label: "Trainers", href: "/#trainers" },
+  { label: "Pricing", href: "/#pricing" },
   { label: "Member Portal", href: "/login" },
 ];
 
@@ -86,8 +86,14 @@ export default function Footer() {
 
           {/* ── BRAND COLUMN — Logo, name, tagline ── */}
           <div className="flex flex-col gap-3">
-            <Link href="/" className="flex items-center gap-2.5 select-none w-fit">
-              <Image src="/assets/proje_logo.svg" alt="Project-E Gym Logo" width={28} height={26} />
+            <Link href="/#hero" className="flex items-center gap-2.5 select-none w-fit">
+              <Image 
+                src="/assets/proje_logo.svg" 
+                alt="Project-E Gym Logo" 
+                width={28} 
+                height={26} 
+                style={{ width: "auto", height: "auto" }}
+              />
               <span className="text-white font-bold text-sm tracking-wide">Project-E Gym</span>
             </Link>
             <p className="text-[#A1A1AA] text-sm leading-relaxed">

@@ -14,7 +14,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <div className="relative min-h-[90vh] lg:min-h-screen bg-land-bg overflow-hidden flex items-center">
+    <div id="hero" className="relative min-h-[90vh] lg:min-h-screen bg-land-bg overflow-hidden flex items-center">
       {/* Background Image */}
       <div className="absolute inset-0 bg-land-bg">
         <Image

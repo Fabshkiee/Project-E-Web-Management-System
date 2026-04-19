@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Trainers() {
   return (
-    <section className="py-[80px]  bg-land-dark">
+    <section id="trainers" className="py-[80px] bg-land-dark scroll-mt-24">
       {/* Title Bar Container */}
       <div className="container px-[32px] text-left">
         <h2 className="landing-h2">Meet Your Trainers</h2>

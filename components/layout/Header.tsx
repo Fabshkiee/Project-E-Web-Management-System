@@ -8,9 +8,9 @@ import { useState } from "react";
 // NAV LINKS — Edit labels and hrefs here
 // ============================================================
 const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "Trainers", href: "#trainers" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Features", href: "/#features" },
+  { label: "Trainers", href: "/#trainers" },
+  { label: "Pricing", href: "/#pricing" },
 ];
 
 export default function Header() {
@@ -21,12 +21,12 @@ export default function Header() {
     // HEADER WRAPPER — Background color and font set here
     // ============================================================
     <header
-      className="relative w-full bg-land-bg border-b border-land-border"
+      className="sticky top-0 w-full bg-land-bg/95 backdrop-blur-md border-b border-land-border z-50"
       style={{ fontFamily: "var(--font-space), sans-serif" }}
     >
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
         {/* ── LOGO + BRAND NAME ── */}
-        <Link href="/" className="flex items-center gap-2.5 group select-none">
+        <Link href="/#hero" className="flex items-center gap-2.5 group select-none">
           <Image
             src="/assets/proje_logo.svg"
             alt="Project-E Gym Logo"
