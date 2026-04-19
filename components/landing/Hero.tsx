@@ -14,7 +14,10 @@ export default function Hero() {
   }, []);
 
   return (
-    <div id="hero" className="relative min-h-[90vh] lg:min-h-screen bg-land-bg overflow-hidden flex items-center">
+    <div
+      id="hero"
+      className="relative min-h-[90vh] lg:min-h-screen bg-land-bg overflow-hidden flex items-center"
+    >
       {/* Background Image */}
       <div className="absolute inset-0 bg-land-bg">
         <Image
@@ -65,6 +68,7 @@ export default function Hero() {
 
             {/* Member Portal */}
             <button
+              onClick={() => (window.location.href = "/login")}
               className="group w-full sm:w-[220px] h-[56px] flex items-center justify-center gap-3
                          border border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-sm
                          transition-all duration-300 text-white text-base md:text-lg font-bold rounded-xl 
