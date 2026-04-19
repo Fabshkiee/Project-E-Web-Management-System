@@ -82,7 +82,7 @@ export default function Membership() {
       </div>
 
       {/* GRID FOR DIFFERENT MEMBER PRICES */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[40px] lg:gap-[15px] mx-[32px]  py-[33px] justify-items-center mt-16 mb-[96px] items-center   ">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-y-[40px] md:gap-x-[20px] xl:gap-x-[15px] mx-auto max-w-[340px] md:max-w-[760px] xl:max-w-[1400px] py-[33px] justify-items-center mt-16 mb-[96px] items-center">
         {/* INDIVIDUAL CARD FOR EACH MEMBERSHIP PLAN */}
         {MEMBERSHIP_PLANS.map((plan) => (
           <div
@@ -121,7 +121,9 @@ export default function Membership() {
               {/* PRICE */}
               <div className="flex items-baseline mt-4 landing-h2">
                 <span>₱{plan.price}</span>
-                <div className="landing-p-sm text-muted ml-1">/ {plan.unit}</div>
+                <div className="landing-p-sm text-muted ml-1">
+                  / {plan.unit}
+                </div>
               </div>
 
               {/* Student PRICE */}
