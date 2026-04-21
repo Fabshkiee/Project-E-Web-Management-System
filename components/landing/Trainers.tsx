@@ -3,22 +3,21 @@ import ScrollReveal from "./ScrollReveal";
 
 export default function Trainers() {
   return (
-    <section id="trainers" className="py-[80px] bg-land-dark scroll-mt-24">
+    <section id="trainers" className="py-[100px] bg-land-dark scroll-mt-24 overflow-hidden">
       {/* Title Bar Container */}
-      <ScrollReveal threshold={0.3}>
-        <div className="container px-[32px] text-left">
-          <h2 className="landing-h2">Meet Your Trainers</h2>
-          <p className="landing-p-lg mt-[16px] text-muted">
-            Elite coaches dedicated to your performance.
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-10 md:px-16 flex flex-col items-center md:items-start text-center md:text-left">
+        <ScrollReveal threshold={0.3}>
+          <h2 className="landing-h2 text-4xl md:text-5xl max-w-2xl leading-[1.1]">
+            Meet Your Trainers
+          </h2>
+          <p className="landing-p-lg mt-6 text-[#A1A1AA] text-lg md:text-xl max-w-xl leading-relaxed mx-auto md:mx-0">
+            Elite coaches dedicated to your performance and safety.
           </p>
-        </div>
-      </ScrollReveal>
+        </ScrollReveal>
+      </div>
 
       {/* Trainers Containers */}
-      <div
-        className="container px-10 md:px-17 xl:px-[214px] mt-[48px] grid grid-cols-1 md:grid-cols-2 gap-[200px] place-items-center mx-auto py-[25px]
-      "
-      >
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-10 md:px-16 mt-16 md:mt-20 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 place-items-center">
         {/* 1st Trainer Card */}
         <ScrollReveal delay={200} direction="right">
           <div className=" relative group overflow-hidden bg-land-light rounded-md text-center ring-3 ring-land-crimson/20 shadow-2xl shadow-black w-[369.6px] h-[545.6px] ">
@@ -31,7 +30,7 @@ export default function Trainers() {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-land-black/50 to-transparent"></div>
 
             {/* Text Container */}
-            <div className="absolute bottom-[35.2px] left-[35.2px] right-[35.2px] text-left">
+            <div className="absolute bottom-[35.2px] left-[35.2px] right-[35.2px] text-center md:text-left">
               {/* Name of Coach */}
               <div className=" h3-b">ERIC DIONES</div>
               {/* Coach Specialty */}
@@ -54,7 +53,7 @@ export default function Trainers() {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-land-black/50 to-transparent"></div>
 
             {/* Text Container */}
-            <div className="absolute bottom-[35.2px] left-[35.2px] right-[35.2px] text-left">
+            <div className="absolute bottom-[35.2px] left-[35.2px] right-[35.2px] text-center md:text-left">
               {/* Name of Coach */}
               <div className=" h3-b">COACH EZEKIEL</div>
               {/* Coach Specialty */}
