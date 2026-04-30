@@ -279,3 +279,20 @@ export function StaffIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function AnalyticsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+    >
+      <path
+        d="M0 4.17969H3.35938V13.3594H0V4.17969ZM10 7.5H13.3594V13.3594H10V7.5ZM5 0H8.35938V13.3594H5V0Z"
+        fill="#4B5563"
+      />
+    </svg>
+  );
+}
