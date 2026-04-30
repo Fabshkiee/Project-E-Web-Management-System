@@ -10,20 +10,25 @@
   },
   "services": [
     {
-      // Self-reference service binding, the service name must match the worker name
-      // see https://opennext.js.org/cloudflare/caching
       "binding": "WORKER_SELF_REFERENCE",
       "service": "project-e",
     },
   ],
   "images": {
-    // Enable image optimization
-    // see https://opennext.js.org/cloudflare/howtos/image
     "binding": "IMAGES",
   },
   "env": {
     "production": {
       "name": "project-e",
+      "services": [
+        {
+          "binding": "WORKER_SELF_REFERENCE",
+          "service": "project-e",
+        },
+      ],
+      "images": {
+        "binding": "IMAGES",
+      },
     },
   },
 }
