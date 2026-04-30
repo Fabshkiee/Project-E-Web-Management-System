@@ -9,6 +9,8 @@
   display: none;
 }
 
+@variant dark (&:is(.dark, .dark *));
+
 @theme {
   /* 1. Core Colors mapped to dynamic CSS variables */
   --color-background: var(--bg-base);
