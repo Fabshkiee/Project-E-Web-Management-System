@@ -21,11 +21,6 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Enforce dark mode on the login page
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-  }, []);
-
   //Login Logic
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -10,6 +10,7 @@
 }
 
 @variant dark (&:is(.dark, .dark *));
+@variant light (&:is(.light, .light *));
 
 @theme {
   /* 1. Core Colors mapped to dynamic CSS variables */

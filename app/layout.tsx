@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${teko.variable} ${lexend.variable} ${spaceGrotesk.variable} ${inter.variable} h-full antialiased overflow-x-hidden`}
+      className={`dark ${teko.variable} ${lexend.variable} ${spaceGrotesk.variable} ${inter.variable} h-full antialiased overflow-x-hidden`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden">
         {children}

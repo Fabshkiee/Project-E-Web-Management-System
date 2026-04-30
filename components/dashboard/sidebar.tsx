@@ -29,7 +29,7 @@ export default function Sidebar() {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.refresh(); // Clear server state
+    document.documentElement.classList.add("dark");
     router.push("/login");
   };
 
