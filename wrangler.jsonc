@@ -21,4 +21,9 @@
     // see https://opennext.js.org/cloudflare/howtos/image
     "binding": "IMAGES",
   },
+  "env": {
+    "production": {
+      "name": "project-e",
+    },
+  },
 }
