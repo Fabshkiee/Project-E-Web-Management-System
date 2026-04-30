@@ -8,7 +8,11 @@ import {
   AdminIcon,
 } from "@/components/ui/Icons";
 
-export default function Header() {
+export default function Header({
+  userProfile,
+}: {
+  userProfile: { name: string; role: string };
+}) {
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
 
@@ -45,7 +49,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="h-[80px] w-full bg-surface border-b border-stroke flex items-center justify-between px-10 shrink-0 transition-colors duration-300">
+    <header className="h-20 w-full bg-surface border-b border-stroke flex items-center justify-between px-10 shrink-0 transition-colors duration-300">
       {/* Left Section: Time & Date */}
       <div className="flex flex-col">
         <span className="font-lexend font-bold text-[24px] leading-tight text-foreground">
@@ -80,12 +84,12 @@ export default function Header() {
 
         {/* User Profile */}
         <div className="flex items-center gap-3 ml-2 cursor-pointer group">
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-end text-right">
             <span className="font-lexend font-bold text-[14px] leading-none text-foreground">
-              Admin User
+              {userProfile.name}
             </span>
             <span className="font-lexend font-medium text-[12px] text-secondary mt-1">
-              Gym Manager
+              {userProfile.role}
             </span>
           </div>
           <div className="w-10 h-10 rounded-full bg-muted/10 border border-stroke/50 flex items-center justify-center transition-all duration-300 group-hover:bg-muted/20 group-hover:border-primary/30">
