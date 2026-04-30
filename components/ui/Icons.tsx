@@ -381,3 +381,20 @@ export function NotificationIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function AdminIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M12 12C15.3137 12 18 9.31371 18 6C18 2.68629 15.3137 0 12 0C8.68629 0 6 2.68629 6 6C6 9.31371 8.68629 12 12 12ZM12 13.5C8.03987 13.5 4.62597 14.8954 2.23446 17.2644C2.61848 19.7269 7.19723 22 12 22C16.8028 22 21.3815 19.7269 21.7655 17.2644C19.374 14.8954 15.9601 13.5 12 13.5Z"
+        fill="#9CA3AF"
+      />
+    </svg>
+  );
+}
