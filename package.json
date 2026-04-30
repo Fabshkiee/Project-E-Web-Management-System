@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build --webpack && npx @opennextjs/cloudflare build",
+    "build": "next build --webpack && @opennextjs/cloudflare build",
     "dev": "next dev",
     "start": "next start",
     "lint": "eslint",
