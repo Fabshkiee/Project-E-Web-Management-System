@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/Icons";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function Login() {
@@ -20,6 +20,11 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Enforce dark mode on the login page
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+  }, []);
 
   //Login Logic
   const handleLogin = async (e: React.FormEvent) => {
