@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import {
   DashboardIcon,
   MembersIcon,
@@ -23,6 +24,14 @@ const mainMenuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.refresh(); // Clear server state
+    router.push("/login");
+  };
 
   return (
     <aside className="w-[260px] h-screen bg-surface border-r border-stroke flex flex-col flex-shrink-0 dark:bg-dark-bg">
@@ -111,7 +120,10 @@ export default function Sidebar() {
           </span>
         </Link>
 
-        <button className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-lg bg-[#1F2937] text-white transition-all hover:bg-[#111827]">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-lg bg-[#1F2937] text-white transition-all hover:bg-[#111827] cursor-pointer"
+        >
           <LogoutIcon className="w-[18px] h-[18px]" />
           <span className="font-lexend font-medium text-[15px]">Logout</span>
         </button>
