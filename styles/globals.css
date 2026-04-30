@@ -9,11 +9,15 @@
   display: none;
 }
 
+@variant dark (&:is(.dark, .dark *));
+
 @theme {
   /* 1. Core Colors mapped to dynamic CSS variables */
   --color-background: var(--bg-base);
+  --color-dark-bg: var(--bg-base);
   --color-surface: var(--bg-surface);
   --color-foreground: var(--text-main);
+  --color-secondary: var(--text-secondary);
   --color-muted: var(--text-muted);
   --color-stroke: var(--border-stroke);
 
@@ -33,19 +37,19 @@
     --bg-base: #f7f9fb; /* Light Base */
     --bg-surface: #ffffff; /* Surface White */
     --text-main: #111111; /* Midnight Base */
+    --text-secondary: #4b5563; /* Slate Grey */
     --text-muted: #9ca3af; /* Silver Grey */
     --border-stroke: #e2e8f0;
   }
 
-  /* DARK MODE OVERRIDES */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg-base: #111111; /* Midnight Base */
-      --bg-surface: #1a1a1a; /* Surface Dark */
-      --text-main: #ffffff; /* White Text */
-      --text-muted: #9ca3af; /* Silver Grey */
-      --border-stroke: #333333; /* Stroke */
-    }
+  /* DARK MODE OVERRIDES (Manual Toggle) */
+  .dark {
+    --bg-base: #111111; /* Midnight Base */
+    --bg-surface: #1a1a1a; /* Surface Dark */
+    --text-main: #ffffff; /* White Text */
+    --text-secondary: #9ca3af; /* Silver Grey */
+    --text-muted: #6b7280; /* Darker Grey */
+    --border-stroke: #333333; /* Stroke */
   }
 
   html {
