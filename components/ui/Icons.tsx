@@ -211,3 +211,19 @@ export function StatusIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function DashboardIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="15"
+      height="15"
+      viewBox="0 0 15 15"
+      fill="none"
+    >
+      <path d="M13.3203 1.67969V3.32031H10V1.67969H13.3203ZM5 1.67969V6.67969H1.67969V1.67969H5ZM13.3203 8.32031V13.3203H10V8.32031H13.3203ZM5 11.6797V13.3203H1.67969V11.6797H5ZM15 0H8.32031V5H15V0ZM6.67969 0H0V8.32031H6.67969V0ZM15 6.67969H8.32031V15H15V6.67969ZM6.67969 10H0V15H6.67969V10Z" />
+    </svg>
+  );
+}
+
+
