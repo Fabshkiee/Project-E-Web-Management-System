@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 interface StatsCardProps {
   label: string;
   value?: string | number;
-  fetchFn?: () => Promise<string | number>;
+  isLoading?: boolean;
+  error?: boolean;
   icon: React.ReactNode;
   trend?: {
     label: string;
@@ -16,36 +17,12 @@ interface StatsCardProps {
 
 export default function StatsCard({
   label,
-  value: initialValue,
-  fetchFn,
+  value,
+  isLoading,
+  error,
   icon,
   trend,
 }: StatsCardProps) {
-  const [data, setData] = useState<string | number | undefined>(initialValue);
-  const [loading, setLoading] = useState(!!fetchFn && !initialValue);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (fetchFn) {
-      const fetchData = async () => {
-        try {
-          setLoading(true);
-          const result = await fetchFn();
-          setData(result);
-          setError(false);
-        } catch (err) {
-          console.error(`Error fetching ${label}:`, err);
-          setError(true);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
-    }
-  }, [fetchFn, label]);
-
-  const displayValue = data;
-
   return (
     <div className="bg-[#1a1a1a] border border-white/5 rounded-2xl p-6 flex justify-between items-start group hover:border-white/10 transition-all duration-300">
       <div className="flex flex-col">
@@ -55,18 +32,16 @@ export default function StatsCard({
         </span>
         {/* Value and Trend */}
         <div className="flex items-center gap-4">
-          {loading ? (
+          {isLoading ? (
             <div className="h-10 w-20 bg-white/10 rounded animate-pulse" />
           ) : error ? (
-            <span className="font-lexend font-bold text-[14px] text-primary">
-              Error
-            </span>
+            <span className="font-lexend font-bold text-[14px] text-primary">Error</span>
           ) : (
             <span className="font-teko font-bold text-[48px] leading-none text-white tracking-tight">
-              {displayValue}
+              {value}
             </span>
           )}
-          {trend && !loading && !error && (
+          {trend && !isLoading && !error && (
             <div
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 border ${
                 trend.type === "up"
