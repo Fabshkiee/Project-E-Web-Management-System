@@ -35,6 +35,9 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
+  const totalMembers = stats?.["Total Members Card"];
+  const expiringSoon = stats?.["Expiring Soon Card"];
+
   return (
     <div>
       <PageTitle
@@ -53,8 +56,8 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         <StatsCard
           label="Total Members"
-          value={stats?.["Total Members Card"].value}
-          trend={stats?.["Total Members Card"].trend}
+          value={totalMembers?.value}
+          trend={totalMembers?.trend}
           isLoading={loading}
           error={error}
           icon={<PeopleIcon className="w-12 h-12" />}
@@ -67,11 +70,15 @@ export default function Dashboard() {
         />
         <StatsCard
           label="Expiring Soon"
-          value={stats?.["Expiring Soon Card"].value}
-          trend={{
-            ...stats?.["Expiring Soon Card"].trend!,
-            icon: <TimerIcon className="w-3.5 h-3.5" />,
-          }}
+          value={expiringSoon?.value}
+          trend={
+            expiringSoon?.trend
+              ? {
+                  ...expiringSoon.trend,
+                  icon: <TimerIcon className="w-3.5 h-3.5" />,
+                }
+              : undefined
+          }
           isLoading={loading}
           error={error}
           icon={<RedWarningIcon className="w-12 h-10" />}
