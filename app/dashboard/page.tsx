@@ -2,8 +2,10 @@ import PageTitle from "@/components/dashboard/page-title";
 import StatsCard from "@/components/dashboard/overview-card";
 import {
   DumbellIcon,
+  MoneyIcon,
   PeopleIcon,
   RedWarningIcon,
+  RevenueIcon,
   TimerIcon,
 } from "@/components/ui/Icons";
 
@@ -43,6 +45,16 @@ export default function Dashboard() {
             label: "3 days",
             type: "down",
             icon: <TimerIcon className="w-3.5 h-3.5" />,
+          }}
+        />
+        <StatsCard
+          label="Monthly Revenue"
+          value="₱42.5k"
+          icon={<MoneyIcon className="w-12 h-10" />}
+          trend={{
+            label: "5%",
+            type: "up",
+            icon: <RevenueIcon className="w-3.5 h-3.5" />,
           }}
         />
       </div>
