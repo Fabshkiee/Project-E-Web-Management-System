@@ -492,3 +492,20 @@ export function TimerIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function RevenueIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="10"
+      height="6"
+      viewBox="0 0 10 6"
+      fill="none"
+    >
+      <path
+        d="M6.98438 0L8.13281 1.14844L5.69531 3.58594L3.70312 1.59375L0 5.29688L0.703125 6L3.70312 3L5.69531 4.99219L8.83594 1.85156L9.98438 3V0H6.98438Z"
+        fill="#4ADE80"
+      />
+    </svg>
+  );
+}
