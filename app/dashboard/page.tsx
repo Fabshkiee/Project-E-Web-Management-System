@@ -1,6 +1,11 @@
 import PageTitle from "@/components/dashboard/page-title";
 import StatsCard from "@/components/dashboard/overview-card";
-import { PeopleIcon, RedWarningIcon, TimerIcon } from "@/components/ui/Icons";
+import {
+  DumbellIcon,
+  PeopleIcon,
+  RedWarningIcon,
+  TimerIcon,
+} from "@/components/ui/Icons";
 
 export default function Dashboard() {
   return (
@@ -24,6 +29,11 @@ export default function Dashboard() {
           value="212"
           icon={<PeopleIcon className="w-12 h-12" />}
           trend={{ label: "12%", type: "up" }}
+        />
+        <StatsCard
+          label="Today's Check-ins"
+          value="84"
+          icon={<DumbellIcon className="w-12 h-12" />}
         />
         <StatsCard
           label="Expiring Soon"
