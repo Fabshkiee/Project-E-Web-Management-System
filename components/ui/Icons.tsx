@@ -442,3 +442,20 @@ export function DumbellIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function RedWarningIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="56"
+      height="48"
+      viewBox="0 0 56 48"
+      fill="none"
+    >
+      <path
+        d="M0 47.4609H55.0781L27.5391 0L0 47.4609ZM30 39.9609H25.0781V34.9219H30V39.9609ZM30 30H25.0781V19.9219H30V30Z"
+        fill="#EF4444"
+      />
+    </svg>
+  );
+}
