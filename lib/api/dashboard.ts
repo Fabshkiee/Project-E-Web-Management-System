@@ -27,16 +27,3 @@ export async function getMemberCards(): Promise<MemberCardsResponse> {
   return data as MemberCardsResponse;
 }
 
-/**
- * @deprecated Use getMemberCards for better performance
- */
-export async function getTotalActiveMembers(): Promise<number> {
-  const supabase = createClient();
-  const { data, error } = await supabase.rpc("get_total_active_members");
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as number;
-}
