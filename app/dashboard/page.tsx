@@ -1,3 +1,5 @@
+"use client";
+
 import PageTitle from "@/components/dashboard/page-title";
 import StatsCard from "@/components/dashboard/overview-card";
 import {
@@ -8,6 +10,7 @@ import {
   RevenueIcon,
   TimerIcon,
 } from "@/components/ui/Icons";
+import { getTotalActiveMembers } from "@/lib/api/dashboard";
 
 export default function Dashboard() {
   return (
@@ -28,7 +31,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         <StatsCard
           label="Total Members"
-          value="212"
+          fetchFn={getTotalActiveMembers}
           icon={<PeopleIcon className="w-12 h-12" />}
           trend={{ label: "12%", type: "up" }}
         />
