@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import PageTitle from "@/components/dashboard/page-title";
 import StatsCard from "@/components/dashboard/overview-card";
 import {
@@ -10,9 +11,30 @@ import {
   RevenueIcon,
   TimerIcon,
 } from "@/components/ui/Icons";
-import { getTotalActiveMembers } from "@/lib/api/dashboard";
+import { getMemberCards, MemberCardsResponse } from "@/lib/api/dashboard";
 
 export default function Dashboard() {
+  const [stats, setStats] = useState<MemberCardsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        setLoading(true);
+        const data = await getMemberCards();
+        setStats(data);
+        setError(false);
+      } catch (err) {
+        console.error("Error fetching dashboard stats:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
   return (
     <div>
       <PageTitle
@@ -31,24 +53,28 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         <StatsCard
           label="Total Members"
-          fetchFn={getTotalActiveMembers}
+          value={stats?.["Total Members Card"].value}
+          trend={stats?.["Total Members Card"].trend}
+          isLoading={loading}
+          error={error}
           icon={<PeopleIcon className="w-12 h-12" />}
-          trend={{ label: "12%", type: "up" }}
         />
         <StatsCard
           label="Today's Check-ins"
           value="84"
+          isLoading={false} // Static for now
           icon={<DumbellIcon className="w-12 h-12" />}
         />
         <StatsCard
           label="Expiring Soon"
-          value="12"
-          icon={<RedWarningIcon className="w-12 h-10" />}
+          value={stats?.["Expiring Soon Card"].value}
           trend={{
-            label: "3 days",
-            type: "down",
+            ...stats?.["Expiring Soon Card"].trend!,
             icon: <TimerIcon className="w-3.5 h-3.5" />,
           }}
+          isLoading={loading}
+          error={error}
+          icon={<RedWarningIcon className="w-12 h-10" />}
         />
         <StatsCard
           label="Monthly Revenue"
