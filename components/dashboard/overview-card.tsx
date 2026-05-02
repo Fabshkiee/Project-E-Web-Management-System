@@ -41,7 +41,7 @@ export default function StatsCard({
               {value}
             </span>
           )}
-          {trend && !isLoading && !error && (
+          {trend && !isLoading && !error && trend.label !== "0%" && trend.label !== "0.0%" && (
             <div
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 border ${
                 trend.type === "up"
