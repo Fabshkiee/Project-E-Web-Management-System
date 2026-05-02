@@ -7,6 +7,7 @@ interface StatsCardProps {
   trend?: {
     label: string;
     type: "up" | "down" | "neutral";
+    icon?: React.ReactNode;
   };
 }
 
@@ -32,14 +33,20 @@ export default function StatsCard({
             <div
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 border ${
                 trend.type === "up"
-                  ? "bg-success/20 border-success/30 text-success"
+                  ? "bg-[#22c55e]/20 border-[#22c55e]/30 text-[#4ade80]"
                   : trend.type === "down"
-                    ? "bg-primary/20 border-primary/30 text-primary"
+                    ? "bg-[#ef4444]/20 border-[#ef4444]/30 text-[#f87171]"
                     : "bg-white/5 border-white/10 text-secondary"
               }`}
             >
+              {trend.icon && <span className="shrink-0">{trend.icon}</span>}
               <span className="font-lexend font-bold text-[12px] leading-none">
-                {trend.type === "up" ? "↑" : trend.type === "down" ? "↓" : ""}{" "}
+                {!trend.icon &&
+                  (trend.type === "up"
+                    ? "↑ "
+                    : trend.type === "down"
+                      ? "↓ "
+                      : "")}
                 {trend.label}
               </span>
             </div>
