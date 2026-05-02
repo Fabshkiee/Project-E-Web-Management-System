@@ -1,8 +1,18 @@
+import PageTitle from "@/components/dashboard/page-title";
+
 export default function Dashboard() {
   return (
-    <main>
-      <h1>Dashboard</h1>
-      <p>Welcome to the Staff Management Dashboard.</p>
-    </main>
+    <PageTitle
+      title="Gym Overview"
+      subtitle={`Real-time statistics for ${new Date().toLocaleDateString(
+        "en-US",
+        {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        },
+      )}`}
+    />
   );
 }
