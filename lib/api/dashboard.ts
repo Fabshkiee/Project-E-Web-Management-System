@@ -11,6 +11,7 @@ export interface MemberCardData {
 export interface MemberCardsResponse {
   "Total Members Card": MemberCardData;
   "Expiring Soon Card": MemberCardData;
+  "Today Check-ins Card": MemberCardData;
 }
 
 /**
@@ -26,4 +27,3 @@ export async function getMemberCards(): Promise<MemberCardsResponse> {
 
   return data as MemberCardsResponse;
 }
-
