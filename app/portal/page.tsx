@@ -41,7 +41,8 @@ export default function Portal() {
         // fetch member profile
         const { data: userData, error: userError } = await supabase
           .from("users")
-          .select(`
+          .select(
+            `
             full_name, 
             nickname, 
             qr_token, 
@@ -55,18 +56,23 @@ export default function Portal() {
                 )
               )
             )
-          `)
+          `,
+          )
           .eq("auth_user_id", user.id)
           .single();
 
         if (!userError && userData) {
           // Handle member details extraction
-          const memberInfo = Array.isArray(userData.members) 
-            ? userData.members[0] 
+          const memberInfo = Array.isArray(userData.members)
+            ? userData.members[0]
             : userData.members;
 
-          const coachData = Array.isArray(memberInfo?.coach) ? memberInfo.coach[0] : memberInfo?.coach;
-          const coachProfile = Array.isArray(coachData?.profile) ? coachData.profile[0] : coachData?.profile;
+          const coachData = Array.isArray(memberInfo?.coach)
+            ? memberInfo.coach[0]
+            : memberInfo?.coach;
+          const coachProfile = Array.isArray(coachData?.profile)
+            ? coachData.profile[0]
+            : coachData?.profile;
           const coachName = coachProfile?.full_name || "No Coach Assigned";
 
           setProfile({
@@ -76,7 +82,7 @@ export default function Portal() {
             qr_token: userData.qr_token,
             valid_until: memberInfo?.valid_until,
             status: memberInfo?.status || "Guest",
-            coach_name: coachName
+            coach_name: coachName,
           });
         }
       } finally {
@@ -232,7 +238,7 @@ export default function Portal() {
                 </div>
                 <span className="p-sm-md text-muted font-lexend">Status</span>
               </div>
-              <StatusTag status={profile?.status} />
+              <StatusTag type={(profile?.status as any) || "Active"} />
             </div>
 
             {/* Coach */}
