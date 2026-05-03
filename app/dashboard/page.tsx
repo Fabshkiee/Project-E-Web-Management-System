@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PageTitle from "@/components/dashboard/page-title";
 import StatsCard from "@/components/dashboard/overview-card";
 import {
@@ -18,14 +18,20 @@ export default function Dashboard() {
   const [stats, setStats] = useState<MemberCardsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const isInitialLoad = useRef(true);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        setLoading(true);
+        // Only show loading skeleton if it's the very first load
+        if (isInitialLoad.current) {
+          setLoading(true);
+        }
+
         const data = await getMemberCards();
         setStats(data);
         setError(false);
+        isInitialLoad.current = false;
       } catch (err) {
         console.error("Error fetching dashboard stats:", err);
         setError(true);
