@@ -37,6 +37,7 @@ export default function Dashboard() {
 
   const totalMembers = stats?.["Total Members Card"];
   const expiringSoon = stats?.["Expiring Soon Card"];
+  const todaysCheckins = stats?.["Today Check-ins Card"];
 
   return (
     <div>
@@ -64,8 +65,10 @@ export default function Dashboard() {
         />
         <StatsCard
           label="Today's Check-ins"
-          value="84"
-          isLoading={false} // Static for now
+          value={todaysCheckins?.value}
+          trend={todaysCheckins?.trend}
+          isLoading={loading}
+          error={error}
           icon={<DumbellIcon className="w-12 h-12" />}
         />
         <StatsCard
