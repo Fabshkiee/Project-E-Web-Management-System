@@ -45,7 +45,7 @@ export default function StatsCard({
             <div
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 border ${
                 trend.type === "up"
-                  ? "bg-[#22c55e]/20 border-[#22c55e]/30 text-[#4ade80]"
+                  ? "bg-success/20 border-success/30 text-[#4ade80]"
                   : trend.type === "down"
                     ? "bg-[#ef4444]/20 border-[#ef4444]/30 text-[#f87171]"
                     : "bg-white/5 border-white/10 text-secondary"
