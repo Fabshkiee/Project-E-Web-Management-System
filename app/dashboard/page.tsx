@@ -12,6 +12,7 @@ import {
   TimerIcon,
 } from "@/components/ui/Icons";
 import { getMemberCards, MemberCardsResponse } from "@/lib/api/dashboard";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Dashboard() {
   const [stats, setStats] = useState<MemberCardsResponse | null>(null);
@@ -32,7 +33,30 @@ export default function Dashboard() {
         setLoading(false);
       }
     }
+
+    // 1. Initial fetch
     fetchStats();
+
+    // 2. Set up realtime subscription
+    const supabase = createClient();
+    const channel = supabase
+      .channel("dashboard-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "members" },
+        () => fetchStats()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "attendance_logs" },
+        () => fetchStats()
+      )
+      .subscribe();
+
+    // 3. Cleanup on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const totalMembers = stats?.["Total Members Card"];
