@@ -22,7 +22,7 @@ function ActionItem({
   return (
     <button
       onClick={onClick}
-      className="rounded-xl w-full flex items-center justify-between p-3 order-white/5 hover:bg-gray-50 dark:hover:bg-white/2 transition-all group activrounded-xl border border-stroke dark:be:scale-[0.98]"
+      className="rounded-xl h-[107px] w-full flex items-center justify-between p-3 order-white/5 hover:bg-gray-50 dark:hover:bg-white/2 transition-all group activrounded-xl border border-stroke dark:be:scale-[0.98]"
     >
       <div className="flex items-center gap-4">
         <div
