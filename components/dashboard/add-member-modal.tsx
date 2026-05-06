@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "@/components/ui/Modal";
 import { ChevronDownIcon } from "@/components/ui/Icons";
 
@@ -27,6 +27,21 @@ export default function AddMemberModal({
   // Dropdown states
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCoachOpen, setIsCoachOpen] = useState(false);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFullName("");
+      setNickname("");
+      setContactNumber("");
+      setMembership("");
+      setDuration("");
+      setCoach("");
+      setHasDiscount(false);
+      setIsMembershipOpen(false);
+      setIsCoachOpen(false);
+    }
+  }, [isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
