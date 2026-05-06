@@ -107,7 +107,7 @@ export default function AddMemberModal({
       console.error("Error creating member:", error);
       showToast(
         error.message || "Failed to create member. Please try again.",
-        "error"
+        "error",
       );
     } finally {
       setIsSubmitting(false);
@@ -150,6 +150,11 @@ export default function AddMemberModal({
               Full Name
             </label>
             <input
+              onKeyDown={(e) => {
+                if (!/[a-zA-Z ]/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
               autoComplete="off"
               id="add-member-fullname"
               type="text"
@@ -166,6 +171,11 @@ export default function AddMemberModal({
               Nickname (Optional)
             </label>
             <input
+              onKeyDown={(e) => {
+                if (!/[a-zA-Z ]/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
               autoComplete="off"
               id="add-member-nickname"
               type="text"
@@ -182,6 +192,20 @@ export default function AddMemberModal({
               Contact Number (Optional)
             </label>
             <input
+              onKeyDown={(e) => {
+                if (
+                  !/[0-9]/.test(e.key) &&
+                  ![
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Tab",
+                  ].includes(e.key)
+                ) {
+                  e.preventDefault();
+                }
+              }}
               autoComplete="off"
               id="add-member-contact"
               type="tel"
