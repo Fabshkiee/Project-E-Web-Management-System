@@ -1,4 +1,4 @@
-import { CloudIcon, StatusIcon } from "@/components/ui/Icons";
+import { CloudIcon } from "@/components/ui/Icons";
 import { StatusTag } from "../ui/StatusTag";
 
 export default function SystemStatus() {

@@ -38,7 +38,7 @@ export const DataTable = <T,>({
               <tr
                 key={rowIdx}
                 onClick={() => onRowClick?.(item)}
-                className={`group border-b border-stroke dark:border-white/5 last:border-0 hover:bg-gray-100 dark:hover:bg-white/[0.02] transition-all duration-300 ${onRowClick ? "cursor-pointer" : ""}`}
+                className={`group border-b border-stroke dark:border-white/5 last:border-0 hover:bg-gray-100 dark:hover:bg-white/2 transition-all duration-300 ${onRowClick ? "cursor-pointer" : ""}`}
               >
                 {columns.map((column, colIdx) => (
                   <td
