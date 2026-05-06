@@ -10,6 +10,8 @@ export default function SystemStatus() {
 
   useEffect(() => {
     let syncTimer: NodeJS.Timeout;
+    let initCheckInterval: NodeJS.Timeout;
+    let unsubscribe = () => {};
 
     // 1. Set initial status & persistent sync time
     const savedSync = localStorage.getItem("powersync_last_synced");
@@ -17,23 +19,13 @@ export default function SystemStatus() {
       lastSyncRef.current = new Date(savedSync);
     }
 
-    let currentDb: any = null;
-    try {
-      currentDb = getDb();
-      setStatus({ ...currentDb.currentStatus });
-    } catch (e) {
-      // Not initialized yet, that's fine
-    }
-
-    // 2. Listen to PowerSync status changes
-    let unsubscribe = () => {};
-    if (currentDb) {
-      unsubscribe = currentDb.registerListener({
+    const startListening = (db: any) => {
+      setStatus({ ...db.currentStatus });
+      unsubscribe = db.registerListener({
         statusChanged: (statusObj: any) => {
           const isDownloading = !!statusObj.downloading;
           const isUploading = !!statusObj.uploading;
 
-          // Detect IF data actually arrived by checking the timestamp
           const newSyncTime = statusObj.lastSyncedAt;
           const dataArrived =
             newSyncTime &&
@@ -74,6 +66,26 @@ export default function SystemStatus() {
           setStatus(statusUpdate);
         },
       });
+    };
+
+    const tryInit = () => {
+      try {
+        const currentDb = getDb();
+        if (currentDb) {
+          startListening(currentDb);
+          clearInterval(initCheckInterval);
+          return true;
+        }
+      } catch (e) {
+        // Not ready yet
+      }
+      return false;
+    };
+
+    // Try immediately
+    if (!tryInit()) {
+      // If not ready, poll every second
+      initCheckInterval = setInterval(tryInit, 1000);
     }
 
     // 3. Update relative time every minute
@@ -102,6 +114,7 @@ export default function SystemStatus() {
     return () => {
       unsubscribe();
       clearInterval(interval);
+      clearInterval(initCheckInterval);
     };
   }, []);
 
