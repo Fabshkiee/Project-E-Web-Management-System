@@ -24,6 +24,9 @@ export function getDb() {
 export async function initPowerSync(supabase: SupabaseClient) {
   if (typeof window === "undefined") return; // Safety check for SSR
   if (isInitialized) return;
+  
+  // Set the lock immediately to prevent race conditions (e.g., from React StrictMode double-mounting)
+  isInitialized = true;
 
   console.log("PowerSync: Initializing...");
 
@@ -53,8 +56,9 @@ export async function initPowerSync(supabase: SupabaseClient) {
     await dbInstance.connect(connector);
 
     console.log("PowerSync: Connection established!");
-    isInitialized = true;
   } catch (error) {
     console.error("PowerSync: Initialization failed", error);
+    // If it completely fails, unlock it so we can try again
+    isInitialized = false;
   }
 }
