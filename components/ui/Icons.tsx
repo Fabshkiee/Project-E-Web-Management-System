@@ -509,3 +509,93 @@ export function RevenueIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+//quick actions
+export function AddMemberIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+    >
+      <g clip-path="url(#clip0_1080_1879)">
+        <path
+          d="M12 15.75V14.25C12 13.4544 11.6839 12.6913 11.1213 12.1287C10.5587 11.5661 9.79565 11.25 9 11.25H4.5C3.70435 11.25 2.94129 11.5661 2.37868 12.1287C1.81607 12.6913 1.5 13.4544 1.5 14.25V15.75"
+          stroke="#F20D33"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M6.75 8.25C8.40685 8.25 9.75 6.90685 9.75 5.25C9.75 3.59315 8.40685 2.25 6.75 2.25C5.09315 2.25 3.75 3.59315 3.75 5.25C3.75 6.90685 5.09315 8.25 6.75 8.25Z"
+          stroke="#F20D33"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M14.25 6V10.5"
+          stroke="#F20D33"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M16.5 8.25H12"
+          stroke="#F20D33"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_1080_1879">
+          <rect width="18" height="18" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+
+export function ExportAnalyticsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="19"
+      height="19"
+      viewBox="0 0 19 19"
+      fill="none"
+    >
+      <g clip-path="url(#clip0_9_1397)">
+        <path
+          d="M7.91675 7.99979C7.91675 7.88491 7.93938 7.77116 7.98334 7.66502C8.0273 7.55889 8.09174 7.46245 8.17297 7.38122C8.2542 7.29999 8.35064 7.23555 8.45677 7.19159C8.56291 7.14763 8.67666 7.125 8.79154 7.125H10.2086C10.3235 7.125 10.4373 7.14763 10.5434 7.19159C10.6495 7.23555 10.746 7.29999 10.8272 7.38122C10.9084 7.46245 10.9729 7.55889 11.0168 7.66502C11.0608 7.77116 11.0834 7.88491 11.0834 7.99979V15.7502C11.0834 15.9822 10.9912 16.2047 10.8272 16.3688C10.6631 16.5328 10.4406 16.625 10.2086 16.625H8.79154C8.55953 16.625 8.33702 16.5328 8.17297 16.3688C8.00891 16.2047 7.91675 15.9822 7.91675 15.7502V7.99979Z"
+          stroke="#22C55E"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M13.4583 3.24979C13.4583 3.01778 13.5504 2.79528 13.7145 2.63122C13.8785 2.46717 14.101 2.375 14.333 2.375H15.7501C15.9821 2.375 16.2046 2.46717 16.3687 2.63122C16.5328 2.79528 16.6249 3.01778 16.6249 3.24979V15.7502C16.6249 15.9822 16.5328 16.2047 16.3687 16.3688C16.2046 16.5328 15.9821 16.625 15.7501 16.625H14.333C14.101 16.625 13.8785 16.5328 13.7145 16.3688C13.5504 16.2047 13.4583 15.9822 13.4583 15.7502V3.24979Z"
+          stroke="#22C55E"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M2.375 15.0417C2.375 15.4616 2.54181 15.8643 2.83875 16.1613C3.13568 16.4582 3.53841 16.625 3.95833 16.625C4.37826 16.625 4.78099 16.4582 5.07792 16.1613C5.37485 15.8643 5.54167 15.4616 5.54167 15.0417C5.54167 14.6218 5.37485 14.219 5.07792 13.9221C4.78099 13.6252 4.37826 13.4583 3.95833 13.4583C3.53841 13.4583 3.13568 13.6252 2.83875 13.9221C2.54181 14.219 2.375 14.6218 2.375 15.0417Z"
+          stroke="#22C55E"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_9_1397">
+          <rect width="19" height="19" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
