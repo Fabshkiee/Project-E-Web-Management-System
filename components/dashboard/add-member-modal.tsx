@@ -258,48 +258,44 @@ export default function AddMemberModal({
           </div>
         </div>
 
-        {/* Real-time Total Summary */}
-        {membership && duration && (
-          <div className="p-4 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/20 flex items-center justify-between animate-in zoom-in-95 duration-300">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold font-lexend uppercase tracking-[0.2em] text-primary/70">
-                Total Membership Fee
-              </span>
-              <span className="text-xs text-secondary font-lexend">
-                {membership} Plan × {duration} Month{Number(duration) > 1 ? "s" : ""}
-              </span>
-            </div>
-            <div className="flex flex-col items-end">
-              <span className="text-2xl font-bold font-lexend text-primary leading-none">
-                ₱{total.toLocaleString()}
-              </span>
-            </div>
+        {/* Actions Area */}
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-xl text-sm font-medium font-lexend text-secondary hover:text-foreground hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={!isFormValid}
+              className={`px-6 py-2.5 rounded-xl text-sm font-semibold font-lexend transition-all shadow-sm ${
+                isFormValid
+                  ? "bg-primary text-white hover:bg-primary/90 active:scale-[0.98] cursor-pointer"
+                  : "bg-gray-200 dark:bg-white/5 text-gray-400 dark:text-gray-600 cursor-not-allowed"
+              }`}
+            >
+              Add Member
+            </button>
           </div>
-        )}
 
-        {/* Divider */}
-        <div className="border-t border-stroke dark:border-white/5" />
-
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-sm font-medium font-lexend text-secondary hover:text-foreground hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={!isFormValid}
-            className={`px-6 py-2.5 rounded-xl text-sm font-semibold font-lexend transition-all shadow-sm ${
-              isFormValid
-                ? "bg-primary text-white hover:bg-primary/90 active:scale-[0.98] cursor-pointer"
-                : "bg-gray-200 dark:bg-white/5 text-gray-400 dark:text-gray-600 cursor-not-allowed"
-            }`}
-          >
-            Add Member
-          </button>
+          <div className="flex flex-col items-end">
+            {membership && duration && (
+              <div className="animate-in fade-in slide-in-from-right-2 duration-300 text-right">
+                <span className="text-[10px] font-bold tracking-[0.1em] text-gray-400 dark:text-white/30 uppercase">
+                  Total Amount
+                </span>
+                <p className="text-xl font-bold font-lexend text-primary leading-none">
+                  ₱{total.toLocaleString()}
+                </p>
+                <p className="text-[10px] font-lexend text-gray-400 dark:text-white/20 mt-1 uppercase tracking-wider">
+                  ₱{hasDiscount ? PRICES[membership as keyof typeof PRICES].discounted : PRICES[membership as keyof typeof PRICES].regular} × {duration} Month{Number(duration) > 1 ? "s" : ""}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </form>
     </Modal>
