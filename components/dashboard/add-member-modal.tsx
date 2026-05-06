@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "@/components/ui/Modal";
 import { ChevronDownIcon } from "@/components/ui/Icons";
+import { getMemberFormOptions, createMemberProfile } from "@/lib/api/dashboard";
 
 interface AddMemberModalProps {
   isOpen: boolean;
@@ -22,6 +23,11 @@ export default function AddMemberModal({
   isOpen,
   onClose,
 }: AddMemberModalProps) {
+  // DB Options State
+  const [membershipOptions, setMembershipOptions] = useState<any[]>([]);
+  const [coachOptions, setCoachOptions] = useState<any[]>([]);
+  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [fullName, setFullName] = useState("");
   const [nickname, setNickname] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -33,6 +39,23 @@ export default function AddMemberModal({
   // Dropdown states
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCoachOpen, setIsCoachOpen] = useState(false);
+
+  // Fetch Options from DB
+  useEffect(() => {
+    async function loadOptions() {
+      setIsLoadingOptions(true);
+      try {
+        const { membershipTypes, coaches } = await getMemberFormOptions();
+        setMembershipOptions(membershipTypes);
+        setCoachOptions(coaches);
+      } catch (err) {
+        console.error("Failed to load form options", err);
+      } finally {
+        setIsLoadingOptions(false);
+      }
+    }
+    loadOptions();
+  }, []);
 
   // Reset form when modal closes
   useEffect(() => {
@@ -49,19 +72,41 @@ export default function AddMemberModal({
     }
   }, [isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual member creation logic
-    console.log({
-      fullName,
-      nickname,
-      contactNumber,
-      membership,
-      duration,
-      coach: membership === "Coaching" ? coach : null,
-      hasDiscount,
-    });
-    onClose();
+    if (!isFormValid || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      // Find UUIDs
+      const selectedPlan = membershipOptions.find((m) => m.name === membership);
+      const selectedCoach = coachOptions.find((c) => c.full_name === coach);
+
+      if (!selectedPlan) throw new Error("Invalid membership selected");
+
+      // Set start date to today
+      const today = new Date().toISOString().split("T")[0];
+
+      await createMemberProfile({
+        p_short_id: null, // Auto-generated
+        p_membership_type_id: selectedPlan.id,
+        p_coach_id: selectedCoach ? selectedCoach.id : null,
+        p_full_name: fullName,
+        p_nickname: nickname || null,
+        p_contact_number: contactNumber || null,
+        p_started_date: today,
+        p_duration_months: Number(duration),
+        p_is_discounted: hasDiscount,
+      });
+
+      // Reset & Close on success
+      onClose();
+    } catch (error) {
+      console.error("Error creating member:", error);
+      alert("Failed to create member. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isFormValid =
@@ -151,19 +196,37 @@ export default function AddMemberModal({
             {isMembershipOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setIsMembershipOpen(false)} />
-                <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                  {MEMBERSHIP_OPTIONS.map((opt) => (
-                    <div
-                      key={opt}
-                      className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                      onClick={() => {
-                        setMembership(opt);
-                        setIsMembershipOpen(false);
-                      }}
-                    >
-                      {opt}
-                    </div>
-                  ))}
+                <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200 max-h-48 overflow-y-auto">
+                  {isLoadingOptions ? (
+                    <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
+                  ) : membershipOptions.length > 0 ? (
+                    membershipOptions.map((opt) => (
+                      <div
+                        key={opt.id}
+                        className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setMembership(opt.name);
+                          setIsMembershipOpen(false);
+                        }}
+                      >
+                        {opt.name}
+                      </div>
+                    ))
+                  ) : (
+                    // Fallback to static if DB fails
+                    MEMBERSHIP_OPTIONS.map((opt) => (
+                      <div
+                        key={opt}
+                        className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setMembership(opt);
+                          setIsMembershipOpen(false);
+                        }}
+                      >
+                        {opt}
+                      </div>
+                    ))
+                  )}
                 </div>
               </>
             )}
@@ -211,19 +274,37 @@ export default function AddMemberModal({
               {isCoachOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setIsCoachOpen(false)} />
-                  <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                    {COACH_OPTIONS.map((opt) => (
-                      <div
-                        key={opt}
-                        className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                        onClick={() => {
-                          setCoach(opt);
-                          setIsCoachOpen(false);
-                        }}
-                      >
-                        {opt}
-                      </div>
-                    ))}
+                  <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200 max-h-48 overflow-y-auto">
+                    {isLoadingOptions ? (
+                      <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
+                    ) : coachOptions.length > 0 ? (
+                      coachOptions.map((opt) => (
+                        <div
+                          key={opt.id}
+                          className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                          onClick={() => {
+                            setCoach(opt.full_name);
+                            setIsCoachOpen(false);
+                          }}
+                        >
+                          {opt.full_name}
+                        </div>
+                      ))
+                    ) : (
+                      // Fallback to static if DB fails
+                      COACH_OPTIONS.map((opt) => (
+                        <div
+                          key={opt}
+                          className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                          onClick={() => {
+                            setCoach(opt);
+                            setIsCoachOpen(false);
+                          }}
+                        >
+                          {opt}
+                        </div>
+                      ))
+                    )}
                   </div>
                 </>
               )}
@@ -270,14 +351,18 @@ export default function AddMemberModal({
             </button>
             <button
               type="submit"
-              disabled={!isFormValid}
-              className={`px-6 py-2.5 rounded-xl text-sm font-semibold font-lexend transition-all shadow-sm ${
-                isFormValid
+              disabled={!isFormValid || isSubmitting}
+              className={`px-6 py-2.5 rounded-xl text-sm font-semibold font-lexend transition-all shadow-sm flex items-center justify-center min-w-[120px] ${
+                isFormValid && !isSubmitting
                   ? "bg-primary text-white hover:bg-primary/90 active:scale-[0.98] cursor-pointer"
                   : "bg-gray-200 dark:bg-white/5 text-gray-400 dark:text-gray-600 cursor-not-allowed"
               }`}
             >
-              Add Member
+              {isSubmitting ? (
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              ) : (
+                "Add Member"
+              )}
             </button>
           </div>
 
