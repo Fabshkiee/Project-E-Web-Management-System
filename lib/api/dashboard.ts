@@ -14,6 +14,28 @@ export interface MemberCardsResponse {
   "Today Check-ins Card": MemberCardData;
 }
 
+export interface RecentAttendance {
+  member_short_id: string;
+  full_name: string;
+  check_in_time: string;
+  membershiptype: string;
+  status: "Active" | "Expired" | "Expiring";
+}
+
+/**
+ * Fetches the most recent attendance logs using the get_recent_attendance RPC.
+ */
+export async function getRecentAttendance(): Promise<RecentAttendance[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("get_recent_attendance");
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as RecentAttendance[];
+}
+
 /**
  * Fetches all member-related statistics in a single call for efficiency.
  */

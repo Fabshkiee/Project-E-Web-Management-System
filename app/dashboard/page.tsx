@@ -11,29 +11,85 @@ import {
   RevenueIcon,
   TimerIcon,
 } from "@/components/ui/Icons";
-import { getMemberCards, MemberCardsResponse } from "@/lib/api/dashboard";
+import {
+  getMemberCards,
+  MemberCardsResponse,
+  getRecentAttendance,
+  RecentAttendance,
+} from "@/lib/api/dashboard";
 import { createClient } from "@/lib/supabase/client";
+import { DataTable } from "@/components/dashboard/data-table";
+import { UserAvatar } from "@/components/ui/UserAvatar";
+import { StatusTag } from "@/components/ui/StatusTag";
+
+const attendanceColumns = [
+  {
+    header: "Member",
+    accessor: (item: RecentAttendance) => (
+      <div className="flex items-center gap-4">
+        <UserAvatar name={item.full_name || "Unknown"} />
+        <div className="flex flex-col">
+          <span className="font-medium text-foreground text-sm font-lexend">
+            {item.full_name || "Unknown Member"}
+          </span>
+          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
+            ID: {item.member_short_id}
+          </span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    header: "Check-in Time",
+    accessor: (item: RecentAttendance) => (
+      <span className="text-sm font-medium text-foreground font-lexend">
+        {new Date(item.check_in_time).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </span>
+    ),
+  },
+  {
+    header: "Membership",
+    accessor: (item: RecentAttendance) => (
+      <span className="text-sm font-medium text-secondary font-lexend">
+        {item.membershiptype}
+      </span>
+    ),
+  },
+  {
+    header: "Status",
+    accessor: (item: RecentAttendance) => (
+      <StatusTag type={item.status as any} />
+    ),
+    className: "text-right md:text-left",
+  },
+];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<MemberCardsResponse | null>(null);
+  const [attendance, setAttendance] = useState<RecentAttendance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchData() {
       try {
-        // Only show loading skeleton if it's the very first load
-        if (isInitialLoad.current) {
-          setLoading(true);
-        }
+        if (isInitialLoad.current) setLoading(true);
 
-        const data = await getMemberCards();
-        setStats(data);
+        const [statsData, attendanceData] = await Promise.all([
+          getMemberCards(),
+          getRecentAttendance(),
+        ]);
+
+        setStats(statsData);
+        setAttendance(attendanceData);
         setError(false);
         isInitialLoad.current = false;
       } catch (err) {
-        console.error("Error fetching dashboard stats:", err);
+        console.error("Error fetching dashboard data:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -41,7 +97,7 @@ export default function Dashboard() {
     }
 
     // 1. Initial fetch
-    fetchStats();
+    fetchData();
 
     // 2. Set up realtime subscription
     const supabase = createClient();
@@ -50,12 +106,12 @@ export default function Dashboard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "members" },
-        () => fetchStats()
+        () => fetchData(),
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "attendance_logs" },
-        () => fetchStats()
+        () => fetchData(),
       )
       .subscribe();
 
@@ -85,6 +141,7 @@ export default function Dashboard() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+        {/* ... (StatsCards) */}
         <StatsCard
           label="Total Members"
           value={totalMembers?.value}
@@ -126,6 +183,19 @@ export default function Dashboard() {
             icon: <RevenueIcon className="w-3.5 h-3.5" />,
           }}
         />
+      </div>
+
+      {/* Recent Attendance Table Section */}
+      <div className="mt-12 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm">
+        <div className="px-8 py-6 border-b border-stroke dark:border-white/5 flex justify-between items-center">
+          <h2 className="font-teko font-medium text-[20px] uppercase tracking-wider text-foreground">
+            Recent Attendance
+          </h2>
+          <button className="text-primary font-bold p-sm-md hover:underline decoration-2 underline-offset-4">
+            View All
+          </button>
+        </div>
+        <DataTable columns={attendanceColumns} data={attendance} />
       </div>
     </div>
   );
