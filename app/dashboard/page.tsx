@@ -11,7 +11,12 @@ import {
   RevenueIcon,
   TimerIcon,
 } from "@/components/ui/Icons";
-import { getMemberCards, MemberCardsResponse } from "@/lib/api/dashboard";
+import {
+  getMemberCards,
+  MemberCardsResponse,
+  getRecentAttendance,
+  RecentAttendance,
+} from "@/lib/api/dashboard";
 import { createClient } from "@/lib/supabase/client";
 import { DataTable } from "@/components/dashboard/data-table";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -20,19 +25,15 @@ import { StatusTag } from "@/components/ui/StatusTag";
 const attendanceColumns = [
   {
     header: "Member",
-    accessor: (item: (typeof recentAttendanceData)[0]) => (
+    accessor: (item: RecentAttendance) => (
       <div className="flex items-center gap-4">
-        <UserAvatar name={item.member.name} />
+        <UserAvatar name={item.full_name || "Unknown"} />
         <div className="flex flex-col">
           <span className="font-medium text-foreground text-sm font-lexend">
-            {item.member.name}
+            {item.full_name || "Unknown Member"}
           </span>
-          <span
-            className={`text-[11px] font-medium uppercase tracking-wider ${item.member.id === "LOGIN FAILED" ? "text-primary" : "text-secondary"}`}
-          >
-            {item.member.id === "LOGIN FAILED"
-              ? "LOGIN FAILED"
-              : `ID: ${item.member.id}`}
+          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
+            ID: {item.member_short_id}
           </span>
         </div>
       </div>
@@ -40,24 +41,27 @@ const attendanceColumns = [
   },
   {
     header: "Check-in Time",
-    accessor: (item: (typeof recentAttendanceData)[0]) => (
+    accessor: (item: RecentAttendance) => (
       <span className="text-sm font-medium text-foreground font-lexend">
-        {item.checkInTime}
+        {new Date(item.check_in_time).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
       </span>
     ),
   },
   {
     header: "Membership",
-    accessor: (item: (typeof recentAttendanceData)[0]) => (
+    accessor: (item: RecentAttendance) => (
       <span className="text-sm font-medium text-secondary font-lexend">
-        {item.membership}
+        {item.membershiptype}
       </span>
     ),
   },
   {
     header: "Status",
-    accessor: (item: (typeof recentAttendanceData)[0]) => (
-      <StatusTag type={item.status} />
+    accessor: (item: RecentAttendance) => (
+      <StatusTag type={item.status as any} />
     ),
     className: "text-right md:text-left",
   },
@@ -65,24 +69,27 @@ const attendanceColumns = [
 
 export default function Dashboard() {
   const [stats, setStats] = useState<MemberCardsResponse | null>(null);
+  const [attendance, setAttendance] = useState<RecentAttendance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchData() {
       try {
-        // Only show loading skeleton if it's the very first load
-        if (isInitialLoad.current) {
-          setLoading(true);
-        }
+        if (isInitialLoad.current) setLoading(true);
 
-        const data = await getMemberCards();
-        setStats(data);
+        const [statsData, attendanceData] = await Promise.all([
+          getMemberCards(),
+          getRecentAttendance(),
+        ]);
+
+        setStats(statsData);
+        setAttendance(attendanceData);
         setError(false);
         isInitialLoad.current = false;
       } catch (err) {
-        console.error("Error fetching dashboard stats:", err);
+        console.error("Error fetching dashboard data:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -90,7 +97,7 @@ export default function Dashboard() {
     }
 
     // 1. Initial fetch
-    fetchStats();
+    fetchData();
 
     // 2. Set up realtime subscription
     const supabase = createClient();
@@ -99,12 +106,12 @@ export default function Dashboard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "members" },
-        () => fetchStats(),
+        () => fetchData(),
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "attendance_logs" },
-        () => fetchStats(),
+        () => fetchData(),
       )
       .subscribe();
 
@@ -188,7 +195,7 @@ export default function Dashboard() {
             View All
           </button>
         </div>
-        <DataTable columns={attendanceColumns} data={recentAttendanceData} />
+        <DataTable columns={attendanceColumns} data={attendance} />
       </div>
     </div>
   );
