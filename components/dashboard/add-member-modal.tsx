@@ -65,10 +65,10 @@ export default function AddMemberModal({
     (membership === "Coaching" ? coach !== "" : true);
 
   const inputBase =
-    "w-full px-4 py-3 rounded-xl border border-stroke dark:border-white/10 bg-transparent text-foreground text-sm font-lexend placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
+    "w-full px-4 py-3 rounded-xl border border-stroke dark:border-white/10 bg-gray-50/50 dark:bg-transparent text-foreground text-sm font-lexend placeholder:text-gray-400 dark:placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
 
   const labelBase =
-    "text-[11px] font-medium font-lexend uppercase tracking-wider text-[#9CA3AF] mb-1.5 block";
+    "text-[11px] font-medium font-lexend uppercase tracking-wider text-gray-500 dark:text-[#9CA3AF] mb-1.5 block";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Add New Member">
