@@ -10,6 +10,7 @@ interface AddMemberModalProps {
 }
 
 const MEMBERSHIP_OPTIONS = ["Basic", "Supervision", "Coaching"];
+const COACH_OPTIONS = ["Coach Eric", "Coach Ezekiel"];
 
 export default function AddMemberModal({
   isOpen,
@@ -20,10 +21,12 @@ export default function AddMemberModal({
   const [contactNumber, setContactNumber] = useState("");
   const [membership, setMembership] = useState("");
   const [duration, setDuration] = useState("");
+  const [coach, setCoach] = useState("");
   const [hasDiscount, setHasDiscount] = useState(false);
 
   // Dropdown states
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
+  const [isCoachOpen, setIsCoachOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,12 +37,17 @@ export default function AddMemberModal({
       contactNumber,
       membership,
       duration,
+      coach: membership === "Coaching" ? coach : null,
       hasDiscount,
     });
     onClose();
   };
 
-  const isFormValid = fullName.trim() !== "" && membership !== "" && duration !== "";
+  const isFormValid =
+    fullName.trim() !== "" &&
+    membership !== "" &&
+    duration !== "" &&
+    (membership === "Coaching" ? coach !== "" : true);
 
   const inputBase =
     "w-full px-4 py-3 rounded-xl border border-stroke dark:border-white/10 bg-transparent text-foreground text-sm font-lexend placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
@@ -165,6 +173,47 @@ export default function AddMemberModal({
           </div>
         </div>
 
+        {/* Conditional Coach Dropdown */}
+        {membership === "Coaching" && (
+          <div className="relative animate-in fade-in slide-in-from-top-2 duration-300">
+            <label className={labelBase}>Assign Coach</label>
+            <div
+              className={`${inputBase} flex items-center justify-between cursor-pointer ${isCoachOpen ? "border-primary ring-2 ring-primary/30" : ""}`}
+              onClick={() => setIsCoachOpen(!isCoachOpen)}
+            >
+              <span className={coach ? "text-foreground" : "text-[#9CA3AF]"}>
+                {coach || "Select a coach"}
+              </span>
+              <ChevronDownIcon
+                className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isCoachOpen ? "rotate-180" : ""}`}
+              />
+            </div>
+
+            {isCoachOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setIsCoachOpen(false)}
+                />
+                <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                  {COACH_OPTIONS.map((opt) => (
+                    <div
+                      key={opt}
+                      className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                      onClick={() => {
+                        setCoach(opt);
+                        setIsCoachOpen(false);
+                      }}
+                    >
+                      {opt}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Discount Toggle */}
         <div
           className="flex items-center justify-between p-4 rounded-xl border border-stroke dark:border-white/10 bg-gray-50/50 dark:bg-white/2 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-white/5 transition-all group"
@@ -208,8 +257,8 @@ export default function AddMemberModal({
             type="submit"
             disabled={!isFormValid}
             className={`px-6 py-2.5 rounded-xl text-sm font-semibold font-lexend transition-all shadow-sm ${
-              isFormValid 
-                ? "bg-primary text-white hover:bg-primary/90 active:scale-[0.98] cursor-pointer" 
+              isFormValid
+                ? "bg-primary text-white hover:bg-primary/90 active:scale-[0.98] cursor-pointer"
                 : "bg-gray-200 dark:bg-white/5 text-gray-400 dark:text-gray-600 cursor-not-allowed"
             }`}
           >
