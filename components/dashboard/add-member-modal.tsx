@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "@/components/ui/Modal";
 import { ChevronDownIcon } from "@/components/ui/Icons";
 import { getMemberFormOptions, createMemberProfile } from "@/lib/api/dashboard";
+import { useToast } from "@/lib/contexts/ToastContext";
 
 interface AddMemberModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export default function AddMemberModal({
   const [coachOptions, setCoachOptions] = useState<any[]>([]);
   const [isLoadingOptions, setIsLoadingOptions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
   const [fullName, setFullName] = useState("");
   const [nickname, setNickname] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -99,11 +101,14 @@ export default function AddMemberModal({
         p_is_discounted: hasDiscount,
       });
 
-      // Reset & Close on success
+      showToast("Member created successfully!", "success");
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating member:", error);
-      alert("Failed to create member. Please try again.");
+      showToast(
+        error.message || "Failed to create member. Please try again.",
+        "error"
+      );
     } finally {
       setIsSubmitting(false);
     }
