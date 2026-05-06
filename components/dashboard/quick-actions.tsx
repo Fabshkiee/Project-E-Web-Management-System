@@ -1,8 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import {
   ChevronRightIcon,
   AddMemberIcon,
   ExportAnalyticsIcon,
 } from "@/components/ui/Icons";
+import AddMemberModal from "@/components/dashboard/add-member-modal";
 
 interface ActionItemProps {
   title: string;
@@ -45,6 +49,8 @@ function ActionItem({
 }
 
 export default function QuickActions() {
+  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+
   return (
     <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 p-6 shadow-sm">
       <h2 className="font-teko font-medium text-[20px] uppercase tracking-wider text-foreground mb-6">
@@ -57,7 +63,7 @@ export default function QuickActions() {
           subtitle="Register a new Member"
           iconBg="bg-red-50 dark:bg-red-500/10"
           icon={<AddMemberIcon />}
-          onClick={() => console.log("Add Member clicked")}
+          onClick={() => setIsAddMemberOpen(true)}
         />
 
         <ActionItem
@@ -68,6 +74,12 @@ export default function QuickActions() {
           onClick={() => console.log("Export Analytics clicked")}
         />
       </div>
+
+      <AddMemberModal
+        isOpen={isAddMemberOpen}
+        onClose={() => setIsAddMemberOpen(false)}
+      />
     </div>
   );
 }
+
