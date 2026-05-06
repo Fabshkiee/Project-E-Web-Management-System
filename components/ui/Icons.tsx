@@ -509,3 +509,189 @@ export function RevenueIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+//quick actions
+export function AddMemberIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+    >
+      <g clipPath="url(#clip0_1080_1879)">
+        <path
+          d="M12 15.75V14.25C12 13.4544 11.6839 12.6913 11.1213 12.1287C10.5587 11.5661 9.79565 11.25 9 11.25H4.5C3.70435 11.25 2.94129 11.5661 2.37868 12.1287C1.81607 12.6913 1.5 13.4544 1.5 14.25V15.75"
+          stroke="#F20D33"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M6.75 8.25C8.40685 8.25 9.75 6.90685 9.75 5.25C9.75 3.59315 8.40685 2.25 6.75 2.25C5.09315 2.25 3.75 3.59315 3.75 5.25C3.75 6.90685 5.09315 8.25 6.75 8.25Z"
+          stroke="#F20D33"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M14.25 6V10.5"
+          stroke="#F20D33"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M16.5 8.25H12"
+          stroke="#F20D33"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_1080_1879">
+          <rect width="18" height="18" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+
+export function ExportAnalyticsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="19"
+      height="19"
+      viewBox="0 0 19 19"
+      fill="none"
+    >
+      <g clipPath="url(#clip0_9_1397)">
+        <path
+          d="M7.91675 7.99979C7.91675 7.88491 7.93938 7.77116 7.98334 7.66502C8.0273 7.55889 8.09174 7.46245 8.17297 7.38122C8.2542 7.29999 8.35064 7.23555 8.45677 7.19159C8.56291 7.14763 8.67666 7.125 8.79154 7.125H10.2086C10.3235 7.125 10.4373 7.14763 10.5434 7.19159C10.6495 7.23555 10.746 7.29999 10.8272 7.38122C10.9084 7.46245 10.9729 7.55889 11.0168 7.66502C11.0608 7.77116 11.0834 7.88491 11.0834 7.99979V15.7502C11.0834 15.9822 10.9912 16.2047 10.8272 16.3688C10.6631 16.5328 10.4406 16.625 10.2086 16.625H8.79154C8.55953 16.625 8.33702 16.5328 8.17297 16.3688C8.00891 16.2047 7.91675 15.9822 7.91675 15.7502V7.99979Z"
+          stroke="#22C55E"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M13.4583 3.24979C13.4583 3.01778 13.5504 2.79528 13.7145 2.63122C13.8785 2.46717 14.101 2.375 14.333 2.375H15.7501C15.9821 2.375 16.2046 2.46717 16.3687 2.63122C16.5328 2.79528 16.6249 3.01778 16.6249 3.24979V15.7502C16.6249 15.9822 16.5328 16.2047 16.3687 16.3688C16.2046 16.5328 15.9821 16.625 15.7501 16.625H14.333C14.101 16.625 13.8785 16.5328 13.7145 16.3688C13.5504 16.2047 13.4583 15.9822 13.4583 15.7502V3.24979Z"
+          stroke="#22C55E"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M2.375 15.0417C2.375 15.4616 2.54181 15.8643 2.83875 16.1613C3.13568 16.4582 3.53841 16.625 3.95833 16.625C4.37826 16.625 4.78099 16.4582 5.07792 16.1613C5.37485 15.8643 5.54167 15.4616 5.54167 15.0417C5.54167 14.6218 5.37485 14.219 5.07792 13.9221C4.78099 13.6252 4.37826 13.4583 3.95833 13.4583C3.53841 13.4583 3.13568 13.6252 2.83875 13.9221C2.54181 14.219 2.375 14.6218 2.375 15.0417Z"
+          stroke="#22C55E"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_9_1397">
+          <rect width="19" height="19" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+export function ChevronRightIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      {...props}
+    >
+      <path
+        d="M6.75 13.5L11.25 9L6.75 4.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function CloudIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="17"
+      viewBox="0 0 24 17"
+      fill="none"
+    >
+      <path
+        d="M19.3594 6.04688C18.6562 2.625 15.6562 0 12 0C9.09375 0 6.60938 1.64062 5.34375 4.07812C2.34375 4.35938 0 6.9375 0 10.0312C0 13.3125 2.67188 16.0312 6 16.0312H18.9844C21.75 16.0312 24 13.7812 24 11.0156C24 8.39062 21.9375 6.23438 19.3594 6.04688ZM18.9844 14.0156H6C3.79688 14.0156 2.01562 12.2344 2.01562 10.0312C2.01562 7.96875 3.51562 6.23438 5.57812 6.04688L6.60938 5.95312L7.125 4.96875C8.0625 3.14062 9.9375 2.01562 12 2.01562C14.625 2.01562 16.875 3.89062 17.3906 6.46875L17.6719 7.96875L19.2188 8.0625C20.7656 8.15625 21.9844 9.46875 21.9844 11.0156C21.9844 12.6562 20.6719 14.0156 18.9844 14.0156ZM9.98438 10.2188L7.92188 8.10938L6.51562 9.51562L9.98438 13.0312L16.0312 6.98438L14.5781 5.57812L9.98438 10.2188Z"
+        fill="#9CA3AF"
+      />
+    </svg>
+  );
+}
+
+export function CloseIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  );
+}
+
+export function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+

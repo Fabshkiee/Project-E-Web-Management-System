@@ -2,6 +2,9 @@ type TagType =
   | "Active"
   | "Expired"
   | "Expiring"
+  | "Online"
+  | "Syncing"
+  | "Offline"
   | "Staff"
   | "Member"
   | "Admin"
@@ -23,6 +26,12 @@ const tagStyles: Record<TagType, string> = {
     "bg-[#FFE4E6] border-[#FDA4AF] text-[#9F1239] dark:bg-[#F20D33]/10 dark:border-[#F20D33]/50 dark:text-[#F87171]",
   Expiring:
     "bg-[#FEF3C7] border-[#FCD34D] text-[#92400E] dark:bg-[#FBBF24]/10 dark:border-[#FBBF24]/50 dark:text-[#FBBF24]",
+  Online:
+    "bg-[#DCFCE7] border-[#8BF7D0] text-[#166534] dark:bg-[#22C55E]/10 dark:border-[#22C55E]/50 dark:text-[#4ADE80]",
+  Syncing:
+    "bg-[#FEF3C7] border-[#FCD34D] text-[#92400E] dark:bg-[#FBBF24]/10 dark:border-[#FBBF24]/50 dark:text-[#FBBF24]",
+  Offline:
+    "bg-[#FFE4E6] border-[#FDA4AF] text-[#9F1239] dark:bg-[#F20D33]/10 dark:border-[#F20D33]/50 dark:text-[#F87171]",
 
   // Primary Roles
   Admin:

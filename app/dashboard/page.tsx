@@ -21,13 +21,18 @@ import { createClient } from "@/lib/supabase/client";
 import { DataTable } from "@/components/dashboard/data-table";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
+import QuickActions from "@/components/dashboard/quick-actions";
+import SystemStatus from "@/components/dashboard/system-status";
+import { initPowerSync } from "@/lib/powersync/PowerSync";
 
 const attendanceColumns = [
   {
     header: "Member",
     accessor: (item: RecentAttendance) => (
       <div className="flex items-center gap-4">
-        <UserAvatar name={item.full_name || "Unknown"} />
+        <div className="transition-transform duration-300 group-hover:scale-110">
+          <UserAvatar name={item.full_name || "Unknown"} />
+        </div>
         <div className="flex flex-col">
           <span className="font-medium text-foreground text-sm font-lexend">
             {item.full_name || "Unknown Member"}
@@ -101,6 +106,8 @@ export default function Dashboard() {
 
     // 2. Set up realtime subscription
     const supabase = createClient();
+    initPowerSync(supabase);
+
     const channel = supabase
       .channel("dashboard-realtime")
       .on(
@@ -126,22 +133,27 @@ export default function Dashboard() {
   const todaysCheckins = stats?.["Today Check-ins Card"];
 
   return (
-    <div>
-      <PageTitle
-        title="Gym Overview"
-        subtitle={`Real-time statistics for ${new Date().toLocaleDateString(
-          "en-US",
-          {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          },
-        )}`}
-      />
+    <main className="space-y-12">
+      <header>
+        <PageTitle
+          title="Gym Overview"
+          subtitle={`Real-time statistics for ${new Date().toLocaleDateString(
+            "en-US",
+            {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            },
+          )}`}
+        />
+      </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-        {/* ... (StatsCards) */}
+      {/* Quick Stats Overview */}
+      <section
+        aria-label="Quick Stats"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+      >
         <StatsCard
           label="Total Members"
           value={totalMembers?.value}
@@ -183,20 +195,37 @@ export default function Dashboard() {
             icon: <RevenueIcon className="w-3.5 h-3.5" />,
           }}
         />
-      </div>
+      </section>
 
-      {/* Recent Attendance Table Section */}
-      <div className="mt-12 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm">
-        <div className="px-8 py-6 border-b border-stroke dark:border-white/5 flex justify-between items-center">
-          <h2 className="font-teko font-medium text-[20px] uppercase tracking-wider text-foreground">
-            Recent Attendance
-          </h2>
-          <button className="text-primary font-bold p-sm-md hover:underline decoration-2 underline-offset-4">
-            View All
-          </button>
-        </div>
-        <DataTable columns={attendanceColumns} data={attendance} />
-      </div>
-    </div>
+      {/* Main Dashboard Content */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        {/* Recent Attendance Table Section (Left) */}
+        <section
+          aria-labelledby="attendance-title"
+          className="lg:col-span-8 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm flex flex-col"
+        >
+          <header className="px-8 py-6 border-b border-stroke dark:border-white/5 flex justify-between items-center">
+            <h2
+              id="attendance-title"
+              className="font-teko font-medium text-[20px] uppercase tracking-wider text-foreground"
+            >
+              Recent Attendance
+            </h2>
+            <button className="text-primary font-bold p-sm-md hover:underline decoration-2 underline-offset-4">
+              View All
+            </button>
+          </header>
+          <div className="flex-1 flex flex-col">
+            <DataTable columns={attendanceColumns} data={attendance} className="flex-1" />
+          </div>
+        </section>
+
+        {/* Sidebar (Right) */}
+        <aside className="lg:col-span-4 space-y-8">
+          <QuickActions />
+          <SystemStatus />
+        </aside>
+      </section>
+    </main>
   );
 }

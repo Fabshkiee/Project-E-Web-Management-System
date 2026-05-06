@@ -9,6 +9,7 @@ interface DataTableProps<T> {
   data: T[];
   emptyMessage?: string;
   onRowClick?: (item: T) => void;
+  className?: string;
 }
 
 export const DataTable = <T,>({
@@ -16,9 +17,12 @@ export const DataTable = <T,>({
   data,
   emptyMessage = "No data available",
   onRowClick,
+  className = "",
 }: DataTableProps<T>) => {
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-stroke bg-white dark:bg-[#1a1a1a] dark:border-white/5">
+    <div
+      className={`w-full overflow-x-auto rounded-xl border border-stroke bg-white dark:bg-[#1a1a1a] dark:border-white/5 ${className}`}
+    >
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="bg-[#F9FAFB] dark:bg-white/2 border-b border-stroke dark:border-white/5">
@@ -38,7 +42,7 @@ export const DataTable = <T,>({
               <tr
                 key={rowIdx}
                 onClick={() => onRowClick?.(item)}
-                className={`border-b border-stroke dark:border-white/5 last:border-0 hover:bg-gray-50 dark:hover:bg-white/1 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+                className={`group border-b border-stroke dark:border-white/5 last:border-0 hover:bg-gray-100 dark:hover:bg-white/2 transition-all duration-300 ${onRowClick ? "cursor-pointer" : ""}`}
               >
                 {columns.map((column, colIdx) => (
                   <td
