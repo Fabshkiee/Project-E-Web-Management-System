@@ -1,7 +1,7 @@
 "use client";
 import { QRCodeSVG } from "qrcode.react";
 import {
-  BackIcon,
+  ChevronDownIcon,
   FingerprintIcon,
   LockIcon,
   EyeOpenIcon,
@@ -10,11 +10,14 @@ import {
   BadgeIcon,
   CoachIcon,
   StatusIcon,
+  LogoutIcon,
+  DashboardIcon,
 } from "@/components/ui/Icons";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export default function Portal() {
   const router = useRouter();
@@ -22,6 +25,8 @@ export default function Portal() {
   const [profile, setProfile] = useState<any>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -92,6 +97,18 @@ export default function Portal() {
     getData();
   }, []);
 
+  const handleSignOut = async () => {
+    try {
+      setIsSigningOut(true);
+      const supabase = await createClient();
+      await supabase.auth.signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      setIsSigningOut(false);
+    }
+  };
+
   // Format the date if it exists
   const validUntilDate = profile?.valid_until
     ? new Date(profile.valid_until).toLocaleDateString("en-GB", {
@@ -112,18 +129,76 @@ export default function Portal() {
         backgroundPosition: "center",
       }}
     >
-      {/**Back Button */}
-      <div
-        onClick={() => router.push("/")}
-        className="absolute top-8 left-8 hover:cursor-pointer hover:opacity-80 items-center rounded-full gap-2 w-fit bg-surface px-6 py-3 flex flex-row shadow-lg z-50"
-      >
-        <BackIcon />
-        <button className="hover:cursor-pointer p-sm-md text-[#a1a1a1] uppercase tracking-wider">
-          Exit
-        </button>
-      </div>
+      {/** Floating Navigation Menu */}
+      <header className="fixed top-10 left-6 md:top-10 md:left-24 z-100">
+        <div className="relative">
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="flex items-center gap-3 px-4 py-2 md:px-5 md:py-2.5 bg-[#111111]/60 backdrop-blur-xl border border-white/10 rounded-2xl hover:bg-surface hover:border-primary/50 transition-all group shadow-2xl"
+          >
+            <span className="text-[10px] md:text-xs font-lexend font-medium uppercase tracking-[0.2em] text-muted group-hover:text-white transition-colors hidden xs:block">
+              Menu
+            </span>
+            <div className="w-px h-3 bg-white/10 group-hover:bg-primary/30 transition-colors hidden xs:block"></div>
+            <ChevronDownIcon
+              className={`w-4 h-4 text-muted group-hover:text-white transition-transform duration-300 ${showUserMenu ? "rotate-180" : ""}`}
+            />
+          </button>
 
-      <main className="flex flex-col items-center justify-center gap-8 mt-15">
+          {/**Dropdown Menu */}
+          {showUserMenu && (
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setShowUserMenu(false)}
+              ></div>
+              <div className="absolute left-0 mt-3 w-52 bg-[#111111] border border-stroke rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-20 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-3 py-2 mb-1 border-b border-stroke/30">
+                  <p className="text-[10px] text-muted uppercase tracking-widest font-medium">
+                    Signed in as
+                  </p>
+                  <p className="text-sm font-lexend font-semibold text-white truncate">
+                    {profile?.full_name || "Member"}
+                  </p>
+                </div>
+
+                {/* Home Link */}
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    router.push("/");
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-muted hover:text-white transition-all group"
+                >
+                  <DashboardIcon className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-xs font-lexend font-medium uppercase tracking-wider">
+                    Home
+                  </span>
+                </button>
+
+                {/* Sign Out Action */}
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    handleSignOut();
+                  }}
+                  disabled={isSigningOut}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-muted hover:text-primary transition-all group"
+                >
+                  <LogoutIcon
+                    className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${isSigningOut ? "animate-pulse" : ""}`}
+                  />
+                  <span className="text-xs font-lexend font-medium uppercase tracking-wider">
+                    {isSigningOut ? "Signing Out..." : "Sign Out"}
+                  </span>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </header>
+
+      <main className="flex flex-col items-center justify-center gap-8 pt-20 md:pt-24 mb-12">
         {/**Greet User Section */}
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="h3-b-lexend text-white mb-2">
@@ -151,7 +226,7 @@ export default function Portal() {
               className="rounded-xl"
             />
           </div>
-          <p className="p-xs-sb text-muted mt-6 uppercase tracking-[0.2em]">
+          <p className="p-xs-sb text-muted mt-6 uppercase tracking-[0.2em] text-center">
             Show this QR code at the gym entrance
           </p>
         </section>

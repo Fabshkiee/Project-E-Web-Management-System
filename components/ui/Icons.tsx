@@ -328,10 +328,11 @@ export function LogoutIcon(props: SVGProps<SVGSVGElement>) {
       height="11"
       viewBox="0 0 11 11"
       fill="none"
+      {...props}
     >
       <path
         d="M8.17578 2.92578L7.35547 3.74609L8.25781 4.67578H3.5V5.82422H8.25781L7.35547 6.75391L8.17578 7.57422L10.5 5.25L8.17578 2.92578ZM1.17578 1.17578H5.25V0H1.17578C0.519531 0 0 0.519531 0 1.17578V9.32422C0 9.98047 0.519531 10.5 1.17578 10.5H5.25V9.32422H1.17578V1.17578Z"
-        fill="white"
+        fill="currentColor"
       />
     </svg>
   );
