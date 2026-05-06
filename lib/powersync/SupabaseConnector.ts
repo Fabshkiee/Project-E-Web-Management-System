@@ -49,15 +49,36 @@ export class SupabaseConnector extends BaseObserver<SupabaseConnectorListener> i
 
   async fetchCredentials() {
     console.log('PowerSync: Fetching credentials...');
-    const { data: { session }, error } = await this.client.auth.getSession();
+    
+    // 1. Try to get current session immediately
+    let { data: { session }, error } = await this.client.auth.getSession();
     
     if (error) {
       console.error('PowerSync: Credentials fetch error', error);
       throw error;
     }
 
+    // 2. If no session, wait for it (handles hydration race on production)
     if (!session) {
-      console.warn('PowerSync: No active Supabase session found');
+      console.log('PowerSync: No session found, waiting for auth state...');
+      session = await new Promise<Session | null>((resolve) => {
+        const { data: { subscription } } = this.client.auth.onAuthStateChange((event, currentSession) => {
+          if (currentSession) {
+            subscription.unsubscribe();
+            resolve(currentSession);
+          }
+        });
+
+        // Timeout after 5 seconds so we don't hang forever if not logged in
+        setTimeout(() => {
+          subscription.unsubscribe();
+          resolve(null);
+        }, 5000);
+      });
+    }
+
+    if (!session) {
+      console.warn('PowerSync: No active Supabase session found after waiting');
       throw new Error('Not logged in');
     }
 
