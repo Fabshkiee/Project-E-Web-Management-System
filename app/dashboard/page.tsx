@@ -29,7 +29,9 @@ const attendanceColumns = [
     header: "Member",
     accessor: (item: RecentAttendance) => (
       <div className="flex items-center gap-4">
-        <UserAvatar name={item.full_name || "Unknown"} />
+        <div className="transition-transform duration-300 group-hover:scale-110">
+          <UserAvatar name={item.full_name || "Unknown"} />
+        </div>
         <div className="flex flex-col">
           <span className="font-medium text-foreground text-sm font-lexend">
             {item.full_name || "Unknown Member"}
