@@ -77,7 +77,9 @@ export default function Dashboard() {
   const [attendance, setAttendance] = useState<RecentAttendance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [formattedDate, setFormattedDate] = useState<string>("");
   const isInitialLoad = useRef(true);
+  const isPowerSyncInitialized = useRef(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -92,6 +94,14 @@ export default function Dashboard() {
         setStats(statsData);
         setAttendance(attendanceData);
         setError(false);
+        setFormattedDate(
+          new Date().toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })
+        );
         isInitialLoad.current = false;
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
@@ -106,7 +116,11 @@ export default function Dashboard() {
 
     // 2. Set up realtime subscription
     const supabase = createClient();
-    initPowerSync(supabase);
+    
+    if (!isPowerSyncInitialized.current) {
+      initPowerSync(supabase);
+      isPowerSyncInitialized.current = true;
+    }
 
     const channel = supabase
       .channel("dashboard-realtime")
@@ -137,15 +151,7 @@ export default function Dashboard() {
       <header>
         <PageTitle
           title="Gym Overview"
-          subtitle={`Real-time statistics for ${new Date().toLocaleDateString(
-            "en-US",
-            {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            },
-          )}`}
+          subtitle={formattedDate ? `Real-time statistics for ${formattedDate}` : "Loading real-time statistics..."}
         />
       </header>
 

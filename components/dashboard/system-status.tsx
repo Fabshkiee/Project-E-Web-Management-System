@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { CloudIcon } from "@/components/ui/Icons";
-import { db } from "@/lib/powersync/PowerSync";
+import { getDb } from "@/lib/powersync/PowerSync";
 
 export default function SystemStatus() {
   const [status, setStatus] = useState<any>(null);
@@ -17,60 +17,72 @@ export default function SystemStatus() {
       lastSyncRef.current = new Date(savedSync);
     }
 
-    setStatus({ ...db.currentStatus });
+    let currentDb: any = null;
+    try {
+      currentDb = getDb();
+      setStatus({ ...currentDb.currentStatus });
+    } catch (e) {
+      // Not initialized yet, that's fine
+    }
 
     // 2. Listen to PowerSync status changes
-    const l = db.registerListener({
-      statusChanged: (statusObj: any) => {
-        const isDownloading = !!statusObj.downloading;
-        const isUploading = !!statusObj.uploading;
+    let unsubscribe = () => {};
+    if (currentDb) {
+      unsubscribe = currentDb.registerListener({
+        statusChanged: (statusObj: any) => {
+          const isDownloading = !!statusObj.downloading;
+          const isUploading = !!statusObj.uploading;
 
-        // Detect IF data actually arrived by checking the timestamp
-        const newSyncTime = statusObj.lastSyncedAt;
-        const dataArrived =
-          newSyncTime &&
-          (!lastSyncRef.current ||
-            newSyncTime.getTime() > lastSyncRef.current.getTime());
+          // Detect IF data actually arrived by checking the timestamp
+          const newSyncTime = statusObj.lastSyncedAt;
+          const dataArrived =
+            newSyncTime &&
+            (!lastSyncRef.current ||
+              newSyncTime.getTime() > lastSyncRef.current.getTime());
 
-        if (isDownloading || isUploading || dataArrived) {
-          setIsActivelySyncing(true);
-          clearTimeout(syncTimer);
-
-          if (dataArrived) {
-            lastSyncRef.current = newSyncTime;
-            localStorage.setItem(
-              "powersync_last_synced",
-              newSyncTime.toISOString(),
-            );
-          }
-
-          if (!isDownloading && !isUploading) {
-            syncTimer = setTimeout(() => setIsActivelySyncing(false), 2500);
-          }
-        } else if (!isDownloading && !isUploading) {
-          if (isActivelySyncing) {
+          if (isDownloading || isUploading || dataArrived) {
+            setIsActivelySyncing(true);
             clearTimeout(syncTimer);
-            syncTimer = setTimeout(() => setIsActivelySyncing(false), 2500);
+
+            if (dataArrived) {
+              lastSyncRef.current = newSyncTime;
+              localStorage.setItem(
+                "powersync_last_synced",
+                newSyncTime.toISOString(),
+              );
+            }
+
+            if (!isDownloading && !isUploading) {
+              syncTimer = setTimeout(() => setIsActivelySyncing(false), 2500);
+            }
+          } else if (!isDownloading && !isUploading) {
+            if (isActivelySyncing) {
+              clearTimeout(syncTimer);
+              syncTimer = setTimeout(() => setIsActivelySyncing(false), 2500);
+            }
           }
-        }
 
-        const statusUpdate = {
-          connected: !!statusObj.connected,
-          connecting: !!statusObj.connecting,
-          downloading: isDownloading,
-          uploading: isUploading,
-          lastSyncedAt: statusObj.lastSyncedAt || lastSyncRef.current,
-          hasSynced: !!statusObj.hasSynced,
-        };
+          const statusUpdate = {
+            connected: !!statusObj.connected,
+            connecting: !!statusObj.connecting,
+            downloading: isDownloading,
+            uploading: isUploading,
+            lastSyncedAt: statusObj.lastSyncedAt || lastSyncRef.current,
+            hasSynced: !!statusObj.hasSynced,
+          };
 
-        setStatus(statusUpdate);
-      },
-    });
+          setStatus(statusUpdate);
+        },
+      });
+    }
 
     // 3. Update relative time every minute
     const updateTime = () => {
       // Use the SDK status time, or fall back to our persistent ref
-      const effectiveSyncTime = db.currentStatus.lastSyncedAt || lastSyncRef.current;
+      let effectiveSyncTime: Date | null = lastSyncRef.current;
+      try {
+        effectiveSyncTime = getDb().currentStatus.lastSyncedAt || lastSyncRef.current;
+      } catch (e) {}
       
       if (effectiveSyncTime) {
         const diff = Date.now() - effectiveSyncTime.getTime();
@@ -84,12 +96,11 @@ export default function SystemStatus() {
       }
     };
 
-
     updateTime();
     const interval = setInterval(updateTime, 30000);
 
     return () => {
-      l();
+      unsubscribe();
       clearInterval(interval);
     };
   }, []);
@@ -98,8 +109,13 @@ export default function SystemStatus() {
 
   useEffect(() => {
     const updatePendingCount = async () => {
-      const batch = await db.getCrudBatch();
-      setPendingCount(batch?.crud.length || 0);
+      try {
+        const currentDb = getDb();
+        const batch = await currentDb.getCrudBatch();
+        setPendingCount(batch?.crud.length || 0);
+      } catch (e) {
+        setPendingCount(0);
+      }
     };
 
     updatePendingCount();

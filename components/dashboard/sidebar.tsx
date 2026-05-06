@@ -34,7 +34,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-[260px] h-screen bg-surface border-r border-stroke flex flex-col flex-shrink-0 dark:bg-dark-bg">
+    <aside className="w-[260px] h-screen bg-surface border-r border-stroke flex flex-col shrink-0 dark:bg-dark-bg">
       {/* Brand Section */}
       <div className="px-6 py-4 flex items-center gap-3 border-b border-stroke dark:bg-dark-bg">
         <div className="w-12 h-12 relative shrink-0">
