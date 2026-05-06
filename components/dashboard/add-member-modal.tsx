@@ -131,7 +131,12 @@ export default function AddMemberModal({
     "text-[11px] font-medium font-lexend uppercase tracking-wider text-gray-500 dark:text-[#9CA3AF] mb-1.5 block";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add New Member" maxWidth="max-w-2xl">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Add New Member"
+      maxWidth="max-w-2xl"
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
           {/* Full Name */}
@@ -140,6 +145,7 @@ export default function AddMemberModal({
               Full Name
             </label>
             <input
+              autoComplete="off"
               id="add-member-fullname"
               type="text"
               placeholder="e.g. Alex Johnson"
@@ -155,6 +161,7 @@ export default function AddMemberModal({
               Nickname (Optional)
             </label>
             <input
+              autoComplete="off"
               id="add-member-nickname"
               type="text"
               placeholder="e.g. Lex"
@@ -170,6 +177,7 @@ export default function AddMemberModal({
               Contact Number (Optional)
             </label>
             <input
+              autoComplete="off"
               id="add-member-contact"
               type="tel"
               placeholder="09XXXXXXXXX"
@@ -187,18 +195,27 @@ export default function AddMemberModal({
               className={`${inputBase} flex items-center justify-between cursor-pointer ${isMembershipOpen ? "border-primary ring-2 ring-primary/30" : ""}`}
               onClick={() => setIsMembershipOpen(!isMembershipOpen)}
             >
-              <span className={membership ? "text-foreground" : "text-[#9CA3AF]"}>
+              <span
+                className={membership ? "text-foreground" : "text-[#9CA3AF]"}
+              >
                 {membership || "Select plan"}
               </span>
-              <ChevronDownIcon className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isMembershipOpen ? "rotate-180" : ""}`} />
+              <ChevronDownIcon
+                className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isMembershipOpen ? "rotate-180" : ""}`}
+              />
             </div>
 
             {isMembershipOpen && (
               <>
-                <div className="fixed inset-0 z-10" onClick={() => setIsMembershipOpen(false)} />
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setIsMembershipOpen(false)}
+                />
                 <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200 max-h-48 overflow-y-auto">
                   {isLoadingOptions ? (
-                    <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
+                    <div className="px-4 py-2 text-sm text-gray-500">
+                      Loading...
+                    </div>
                   ) : membershipOptions.length > 0 ? (
                     membershipOptions.map((opt) => (
                       <div
@@ -233,11 +250,16 @@ export default function AddMemberModal({
           </div>
 
           {/* Duration Input */}
-          <div className={membership === "Coaching" ? "md:col-span-1" : "md:col-span-2"}>
+          <div
+            className={
+              membership === "Coaching" ? "md:col-span-1" : "md:col-span-2"
+            }
+          >
             <label htmlFor="add-member-duration" className={labelBase}>
               Duration (Months)
             </label>
             <input
+              autoComplete="off"
               id="add-member-duration"
               type="text"
               placeholder="e.g. 1"
@@ -268,15 +290,22 @@ export default function AddMemberModal({
                 <span className={coach ? "text-foreground" : "text-[#9CA3AF]"}>
                   {coach || "Select a coach"}
                 </span>
-                <ChevronDownIcon className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isCoachOpen ? "rotate-180" : ""}`} />
+                <ChevronDownIcon
+                  className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isCoachOpen ? "rotate-180" : ""}`}
+                />
               </div>
 
               {isCoachOpen && (
                 <>
-                  <div className="fixed inset-0 z-10" onClick={() => setIsCoachOpen(false)} />
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setIsCoachOpen(false)}
+                  />
                   <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200 max-h-48 overflow-y-auto">
                     {isLoadingOptions ? (
-                      <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
+                      <div className="px-4 py-2 text-sm text-gray-500">
+                        Loading...
+                      </div>
                     ) : coachOptions.length > 0 ? (
                       coachOptions.map((opt) => (
                         <div
@@ -376,7 +405,11 @@ export default function AddMemberModal({
                   ₱{total.toLocaleString()}
                 </p>
                 <p className="text-[10px] font-lexend text-gray-400 dark:text-white/20 mt-1 uppercase tracking-wider">
-                  ₱{hasDiscount ? PRICES[membership as keyof typeof PRICES].discounted : PRICES[membership as keyof typeof PRICES].regular} × {duration} Month{Number(duration) > 1 ? "s" : ""}
+                  ₱
+                  {hasDiscount
+                    ? PRICES[membership as keyof typeof PRICES].discounted
+                    : PRICES[membership as keyof typeof PRICES].regular}{" "}
+                  × {duration} Month{Number(duration) > 1 ? "s" : ""}
                 </p>
               </div>
             )}
