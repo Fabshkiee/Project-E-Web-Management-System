@@ -17,7 +17,7 @@ export default function AddMemberModal({
 }: AddMemberModalProps) {
   const [fullName, setFullName] = useState("");
   const [nickname, setNickname] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
   const [membership, setMembership] = useState("");
   const [duration, setDuration] = useState("");
   const [hasDiscount, setHasDiscount] = useState(false);
@@ -31,13 +31,15 @@ export default function AddMemberModal({
     console.log({
       fullName,
       nickname,
-      phoneNumber,
+      contactNumber,
       membership,
       duration,
       hasDiscount,
     });
     onClose();
   };
+
+  const isFormValid = fullName.trim() !== "" && membership !== "" && duration !== "";
 
   const inputBase =
     "w-full px-4 py-3 rounded-xl border border-stroke dark:border-white/10 bg-transparent text-foreground text-sm font-lexend placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
@@ -78,17 +80,17 @@ export default function AddMemberModal({
           />
         </div>
 
-        {/* Phone Number */}
+        {/* Contact Number */}
         <div>
-          <label htmlFor="add-member-phone" className={labelBase}>
-            Contact Number
+          <label htmlFor="add-member-contact" className={labelBase}>
+            Contact Number (Optional)
           </label>
           <input
-            id="add-member-phone"
+            id="add-member-contact"
             type="tel"
             placeholder="09XX XXX XXXX"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            value={contactNumber}
+            onChange={(e) => setContactNumber(e.target.value)}
             maxLength={11}
             className={inputBase}
           />
@@ -204,7 +206,12 @@ export default function AddMemberModal({
           </button>
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl text-sm font-semibold font-lexend bg-primary text-white hover:bg-primary/90 active:scale-[0.98] transition-all shadow-sm"
+            disabled={!isFormValid}
+            className={`px-6 py-2.5 rounded-xl text-sm font-semibold font-lexend transition-all shadow-sm ${
+              isFormValid 
+                ? "bg-primary text-white hover:bg-primary/90 active:scale-[0.98] cursor-pointer" 
+                : "bg-gray-200 dark:bg-white/5 text-gray-400 dark:text-gray-600 cursor-not-allowed"
+            }`}
           >
             Add Member
           </button>
