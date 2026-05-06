@@ -198,11 +198,11 @@ export default function Dashboard() {
       </section>
 
       {/* Main Dashboard Content */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Recent Attendance Table Section (Left) */}
         <section
           aria-labelledby="attendance-title"
-          className="lg:col-span-8 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm"
+          className="lg:col-span-8 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm flex flex-col"
         >
           <header className="px-8 py-6 border-b border-stroke dark:border-white/5 flex justify-between items-center">
             <h2
@@ -215,7 +215,9 @@ export default function Dashboard() {
               View All
             </button>
           </header>
-          <DataTable columns={attendanceColumns} data={attendance} />
+          <div className="flex-1 flex flex-col">
+            <DataTable columns={attendanceColumns} data={attendance} className="flex-1" />
+          </div>
         </section>
 
         {/* Sidebar (Right) */}
