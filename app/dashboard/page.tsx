@@ -13,6 +13,83 @@ import {
 } from "@/components/ui/Icons";
 import { getMemberCards, MemberCardsResponse } from "@/lib/api/dashboard";
 import { createClient } from "@/lib/supabase/client";
+import { DataTable } from "@/components/dashboard/data-table";
+import { UserAvatar } from "@/components/ui/UserAvatar";
+import { StatusTag } from "@/components/ui/StatusTag";
+
+// Mock data for Recent Attendance
+const recentAttendanceData = [
+  {
+    member: { name: "Marcus Johnson", id: "#8821" },
+    checkInTime: "10:42 AM",
+    membership: "Standard",
+    status: "Active" as const,
+  },
+  {
+    member: { name: "Sarah Connor", id: "#9932" },
+    checkInTime: "10:38 AM",
+    membership: "Supervision",
+    status: "Active" as const,
+  },
+  {
+    member: { name: "James Doe", id: "#5322" },
+    checkInTime: "10:15 AM",
+    membership: "Coaching",
+    status: "Active" as const,
+  },
+  {
+    member: { name: "Mike Ross", id: "LOGIN FAILED" },
+    checkInTime: "09:55 AM",
+    membership: "Standard",
+    status: "Expired" as const,
+  },
+];
+
+const attendanceColumns = [
+  {
+    header: "Member",
+    accessor: (item: (typeof recentAttendanceData)[0]) => (
+      <div className="flex items-center gap-4">
+        <UserAvatar name={item.member.name} />
+        <div className="flex flex-col">
+          <span className="font-medium text-foreground text-sm font-lexend">
+            {item.member.name}
+          </span>
+          <span
+            className={`text-[11px] font-medium uppercase tracking-wider ${item.member.id === "LOGIN FAILED" ? "text-primary" : "text-secondary"}`}
+          >
+            {item.member.id === "LOGIN FAILED"
+              ? "LOGIN FAILED"
+              : `ID: ${item.member.id}`}
+          </span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    header: "Check-in Time",
+    accessor: (item: (typeof recentAttendanceData)[0]) => (
+      <span className="text-sm font-medium text-foreground font-lexend">
+        {item.checkInTime}
+      </span>
+    ),
+  },
+  {
+    header: "Membership",
+    accessor: (item: (typeof recentAttendanceData)[0]) => (
+      <span className="text-sm font-medium text-secondary font-lexend">
+        {item.membership}
+      </span>
+    ),
+  },
+  {
+    header: "Status",
+    accessor: (item: (typeof recentAttendanceData)[0]) => (
+      <StatusTag type={item.status} />
+    ),
+    className: "text-right md:text-left",
+  },
+];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<MemberCardsResponse | null>(null);
@@ -50,12 +127,12 @@ export default function Dashboard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "members" },
-        () => fetchStats()
+        () => fetchStats(),
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "attendance_logs" },
-        () => fetchStats()
+        () => fetchStats(),
       )
       .subscribe();
 
@@ -85,6 +162,7 @@ export default function Dashboard() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+        {/* ... (StatsCards) */}
         <StatsCard
           label="Total Members"
           value={totalMembers?.value}
@@ -126,6 +204,19 @@ export default function Dashboard() {
             icon: <RevenueIcon className="w-3.5 h-3.5" />,
           }}
         />
+      </div>
+
+      {/* Recent Attendance Table Section */}
+      <div className="mt-12 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm">
+        <div className="px-8 py-6 border-b border-stroke dark:border-white/5 flex justify-between items-center">
+          <h2 className="font-teko font-medium text-[20px] uppercase tracking-wider text-foreground">
+            Recent Attendance
+          </h2>
+          <button className="text-primary font-bold p-sm-md hover:underline decoration-2 underline-offset-4">
+            View All
+          </button>
+        </div>
+        <DataTable columns={attendanceColumns} data={recentAttendanceData} />
       </div>
     </div>
   );
