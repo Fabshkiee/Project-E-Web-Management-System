@@ -23,6 +23,7 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import QuickActions from "@/components/dashboard/quick-actions";
 import SystemStatus from "@/components/dashboard/system-status";
+import { initPowerSync } from "@/lib/powersync/PowerSync";
 
 const attendanceColumns = [
   {
@@ -105,6 +106,8 @@ export default function Dashboard() {
 
     // 2. Set up realtime subscription
     const supabase = createClient();
+    initPowerSync(supabase);
+
     const channel = supabase
       .channel("dashboard-realtime")
       .on(
