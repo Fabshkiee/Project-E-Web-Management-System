@@ -9,21 +9,12 @@ interface AddMemberModalProps {
   onClose: () => void;
 }
 
-const MEMBERSHIP_OPTIONS = [
-  "Standard",
-  "Premium",
-  "VIP",
-  "Student",
-];
+const MEMBERSHIP_OPTIONS = ["Basic", "Supervision", "Coaching"];
 
-const DURATION_OPTIONS = [
-  "1 Month",
-  "3 Months",
-  "6 Months",
-  "12 Months",
-];
-
-export default function AddMemberModal({ isOpen, onClose }: AddMemberModalProps) {
+export default function AddMemberModal({
+  isOpen,
+  onClose,
+}: AddMemberModalProps) {
   const [fullName, setFullName] = useState("");
   const [nickname, setNickname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -132,26 +123,28 @@ export default function AddMemberModal({ isOpen, onClose }: AddMemberModalProps)
 
           {/* Duration Dropdown */}
           <div>
-            <label htmlFor="add-member-duration" className={labelBase}>
-              Duration
-            </label>
-            <div className="relative">
-              <select
+            <div>
+              <label htmlFor="add-member-duration" className={labelBase}>
+                Duration
+              </label>
+              <input
                 id="add-member-duration"
+                type="text"
+                placeholder="Months (1-12)"
                 value={duration}
-                onChange={(e) => setDuration(e.target.value)}
+                min={1}
+                max={12}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^\d{0,2}$/.test(val) && Number(val) <= 12) {
+                    setDuration(val);
+                  }
+                }}
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 className={`${inputBase} appearance-none pr-10 cursor-pointer`}
-              >
-                <option value="" disabled>
-                  Select duration
-                </option>
-                {DURATION_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-              <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF] pointer-events-none" />
+              />
             </div>
           </div>
         </div>
