@@ -20,9 +20,10 @@ export default function AddMemberModal({
   const [phoneNumber, setPhoneNumber] = useState("");
   const [membership, setMembership] = useState("");
   const [duration, setDuration] = useState("");
-  const [isStudent, setIsStudent] = useState(false);
-  const [isSenior, setIsSenior] = useState(false);
-  const [isPWD, setIsPWD] = useState(false);
+  const [hasDiscount, setHasDiscount] = useState(false);
+
+  // Dropdown states
+  const [isMembershipOpen, setIsMembershipOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +34,7 @@ export default function AddMemberModal({
       phoneNumber,
       membership,
       duration,
-      isStudent,
-      isSenior,
-      isPWD,
+      hasDiscount,
     });
     onClose();
   };
@@ -67,7 +66,7 @@ export default function AddMemberModal({
         {/* Nickname */}
         <div>
           <label htmlFor="add-member-nickname" className={labelBase}>
-            Nickname
+            Nickname (Optional)
           </label>
           <input
             id="add-member-nickname"
@@ -82,7 +81,7 @@ export default function AddMemberModal({
         {/* Phone Number */}
         <div>
           <label htmlFor="add-member-phone" className={labelBase}>
-            Phone Number
+            Contact Number
           </label>
           <input
             id="add-member-phone"
@@ -90,86 +89,103 @@ export default function AddMemberModal({
             placeholder="09XX XXX XXXX"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            maxLength={11}
             className={inputBase}
           />
         </div>
 
         {/* Membership & Duration Row */}
         <div className="grid grid-cols-2 gap-4">
-          {/* Membership Dropdown */}
-          <div>
-            <label htmlFor="add-member-membership" className={labelBase}>
-              Membership
-            </label>
-            <div className="relative">
-              <select
-                id="add-member-membership"
-                value={membership}
-                onChange={(e) => setMembership(e.target.value)}
-                className={`${inputBase} appearance-none pr-10 cursor-pointer`}
+          {/* Custom Membership Dropdown */}
+          <div className="relative">
+            <label className={labelBase}>Membership</label>
+            <div
+              className={`${inputBase} flex items-center justify-between cursor-pointer ${isMembershipOpen ? "border-primary ring-2 ring-primary/30" : ""}`}
+              onClick={() => setIsMembershipOpen(!isMembershipOpen)}
+            >
+              <span
+                className={membership ? "text-foreground" : "text-[#9CA3AF]"}
               >
-                <option value="" disabled>
-                  Select plan
-                </option>
-                {MEMBERSHIP_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-              <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF] pointer-events-none" />
-            </div>
-          </div>
-
-          {/* Duration Dropdown */}
-          <div>
-            <div>
-              <label htmlFor="add-member-duration" className={labelBase}>
-                Duration
-              </label>
-              <input
-                id="add-member-duration"
-                type="text"
-                placeholder="Months (1-12)"
-                value={duration}
-                min={1}
-                max={12}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (/^\d{0,2}$/.test(val) && Number(val) <= 12) {
-                    setDuration(val);
-                  }
-                }}
-                maxLength={2}
-                pattern="[0-9]*"
-                inputMode="numeric"
-                className={`${inputBase} appearance-none pr-10 cursor-pointer`}
+                {membership || "Select plan"}
+              </span>
+              <ChevronDownIcon
+                className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isMembershipOpen ? "rotate-180" : ""}`}
               />
             </div>
+
+            {isMembershipOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setIsMembershipOpen(false)}
+                />
+                <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                  {MEMBERSHIP_OPTIONS.map((opt) => (
+                    <div
+                      key={opt}
+                      className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                      onClick={() => {
+                        setMembership(opt);
+                        setIsMembershipOpen(false);
+                      }}
+                    >
+                      {opt}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Duration Input */}
+          <div>
+            <label htmlFor="add-member-duration" className={labelBase}>
+              Duration
+            </label>
+            <input
+              id="add-member-duration"
+              type="text"
+              placeholder="Months (1-12)"
+              value={duration}
+              min={1}
+              max={12}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (/^\d{0,2}$/.test(val) && Number(val) <= 12) {
+                  setDuration(val);
+                }
+              }}
+              maxLength={2}
+              pattern="[0-9]*"
+              inputMode="numeric"
+              className={inputBase}
+            />
           </div>
         </div>
 
-        {/* Discount Checkboxes */}
-        <div>
-          <span className={labelBase}>Discount Category</span>
-          <div className="flex items-center gap-6 mt-2">
-            <CheckboxItem
-              id="add-member-student"
-              label="Student"
-              checked={isStudent}
-              onChange={setIsStudent}
+        {/* Discount Toggle */}
+        <div
+          className="flex items-center justify-between p-4 rounded-xl border border-stroke dark:border-white/10 bg-gray-50/50 dark:bg-white/2 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-white/5 transition-all group"
+          onClick={() => setHasDiscount(!hasDiscount)}
+        >
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold font-lexend text-foreground">
+              Student / Senior / PWD
+            </span>
+            <span className="text-[11px] font-lexend text-[#9CA3AF]">
+              Please verify the ID before applying the discount.
+            </span>
+          </div>
+          <div className="relative">
+            <div
+              className={`w-11 h-6 rounded-full transition-colors duration-200 ease-in-out ${
+                hasDiscount ? "bg-primary" : "bg-gray-200 dark:bg-white/10"
+              }`}
             />
-            <CheckboxItem
-              id="add-member-senior"
-              label="Senior"
-              checked={isSenior}
-              onChange={setIsSenior}
-            />
-            <CheckboxItem
-              id="add-member-pwd"
-              label="PWD"
-              checked={isPWD}
-              onChange={setIsPWD}
+            <div
+              className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform duration-200 ease-in-out ${
+                hasDiscount ? "translate-x-5" : "translate-x-0"
+              }`}
             />
           </div>
         </div>
@@ -195,56 +211,5 @@ export default function AddMemberModal({
         </div>
       </form>
     </Modal>
-  );
-}
-
-function CheckboxItem({
-  id,
-  label,
-  checked,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  checked: boolean;
-  onChange: (val: boolean) => void;
-}) {
-  return (
-    <label
-      htmlFor={id}
-      className="flex items-center gap-2 cursor-pointer group select-none"
-    >
-      <div className="relative">
-        <input
-          id={id}
-          type="checkbox"
-          checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
-          className="sr-only peer"
-        />
-        <div className="w-[18px] h-[18px] rounded-md border-2 border-stroke dark:border-white/20 peer-checked:border-primary peer-checked:bg-primary transition-all flex items-center justify-center">
-          {checked && (
-            <svg
-              width="10"
-              height="8"
-              viewBox="0 0 10 8"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 4L3.5 6.5L9 1"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          )}
-        </div>
-      </div>
-      <span className="text-sm font-medium font-lexend text-foreground group-hover:text-primary transition-colors">
-        {label}
-      </span>
-    </label>
   );
 }
