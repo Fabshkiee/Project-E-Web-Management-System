@@ -12,6 +12,12 @@ interface AddMemberModalProps {
 const MEMBERSHIP_OPTIONS = ["Basic", "Supervision", "Coaching"];
 const COACH_OPTIONS = ["Coach Eric", "Coach Ezekiel"];
 
+const PRICES = {
+  Basic: { regular: 900, discounted: 700 },
+  Supervision: { regular: 1500, discounted: 1200 },
+  Coaching: { regular: 3000, discounted: 2500 },
+};
+
 export default function AddMemberModal({
   isOpen,
   onClose,
@@ -64,86 +70,87 @@ export default function AddMemberModal({
     duration !== "" &&
     (membership === "Coaching" ? coach !== "" : true);
 
+  const calculateTotal = () => {
+    if (!membership || !duration) return 0;
+    const rates = PRICES[membership as keyof typeof PRICES];
+    const rate = hasDiscount ? rates.discounted : rates.regular;
+    return rate * Number(duration);
+  };
+
+  const total = calculateTotal();
+
   const inputBase =
-    "w-full px-4 py-3 rounded-xl border border-stroke dark:border-white/10 bg-gray-50/50 dark:bg-transparent text-foreground text-sm font-lexend placeholder:text-gray-400 dark:placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
+    "w-full px-4 py-3 rounded-xl border border-stroke dark:border-white/10 bg-gray-100/50 dark:bg-transparent text-foreground text-sm font-lexend placeholder:text-gray-400 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
 
   const labelBase =
     "text-[11px] font-medium font-lexend uppercase tracking-wider text-gray-500 dark:text-[#9CA3AF] mb-1.5 block";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add New Member">
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Full Name */}
-        <div>
-          <label htmlFor="add-member-fullname" className={labelBase}>
-            Full Name
-          </label>
-          <input
-            id="add-member-fullname"
-            type="text"
-            placeholder="Enter full name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className={inputBase}
-          />
-        </div>
+    <Modal isOpen={isOpen} onClose={onClose} title="Add New Member" maxWidth="max-w-2xl">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          {/* Full Name */}
+          <div className="md:col-span-1">
+            <label htmlFor="add-member-fullname" className={labelBase}>
+              Full Name
+            </label>
+            <input
+              id="add-member-fullname"
+              type="text"
+              placeholder="e.g. Alex Johnson"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className={inputBase}
+            />
+          </div>
 
-        {/* Nickname */}
-        <div>
-          <label htmlFor="add-member-nickname" className={labelBase}>
-            Nickname (Optional)
-          </label>
-          <input
-            id="add-member-nickname"
-            type="text"
-            placeholder="Enter nickname"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            className={inputBase}
-          />
-        </div>
+          {/* Nickname */}
+          <div className="md:col-span-1">
+            <label htmlFor="add-member-nickname" className={labelBase}>
+              Nickname (Optional)
+            </label>
+            <input
+              id="add-member-nickname"
+              type="text"
+              placeholder="e.g. Lex"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              className={inputBase}
+            />
+          </div>
 
-        {/* Contact Number */}
-        <div>
-          <label htmlFor="add-member-contact" className={labelBase}>
-            Contact Number (Optional)
-          </label>
-          <input
-            id="add-member-contact"
-            type="tel"
-            placeholder="09XX XXX XXXX"
-            value={contactNumber}
-            onChange={(e) => setContactNumber(e.target.value)}
-            maxLength={11}
-            className={inputBase}
-          />
-        </div>
+          {/* Contact Number */}
+          <div className="md:col-span-1">
+            <label htmlFor="add-member-contact" className={labelBase}>
+              Contact Number (Optional)
+            </label>
+            <input
+              id="add-member-contact"
+              type="tel"
+              placeholder="09XXXXXXXXX"
+              value={contactNumber}
+              onChange={(e) => setContactNumber(e.target.value)}
+              maxLength={11}
+              className={inputBase}
+            />
+          </div>
 
-        {/* Membership & Duration Row */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* Custom Membership Dropdown */}
-          <div className="relative">
+          {/* Membership Dropdown */}
+          <div className="md:col-span-1 relative">
             <label className={labelBase}>Membership</label>
             <div
               className={`${inputBase} flex items-center justify-between cursor-pointer ${isMembershipOpen ? "border-primary ring-2 ring-primary/30" : ""}`}
               onClick={() => setIsMembershipOpen(!isMembershipOpen)}
             >
-              <span
-                className={membership ? "text-foreground" : "text-[#9CA3AF]"}
-              >
+              <span className={membership ? "text-foreground" : "text-[#9CA3AF]"}>
                 {membership || "Select plan"}
               </span>
-              <ChevronDownIcon
-                className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isMembershipOpen ? "rotate-180" : ""}`}
-              />
+              <ChevronDownIcon className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isMembershipOpen ? "rotate-180" : ""}`} />
             </div>
 
             {isMembershipOpen && (
               <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setIsMembershipOpen(false)}
-                />
+                <div className="fixed inset-0 z-10" onClick={() => setIsMembershipOpen(false)} />
                 <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
                   {MEMBERSHIP_OPTIONS.map((opt) => (
                     <div
@@ -163,14 +170,14 @@ export default function AddMemberModal({
           </div>
 
           {/* Duration Input */}
-          <div>
+          <div className={membership === "Coaching" ? "md:col-span-1" : "md:col-span-2"}>
             <label htmlFor="add-member-duration" className={labelBase}>
-              Duration
+              Duration (Months)
             </label>
             <input
               id="add-member-duration"
               type="text"
-              placeholder="Months (1-12)"
+              placeholder="e.g. 1"
               value={duration}
               min={1}
               max={12}
@@ -186,66 +193,61 @@ export default function AddMemberModal({
               className={inputBase}
             />
           </div>
+
+          {/* Conditional Coach Dropdown */}
+          {membership === "Coaching" && (
+            <div className="md:col-span-1 relative animate-in fade-in slide-in-from-right-2 duration-300">
+              <label className={labelBase}>Assign Coach</label>
+              <div
+                className={`${inputBase} flex items-center justify-between cursor-pointer ${isCoachOpen ? "border-primary ring-2 ring-primary/30" : ""}`}
+                onClick={() => setIsCoachOpen(!isCoachOpen)}
+              >
+                <span className={coach ? "text-foreground" : "text-[#9CA3AF]"}>
+                  {coach || "Select a coach"}
+                </span>
+                <ChevronDownIcon className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isCoachOpen ? "rotate-180" : ""}`} />
+              </div>
+
+              {isCoachOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setIsCoachOpen(false)} />
+                  <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                    {COACH_OPTIONS.map((opt) => (
+                      <div
+                        key={opt}
+                        className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setCoach(opt);
+                          setIsCoachOpen(false);
+                        }}
+                      >
+                        {opt}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Conditional Coach Dropdown */}
-        {membership === "Coaching" && (
-          <div className="relative animate-in fade-in slide-in-from-top-2 duration-300">
-            <label className={labelBase}>Assign Coach</label>
-            <div
-              className={`${inputBase} flex items-center justify-between cursor-pointer ${isCoachOpen ? "border-primary ring-2 ring-primary/30" : ""}`}
-              onClick={() => setIsCoachOpen(!isCoachOpen)}
-            >
-              <span className={coach ? "text-foreground" : "text-[#9CA3AF]"}>
-                {coach || "Select a coach"}
-              </span>
-              <ChevronDownIcon
-                className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isCoachOpen ? "rotate-180" : ""}`}
-              />
-            </div>
-
-            {isCoachOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setIsCoachOpen(false)}
-                />
-                <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                  {COACH_OPTIONS.map((opt) => (
-                    <div
-                      key={opt}
-                      className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                      onClick={() => {
-                        setCoach(opt);
-                        setIsCoachOpen(false);
-                      }}
-                    >
-                      {opt}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Discount Toggle */}
+        {/* Discount Toggle - Full Width */}
         <div
-          className="flex items-center justify-between p-4 rounded-xl border border-stroke dark:border-white/10 bg-gray-50/50 dark:bg-white/2 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-white/5 transition-all group"
+          className="flex items-center justify-between p-4 rounded-xl border border-stroke dark:border-white/10 bg-gray-100/50 dark:bg-white/2 cursor-pointer hover:bg-gray-200/50 dark:hover:bg-white/5 transition-all group"
           onClick={() => setHasDiscount(!hasDiscount)}
         >
           <div className="flex flex-col">
             <span className="text-sm font-semibold font-lexend text-foreground">
               Student / Senior / PWD
             </span>
-            <span className="text-[11px] font-lexend text-[#9CA3AF]">
+            <span className="text-[11px] font-lexend text-gray-500 dark:text-[#9CA3AF]">
               Please verify the ID before applying the discount.
             </span>
           </div>
           <div className="relative">
             <div
               className={`w-11 h-6 rounded-full transition-colors duration-200 ease-in-out ${
-                hasDiscount ? "bg-primary" : "bg-gray-200 dark:bg-white/10"
+                hasDiscount ? "bg-primary" : "bg-gray-300 dark:bg-white/10"
               }`}
             />
             <div
@@ -255,6 +257,25 @@ export default function AddMemberModal({
             />
           </div>
         </div>
+
+        {/* Real-time Total Summary */}
+        {membership && duration && (
+          <div className="p-4 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/20 flex items-center justify-between animate-in zoom-in-95 duration-300">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold font-lexend uppercase tracking-[0.2em] text-primary/70">
+                Total Membership Fee
+              </span>
+              <span className="text-xs text-secondary font-lexend">
+                {membership} Plan × {duration} Month{Number(duration) > 1 ? "s" : ""}
+              </span>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className="text-2xl font-bold font-lexend text-primary leading-none">
+                ₱{total.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Divider */}
         <div className="border-t border-stroke dark:border-white/5" />
