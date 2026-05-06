@@ -427,7 +427,7 @@ export default function AddMemberModal({
           <div className="flex flex-col items-end">
             {membership && duration && (
               <div className="animate-in fade-in slide-in-from-right-2 duration-300 text-right">
-                <span className="text-[10px] font-bold tracking-[0.1em] text-gray-400 dark:text-white/30 uppercase">
+                <span className="text-[10px] font-bold tracking-widest text-gray-400 dark:text-white/30 uppercase">
                   Total Amount
                 </span>
                 <p className="text-xl font-bold font-lexend text-primary leading-none">
