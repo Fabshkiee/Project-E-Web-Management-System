@@ -49,3 +49,54 @@ export async function getMemberCards(): Promise<MemberCardsResponse> {
 
   return data as MemberCardsResponse;
 }
+
+/**
+ * Payload for the create_member_profile RPC
+ */
+export interface CreateMemberPayload {
+  p_short_id: string | null;
+  p_membership_type_id: string;
+  p_coach_id: string | null;
+  p_full_name: string;
+  p_nickname: string | null;
+  p_contact_number: string | null;
+  p_started_date: string;
+  p_duration_months: number;
+  p_is_discounted: boolean;
+}
+
+/**
+ * Fetches dynamic options for the Add Member modal (Memberships & Coaches)
+ */
+export async function getMemberFormOptions() {
+  const supabase = createClient();
+  
+  const [mtRes, staffRes] = await Promise.all([
+    supabase.from("membership_types").select("id, name"),
+    supabase.from("users").select("id, full_name, role").in("role", ["Staff", "Admin"])
+  ]);
+
+  return {
+    membershipTypes: mtRes.data || [],
+    coaches: staffRes.data || []
+  };
+}
+
+/**
+ * Calls the RPC to create a new member profile
+ */
+export async function createMemberProfile(payload: CreateMemberPayload) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("create_member_profile", payload);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  // The RPC returns a JSON object. If it failed internally, it sets success: false.
+  if (data && typeof data === 'object' && !data.success) {
+    throw new Error(data.error || "Failed to create member");
+  }
+
+  return data;
+}
