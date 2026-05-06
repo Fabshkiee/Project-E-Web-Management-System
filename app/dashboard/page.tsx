@@ -17,34 +17,6 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 
-// Mock data for Recent Attendance
-const recentAttendanceData = [
-  {
-    member: { name: "Marcus Johnson", id: "#8821" },
-    checkInTime: "10:42 AM",
-    membership: "Standard",
-    status: "Active" as const,
-  },
-  {
-    member: { name: "Sarah Connor", id: "#9932" },
-    checkInTime: "10:38 AM",
-    membership: "Supervision",
-    status: "Active" as const,
-  },
-  {
-    member: { name: "James Doe", id: "#5322" },
-    checkInTime: "10:15 AM",
-    membership: "Coaching",
-    status: "Active" as const,
-  },
-  {
-    member: { name: "Mike Ross", id: "LOGIN FAILED" },
-    checkInTime: "09:55 AM",
-    membership: "Standard",
-    status: "Expired" as const,
-  },
-];
-
 const attendanceColumns = [
   {
     header: "Member",
