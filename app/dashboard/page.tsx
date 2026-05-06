@@ -22,6 +22,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import QuickActions from "@/components/dashboard/quick-actions";
+import SystemStatus from "@/components/dashboard/system-status";
 
 const attendanceColumns = [
   {
@@ -215,6 +216,7 @@ export default function Dashboard() {
         {/* Sidebar (Right) */}
         <aside className="lg:col-span-4 space-y-8">
           <QuickActions />
+          <SystemStatus />
         </aside>
       </section>
     </main>
