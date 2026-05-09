@@ -15,7 +15,7 @@ import { Pagination } from "@/components/ui/Pagination";
 const toTitleCase = (str: string) => {
   return str.replace(
     /\w\S*/g,
-    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
   );
 };
 
@@ -85,7 +85,7 @@ const MembersColumn = [
       <span
         className={`text-sm font-medium font-lexend ${item.coach === "None" ? "text-gray-300" : "text-secondary"}`}
       >
-        {item.coach === "None" ? "None" : `Coach ${toTitleCase(item.coach)}`}
+        {item.coach === "None" ? "None" : `${toTitleCase(item.coach)}`}
       </span>
     ),
   },
