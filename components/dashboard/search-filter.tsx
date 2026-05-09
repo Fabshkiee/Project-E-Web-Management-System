@@ -1,4 +1,4 @@
-import { SearchIcon, ChevronDown } from "@/components/ui/Icons";
+import { SearchIcon, ChevronDownIcon } from "@/components/ui/Icons";
 
 interface FilterOption {
   label: string;
@@ -26,7 +26,9 @@ export const SearchFilter = ({
   className = "",
 }: SearchFilterProps) => {
   return (
-    <section className={`flex flex-col md:flex-row gap-4 items-center w-full ${className}`}>
+    <section
+      className={`flex flex-col md:flex-row gap-4 items-center w-full ${className}`}
+    >
       {/* Search Input */}
       <div className="relative flex-1 w-full group">
         <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors duration-200">
@@ -49,9 +51,7 @@ export const SearchFilter = ({
               onChange={(e) => filter.onChange(e.target.value)}
               className="appearance-none w-full pl-5 pr-12 py-3.5 bg-white dark:bg-[#1a1a1a] border border-stroke dark:border-white/5 rounded-xl text-sm font-lexend font-medium text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all shadow-sm cursor-pointer hover:border-gray-300 dark:hover:border-white/10"
             >
-              <option value="all">
-                {filter.label}: All
-              </option>
+              <option value="all">{filter.label}: All</option>
               {filter.options.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {filter.label}: {opt.label}
@@ -59,7 +59,7 @@ export const SearchFilter = ({
               ))}
             </select>
             <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors">
-              <ChevronDown className="w-4 h-4" />
+              <ChevronDownIcon className="w-4 h-4" />
             </span>
           </div>
         ))}
