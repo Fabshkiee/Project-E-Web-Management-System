@@ -11,6 +11,7 @@ import MemberWelcomeCard from "./MemberWelcomeCard";
 interface AddMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 const MEMBERSHIP_OPTIONS = ["Basic", "Supervision", "Coaching"];
@@ -25,6 +26,7 @@ const PRICES = {
 export default function AddMemberModal({
   isOpen,
   onClose,
+  onSuccess,
 }: AddMemberModalProps) {
   // DB Options State
   const [membershipOptions, setMembershipOptions] = useState<any[]>([]);
@@ -124,6 +126,9 @@ export default function AddMemberModal({
   };
 
   const handleDone = () => {
+    if (newMember && onSuccess) {
+      onSuccess();
+    }
     setNewMember(null);
     onClose();
   };

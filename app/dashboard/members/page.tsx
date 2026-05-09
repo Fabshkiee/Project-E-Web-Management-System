@@ -9,8 +9,13 @@ import { SearchFilter } from "@/components/dashboard/search-filter";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { DataTable } from "@/components/dashboard/data-table";
-import { getMembersList, MemberListItem, getMemberFormOptions } from "@/lib/api/dashboard";
+import {
+  getMembersList,
+  MemberListItem,
+  getMemberFormOptions,
+} from "@/lib/api/dashboard";
 import { Pagination } from "@/components/ui/Pagination";
+import { createClient } from "@/lib/supabase/client";
 
 const toTitleCase = (str: string) => {
   return str.replace(
@@ -102,8 +107,11 @@ export default function Members() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [coachFilter, setCoachFilter] = useState("all");
-  const [coachOptions, setCoachOptions] = useState<{label: string, value: string}[]>([]);
+  const [coachOptions, setCoachOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
   const [members, setMembers] = useState<MemberListItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -127,6 +135,33 @@ export default function Members() {
       }
     }
     fetchCoaches();
+  }, []);
+
+  // Set up Supabase Realtime listener
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel("dashboard-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "members" },
+        () => {
+          setRealtimeTrigger((prev) => prev + 1);
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "users" },
+        () => {
+          setRealtimeTrigger((prev) => prev + 1);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -165,7 +200,14 @@ export default function Members() {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchQuery, statusFilter, dateFilter, coachFilter]);
+  }, [
+    currentPage,
+    searchQuery,
+    statusFilter,
+    dateFilter,
+    coachFilter,
+    realtimeTrigger,
+  ]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -239,10 +281,13 @@ export default function Members() {
             label: "Coach",
             value: coachFilter,
             onChange: handleCoachChange,
-            options: coachOptions.length > 0 ? coachOptions : [
-              { label: "All Coaches", value: "all" },
-              { label: "None", value: "none" },
-            ],
+            options:
+              coachOptions.length > 0
+                ? coachOptions
+                : [
+                    { label: "All Coaches", value: "all" },
+                    { label: "None", value: "none" },
+                  ],
           },
         ]}
       />
@@ -267,6 +312,7 @@ export default function Members() {
       <AddMemberModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSuccess={() => setRealtimeTrigger((prev) => prev + 1)}
       />
     </main>
   );
