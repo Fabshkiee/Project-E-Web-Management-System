@@ -163,3 +163,38 @@ export async function createMemberProfile(payload: CreateMemberPayload) {
   return data;
 }
 
+export async function getMemberDetails(userId: string) {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase.rpc("get_member_details", {
+    p_user_id: userId
+  });
+
+  if (error) {
+    console.error("Error fetching member details:", error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function updateMemberProfile(payload: {
+  userId: string;
+  fullName: string;
+  nickname: string;
+  contactNumber: string;
+  coachId: string | null;
+}) {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase.rpc("update_member_profile", {
+    p_user_id: payload.userId,
+    p_full_name: payload.fullName,
+    p_nickname: payload.nickname,
+    p_contact_number: payload.contactNumber,
+    p_coach_id: payload.coachId === "none" ? null : payload.coachId
+  });
+
+  if (error) throw new Error(error.message);
+  return data;
+}
