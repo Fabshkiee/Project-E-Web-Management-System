@@ -7,6 +7,7 @@ import {
   updateMemberProfile,
   getMemberFormOptions,
 } from "@/lib/api/dashboard";
+import MemberWelcomeCard from "./MemberWelcomeCard";
 import { useToast } from "@/lib/contexts/ToastContext";
 import { PrimaryButton } from "../ui/ActionButton";
 
@@ -125,6 +126,19 @@ export default function MemberDetailsModal({
                 <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
               )}
             </button>
+            <button
+              onClick={() => setActiveTab("qr")}
+              className={`pb-3 text-sm font-semibold font-lexend transition-colors relative ${
+                activeTab === "qr"
+                  ? "text-primary"
+                  : "text-gray-500 hover:text-foreground"
+              }`}
+            >
+              QR Profile
+              {activeTab === "qr" && (
+                <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
+              )}
+            </button>
           </div>
 
           {/* Tab Content */}
@@ -186,7 +200,24 @@ export default function MemberDetailsModal({
                   </PrimaryButton>
                 </div>
               </form>
-            ) : ("")}
+            ) : (
+              <div className="flex justify-center items-center py-4">
+                <MemberWelcomeCard
+                  member={{
+                    full_name: memberData.full_name,
+                    nickname: memberData.nickname,
+                    short_id: memberData.short_id,
+                    qr_token: memberData.qr_token,
+                    valid_until: memberData.valid_until,
+                    membership_name: memberData.membership_name,
+                    coach_name: memberData.coach_name,
+                  }}
+                  title="Digital ID Card"
+                  subtitle={`QR Profile for ${memberData.full_name}`}
+                  showDoneButton={false}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
