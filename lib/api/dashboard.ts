@@ -36,15 +36,21 @@ export interface MembersListResponse {
 export async function getMembersList(
   page: number = 1, 
   itemsPerPage: number = 10,
-  searchQuery: string = ""
+  searchQuery: string = "",
+  statusFilter: string = "all",
+  sortBy: string = "newest",
+  dateFilter: string = "all"
 ): Promise<MembersListResponse> {
   const supabase = createClient();
   const offset = (page - 1) * itemsPerPage;
 
   const { data, error } = await supabase.rpc("get_member_management_list", {
-    p_limit: itemsPerPage,
-    p_offset: offset,
-    p_search_query: searchQuery
+    p_limit: Math.floor(itemsPerPage),
+    p_offset: Math.floor(offset),
+    p_search_query: searchQuery,
+    p_status_filter: statusFilter,
+    p_sort_by: sortBy,
+    p_date_range: dateFilter
   });
 
   if (error) {
