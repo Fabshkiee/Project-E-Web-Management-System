@@ -12,6 +12,13 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { getMembersList, MemberListItem } from "@/lib/api/dashboard";
 import { Pagination } from "@/components/ui/Pagination";
 
+const toTitleCase = (str: string) => {
+  return str.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  );
+};
+
 const MembersColumn = [
   {
     header: "Member",
@@ -22,7 +29,7 @@ const MembersColumn = [
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-foreground text-sm font-lexend">
-            {item.full_name || "Unknown Member"}
+            {toTitleCase(item.full_name || "Unknown Member")}
           </span>
           <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
             ID: {item.member_id}
@@ -78,7 +85,7 @@ const MembersColumn = [
       <span
         className={`text-sm font-medium font-lexend ${item.coach === "None" ? "text-gray-300" : "text-secondary"}`}
       >
-        {item.coach === "None" ? "None" : `Coach ${item.coach}`}
+        {item.coach === "None" ? "None" : `Coach ${toTitleCase(item.coach)}`}
       </span>
     ),
   },
