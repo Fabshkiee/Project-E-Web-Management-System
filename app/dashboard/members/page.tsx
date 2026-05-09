@@ -30,6 +30,23 @@ const MembersColumn = [
     ),
   },
   {
+    header: "Status",
+    accessor: (item: any) => <StatusTag type={item.status as any} />,
+  },
+  {
+    header: "Dates",
+    accessor: (item: any) => (
+      <div className="flex flex-col gap-0.5">
+        <div className="text-[11px] text-secondary font-medium font-lexend">
+          <span className="opacity-60">Started:</span> {item.start_date}
+        </div>
+        <div className={`text-[11px] font-medium font-lexend ${item.status === 'Expired' ? 'text-red-500' : 'text-secondary'}`}>
+          <span className="opacity-60">{item.status === 'Expired' ? 'Expired:' : 'Expires:'}</span> {item.end_date}
+        </div>
+      </div>
+    ),
+  },
+  {
     header: "Membership",
     accessor: (item: any) => (
       <span className="text-sm font-medium text-foreground font-lexend">
@@ -38,26 +55,12 @@ const MembersColumn = [
     ),
   },
   {
-    header: "Dates",
-    accessor: (item: any) => (
-      <span className="text-sm font-medium text-secondary font-lexend">
-        {item.start_date} - {item.end_date}
-      </span>
-    ),
-  },
-  {
     header: "Coach",
     accessor: (item: any) => (
-      <span className="text-sm font-medium text-secondary font-lexend">
-        {item.coach}
+      <span className={`text-sm font-medium font-lexend ${item.coach === 'None' ? 'text-gray-300' : 'text-secondary'}`}>
+        {item.coach === 'None' ? 'None' : `Coach ${item.coach}`}
       </span>
     ),
-    className: "text-right md:text-left",
-  },
-  {
-    header: "Status",
-    accessor: (item: any) => <StatusTag type={item.status as any} />,
-    className: "text-right md:text-left",
   },
 ];
 
