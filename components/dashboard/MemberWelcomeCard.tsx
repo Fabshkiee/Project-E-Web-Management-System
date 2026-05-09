@@ -55,17 +55,7 @@ export default function MemberWelcomeCard({
 
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
-        backgroundColor: "#111111", // Always dark for premium look
-        style: {
-          padding: "20px 0px",
-          borderRadius: "0px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "24px",
-          width: "400px",
-          transform: "none",
-        },
+        backgroundColor: "#0a0a0a", // Match card background
         pixelRatio: 2,
       });
 
@@ -96,11 +86,11 @@ export default function MemberWelcomeCard({
   };
 
   return (
-    <div className="dark flex flex-col items-center gap-4 w-full max-w-[400px] mx-auto animate-in fade-in zoom-in-95 duration-500 text-white bg-[#0a0a0a] p-5 rounded-[32px] border border-white/5 shadow-2xl">
+    <div className="dark flex flex-col gap-4 w-full max-w-[480px] mx-auto animate-in fade-in zoom-in-95 duration-500 text-white">
       {/* Capture Container */}
       <div
         ref={cardRef}
-        className="flex flex-col items-center gap-4 w-full bg-[#0a0a0a]"
+        className="flex flex-col items-center gap-4 w-full bg-[#0a0a0a] p-5 rounded-[32px] border border-white/5 shadow-2xl"
       >
         {/* Header */}
         <div className="text-center pt-2">
@@ -135,7 +125,7 @@ export default function MemberWelcomeCard({
         </div>
 
         {/* Details Card */}
-        <div className="w-full bg-[#111111] border border-white/5 rounded-2xl p-4 space-y-3 shadow-sm">
+        <div className="w-full bg-[#111111] border border-white/5 rounded-2xl p-3.5 space-y-2.5 shadow-sm">
           <div className="flex items-center gap-2.5 pb-2 border-b border-white/5">
             <BadgeIcon className="text-primary w-4 h-4" />
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-white">
@@ -143,54 +133,54 @@ export default function MemberWelcomeCard({
             </h4>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
             {/* ID */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
-              <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
+              <div className="flex items-center gap-1.5 flex-shrink-0">
                 <FingerprintIcon className="w-3.5 h-3.5 text-gray-500" />
-                <span className="text-[11px] font-lexend text-gray-400 truncate">
-                  Member ID
+                <span className="text-[10px] font-lexend text-gray-400">
+                  ID
                 </span>
               </div>
-              <span className="text-xs font-bold font-lexend text-white tracking-wider flex-shrink-0 ml-4">
+              <span className="text-[11px] font-bold font-lexend text-white truncate">
                 {member.short_id}
               </span>
             </div>
 
             {/* Password */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
-              <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
+              <div className="flex items-center gap-1.5 flex-shrink-0">
                 <LockIcon className="w-3.5 h-3.5 text-gray-500" />
-                <span className="text-[11px] font-lexend text-gray-400 truncate">
+                <span className="text-[10px] font-lexend text-gray-400">
                   Password
                 </span>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                <span className="text-xs font-bold font-lexend text-white tracking-wider">
+              <div className="flex items-center gap-1.5 min-w-0 justify-end">
+                <span className="text-[11px] font-bold font-lexend text-white truncate">
                   {showPassword ? `Member${member.short_id}` : "••••••••"}
                 </span>
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-500 hover:text-primary transition-colors"
+                  className="text-gray-500 hover:text-white transition-colors flex-shrink-0"
                 >
                   {showPassword ? (
-                    <EyeClosedIcon className="w-3.5 h-3.5" />
+                    <EyeClosedIcon className="w-3 h-3" />
                   ) : (
-                    <EyeOpenIcon className="w-3.5 h-3.5" />
+                    <EyeOpenIcon className="w-3 h-3" />
                   )}
                 </button>
               </div>
             </div>
 
             {/* Valid Until */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
-              <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
+              <div className="flex items-center gap-1.5 flex-shrink-0">
                 <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
-                <span className="text-[11px] font-lexend text-gray-400 truncate">
-                  Valid Until
+                <span className="text-[10px] font-lexend text-gray-400">
+                  Expires
                 </span>
               </div>
-              <span className="text-xs font-bold font-lexend text-white flex-shrink-0 ml-4">
+              <span className="text-[11px] font-bold font-lexend text-white truncate">
                 {new Date(member.valid_until).toLocaleDateString("en-GB", {
                   day: "2-digit",
                   month: "short",
@@ -200,14 +190,14 @@ export default function MemberWelcomeCard({
             </div>
 
             {/* Coach */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
-              <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
+              <div className="flex items-center gap-1.5 flex-shrink-0">
                 <CoachIcon className="w-3.5 h-3.5 text-gray-500" />
-                <span className="text-[11px] font-lexend text-gray-400 truncate">
+                <span className="text-[10px] font-lexend text-gray-400">
                   Coach
                 </span>
               </div>
-              <span className="text-xs font-bold font-lexend text-white flex-shrink-0 ml-4">
+              <span className="text-[11px] font-bold font-lexend text-white truncate">
                 {member.coach_name || "None"}
               </span>
             </div>
