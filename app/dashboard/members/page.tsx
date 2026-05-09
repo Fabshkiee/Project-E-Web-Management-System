@@ -109,6 +109,7 @@ export default function Members() {
         const { members, totalCount } = await getMembersList(
           currentPage,
           itemsPerPage,
+          searchQuery
         );
         setMembers(members);
         setTotalCount(totalCount);
@@ -118,15 +119,18 @@ export default function Members() {
         setLoading(false);
       }
     }
-    fetchData();
-  }, [currentPage]);
 
-  // Client-side search
-  const filteredMembers = members.filter(
-    (m) =>
-      m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.member_id.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [currentPage, searchQuery]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
 
   return (
     <main className="space-y-8">
@@ -149,7 +153,7 @@ export default function Members() {
       </header>
 
       <SearchFilter
-        onSearch={setSearchQuery}
+        onSearch={handleSearch}
         filters={[
           {
             label: "Status",
@@ -179,7 +183,7 @@ export default function Members() {
           columns={MembersColumn}
           className="border-0 rounded-none"
           emptyMessage={loading ? "Loading members..." : "No members found."}
-          data={filteredMembers}
+          data={members}
         />
 
         <Pagination
