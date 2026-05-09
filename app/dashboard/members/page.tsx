@@ -22,16 +22,17 @@ const toTitleCase = (str: string) => {
 const MembersColumn = [
   {
     header: "Member",
+    className: "w-[25%]",
     accessor: (item: MemberListItem) => (
       <div className="flex items-center gap-4">
         <div className="transition-transform duration-300 group-hover:scale-110">
           <UserAvatar name={item.full_name || "Unknown"} />
         </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-foreground text-sm font-lexend">
+        <div className="flex flex-col min-w-0 max-w-[200px] sm:max-w-[250px]">
+          <span className="font-medium text-foreground text-sm font-lexend whitespace-nowrap truncate">
             {toTitleCase(item.full_name || "Unknown Member")}
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary whitespace-nowrap truncate">
             ID: {item.member_id}
           </span>
         </div>
@@ -40,12 +41,14 @@ const MembersColumn = [
   },
   {
     header: "Status",
+    className: "w-[15%]",
     accessor: (item: MemberListItem) => (
       <StatusTag type={item.payment_status as any} />
     ),
   },
   {
     header: "Dates",
+    className: "w-[20%]",
     accessor: (item: MemberListItem) => (
       <div className="flex flex-col gap-0.5">
         <div className="text-[11px] text-secondary font-medium font-lexend">
@@ -73,6 +76,7 @@ const MembersColumn = [
   },
   {
     header: "Membership",
+    className: "w-[20%]",
     accessor: (item: MemberListItem) => (
       <span className="text-sm font-medium text-foreground font-lexend">
         {item.membership_type}
@@ -81,6 +85,7 @@ const MembersColumn = [
   },
   {
     header: "Coach",
+    className: "w-[20%]",
     accessor: (item: MemberListItem) => (
       <span
         className={`text-sm font-medium font-lexend ${item.coach === "None" ? "text-gray-300" : "text-secondary"}`}
@@ -133,7 +138,7 @@ export default function Members() {
   };
 
   return (
-    <main className="space-y-8">
+    <main className="space-y-8 h-fit">
       <header className="flex justify-between items-center">
         <PageTitle
           title="Members Management"
@@ -178,10 +183,10 @@ export default function Members() {
       />
 
       {/* Members Table Section */}
-      <section className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm flex flex-col">
+      <section className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm">
         <DataTable
           columns={MembersColumn}
-          className="border-0 rounded-none"
+          className="border-0 rounded-none h-fit"
           emptyMessage={loading ? "Loading members..." : "No members found."}
           data={members}
         />
