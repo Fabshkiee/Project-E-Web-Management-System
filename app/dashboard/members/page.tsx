@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import PageTitle from "@/components/dashboard/page-title";
 import { ExportPDF, PlusIcon } from "@/components/ui/Icons";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
 import AddMemberModal from "@/components/dashboard/add-member-modal";
 import MemberDetailsModal from "@/components/dashboard/member-details-modal";
@@ -237,6 +239,118 @@ export default function Members() {
     setCurrentPage(1);
   };
 
+  const handleExport = async () => {
+    try {
+      setLoading(true);
+
+      // Map UI filter to API logic
+      let apiStatus = statusFilter;
+      let apiSort = "newest";
+
+      if (statusFilter === "newest" || statusFilter === "oldest") {
+        apiStatus = "all";
+        apiSort = statusFilter;
+      }
+
+      // Fetch all members matching current filters (up to 1000)
+      const { members: allMembers } = await getMembersList(
+        1,
+        1000,
+        searchQuery,
+        apiStatus,
+        apiSort,
+        dateFilter,
+        coachFilter,
+      );
+
+      const doc = new jsPDF();
+
+      // Report Header
+      doc.setFontSize(20);
+      doc.setTextColor(17, 24, 39);
+      doc.text("Project-E: Members Report", 14, 22);
+
+      doc.setFontSize(11);
+      doc.setTextColor(107, 114, 128);
+      doc.text(
+        `Generated on ${new Date().toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+        14,
+        30,
+      );
+
+      // Filters Summary
+      doc.setFontSize(9);
+      doc.text(
+        `Filters Applied - Status: ${statusFilter.toUpperCase()} | Date Range: ${dateFilter.toUpperCase()} | Coach: ${coachFilter.toUpperCase()}`,
+        14,
+        38,
+      );
+
+      // Table Data
+      const tableData = allMembers.map((m) => [
+        m.full_name,
+        m.member_id,
+        m.member_status,
+        m.membership_type,
+        new Date(m.start_date).toLocaleDateString("en-GB"),
+        new Date(m.end_date).toLocaleDateString("en-GB"),
+        m.coach || "None",
+      ]);
+
+      autoTable(doc, {
+        startY: 45,
+        head: [
+          [
+            "Member Name",
+            "ID",
+            "Status",
+            "Membership",
+            "Started",
+            "Expires",
+            "Coach",
+          ],
+        ],
+        body: tableData,
+        theme: "grid",
+        headStyles: {
+          fillColor: "#f20d33",
+          fontSize: 10,
+          halign: "left",
+          font: "helvetica",
+          fontStyle: "bold",
+        },
+        bodyStyles: { fontSize: 9, textColor: [55, 65, 81], font: "helvetica" },
+        alternateRowStyles: { fillColor: [249, 250, 251] },
+        margin: { top: 45 },
+        didDrawPage: (data) => {
+          // Footer with page numbers
+          const str = `Page ${doc.internal.pages.length}`;
+          doc.setFontSize(8);
+          doc.setTextColor(156, 163, 175);
+          doc.text(
+            str,
+            data.settings.margin.left,
+            doc.internal.pageSize.height - 10,
+          );
+        },
+      });
+
+      doc.save(
+        `ProjectE_Members_Report_${new Date().toISOString().split("T")[0]}.pdf`,
+      );
+    } catch (error) {
+      console.error("Export failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="space-y-8 h-fit">
       <header className="flex justify-between items-center">
@@ -245,8 +359,12 @@ export default function Members() {
           subtitle="Manage gym members, subscription, and status."
         />
         <div className="flex gap-3">
-          <SecondaryButton icon={<ExportPDF className="w-6 h-6" />}>
-            Export List (PDF)
+          <SecondaryButton
+            onClick={handleExport}
+            disabled={loading}
+            icon={<ExportPDF className="w-6 h-6" />}
+          >
+            {loading ? "Exporting..." : "Export List (PDF)"}
           </SecondaryButton>
           <PrimaryButton
             onClick={() => setIsModalOpen(true)}
