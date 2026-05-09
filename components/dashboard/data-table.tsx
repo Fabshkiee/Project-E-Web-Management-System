@@ -23,7 +23,7 @@ export const DataTable = <T,>({
     <div
       className={`w-full overflow-x-auto rounded-xl border border-stroke bg-white dark:bg-[#1a1a1a] dark:border-white/5 ${className}`}
     >
-      <table className="w-full text-left border-collapse">
+      <table className="w-full h-fit table-fixed text-left border-collapse">
         <thead>
           <tr className="bg-[#F9FAFB] dark:bg-white/2 border-b border-stroke dark:border-white/5">
             {columns.map((column, idx) => (
@@ -47,7 +47,7 @@ export const DataTable = <T,>({
                 {columns.map((column, colIdx) => (
                   <td
                     key={colIdx}
-                    className={`px-6 py-5 ${column.className || ""}`}
+                    className={`px-6 py-5 whitespace-nowrap ${column.className || ""}`}
                   >
                     {typeof column.accessor === "function"
                       ? column.accessor(item)
