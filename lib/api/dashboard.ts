@@ -217,3 +217,18 @@ export async function renewMember(payload: {
 
   return true;
 }
+
+export async function terminateMembership(userId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("terminate_member_membership", {
+    p_user_id: userId,
+  });
+
+  if (error) throw new Error(error.message);
+  
+  if (data && typeof data === "object" && !data.success) {
+    throw new Error(data.error || "Failed to terminate membership");
+  }
+
+  return true;
+}
