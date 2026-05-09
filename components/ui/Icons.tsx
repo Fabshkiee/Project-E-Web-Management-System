@@ -696,3 +696,75 @@ export function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function PlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+    >
+      <path
+        d="M5 6.66667H0V5H5V0H6.66667V5H11.6667V6.66667H6.66667V11.6667H5V6.66667Z"
+        fill="white"
+      />
+    </svg>
+  );
+}
+
+export function ExportPDF(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="17"
+      height="17"
+      viewBox="0 0 17 17"
+      fill="none"
+    >
+      <path
+        d="M5.83333 8.75H6.66667V7.08333H7.5C7.73611 7.08333 7.93403 7.00347 8.09375 6.84375C8.25347 6.68403 8.33333 6.48611 8.33333 6.25V5.41667C8.33333 5.18056 8.25347 4.98264 8.09375 4.82292C7.93403 4.66319 7.73611 4.58333 7.5 4.58333H5.83333V8.75ZM6.66667 6.25V5.41667H7.5V6.25H6.66667ZM9.16667 8.75H10.8333C11.0694 8.75 11.2674 8.67014 11.4271 8.51042C11.5868 8.35069 11.6667 8.15278 11.6667 7.91667V5.41667C11.6667 5.18056 11.5868 4.98264 11.4271 4.82292C11.2674 4.66319 11.0694 4.58333 10.8333 4.58333H9.16667V8.75ZM10 7.91667V5.41667H10.8333V7.91667H10ZM12.5 8.75H13.3333V7.08333H14.1667V6.25H13.3333V5.41667H14.1667V4.58333H12.5V8.75ZM5 13.3333C4.54167 13.3333 4.14931 13.1701 3.82292 12.8438C3.49653 12.5174 3.33333 12.125 3.33333 11.6667V1.66667C3.33333 1.20833 3.49653 0.815972 3.82292 0.489583C4.14931 0.163194 4.54167 0 5 0H15C15.4583 0 15.8507 0.163194 16.1771 0.489583C16.5035 0.815972 16.6667 1.20833 16.6667 1.66667V11.6667C16.6667 12.125 16.5035 12.5174 16.1771 12.8438C15.8507 13.1701 15.4583 13.3333 15 13.3333H5ZM5 11.6667H15V1.66667H5V11.6667ZM1.66667 16.6667C1.20833 16.6667 0.815972 16.5035 0.489583 16.1771C0.163194 15.8507 0 15.4583 0 15V3.33333H1.66667V15H13.3333V16.6667H1.66667ZM5 1.66667V11.6667V1.66667Z"
+        className="dark:fill-zinc-100 fill-[#374151]"
+      />
+    </svg>
+  );
+}
+
+export function SearchIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+export function FilterIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+    </svg>
+  );
+}
