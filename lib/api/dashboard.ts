@@ -33,13 +33,18 @@ export interface MembersListResponse {
 /**
  * Fetches a paginated list of members using the get_member_management_list RPC
  */
-export async function getMembersList(page: number = 1, itemsPerPage: number = 10): Promise<MembersListResponse> {
+export async function getMembersList(
+  page: number = 1, 
+  itemsPerPage: number = 10,
+  searchQuery: string = ""
+): Promise<MembersListResponse> {
   const supabase = createClient();
   const offset = (page - 1) * itemsPerPage;
 
   const { data, error } = await supabase.rpc("get_member_management_list", {
     p_limit: itemsPerPage,
-    p_offset: offset
+    p_offset: offset,
+    p_search_query: searchQuery
   });
 
   if (error) {
