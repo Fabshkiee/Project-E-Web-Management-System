@@ -6,8 +6,10 @@ import {
   getMemberDetails,
   updateMemberProfile,
   getMemberFormOptions,
+  renewMember,
 } from "@/lib/api/dashboard";
 import MemberWelcomeCard from "./MemberWelcomeCard";
+import { StatusTag } from "@/components/ui/StatusTag";
 import { useToast } from "@/lib/contexts/ToastContext";
 import { PrimaryButton } from "../ui/ActionButton";
 
@@ -22,18 +24,25 @@ export default function MemberDetailsModal({
   onClose,
   userId,
 }: MemberDetailsModalProps) {
-  const [activeTab, setActiveTab] = useState<"profile" | "qr">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "qr" | "renew">(
+    "profile",
+  );
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [memberData, setMemberData] = useState<any>(null);
   const [coachOptions, setCoachOptions] = useState<any[]>([]);
+  const [membershipOptions, setMembershipOptions] = useState<any[]>([]);
 
-  // Form State
+  // Form State - Profile
   const [fullName, setFullName] = useState("");
   const [nickname, setNickname] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [coachId, setCoachId] = useState<string>("none");
+
+  // Form State - Renewal
+  const [membershipTypeId, setMembershipTypeId] = useState("");
+  const [durationMonths, setDurationMonths] = useState(1);
 
   const { showToast } = useToast();
 
@@ -58,6 +67,10 @@ export default function MemberDetailsModal({
 
         if (optionsRes) {
           setCoachOptions(optionsRes.coaches);
+          setMembershipOptions(optionsRes.membershipTypes);
+          if (optionsRes.membershipTypes.length > 0) {
+            setMembershipTypeId(optionsRes.membershipTypes[0].id);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch details", error);
@@ -87,6 +100,26 @@ export default function MemberDetailsModal({
       onClose();
     } catch (error: any) {
       showToast(error.message || "Failed to update profile", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleRenew = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userId) return;
+
+    setSaving(true);
+    try {
+      await renewMember({
+        memberId: userId,
+        membershipTypeId,
+        durationMonths,
+      });
+      showToast("Membership renewed successfully!", "success");
+      onClose();
+    } catch (error: any) {
+      showToast(error.message || "Failed to renew membership", "error");
     } finally {
       setSaving(false);
     }
@@ -136,6 +169,19 @@ export default function MemberDetailsModal({
             >
               QR Profile
               {activeTab === "qr" && (
+                <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("renew")}
+              className={`pb-3 text-sm font-semibold font-lexend transition-colors relative ${
+                activeTab === "renew"
+                  ? "text-primary"
+                  : "text-gray-500 hover:text-foreground"
+              }`}
+            >
+              Renew Membership
+              {activeTab === "renew" && (
                 <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
               )}
             </button>
@@ -200,7 +246,7 @@ export default function MemberDetailsModal({
                   </PrimaryButton>
                 </div>
               </form>
-            ) : (
+            ) : activeTab === "qr" ? (
               <div className="flex justify-center items-center py-4">
                 <MemberWelcomeCard
                   member={{
@@ -217,6 +263,93 @@ export default function MemberDetailsModal({
                   showDoneButton={false}
                 />
               </div>
+            ) : (
+              <form onSubmit={handleRenew} className="flex flex-col gap-5">
+                <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 mb-2">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs text-gray-500 font-lexend">
+                      Current Expiration
+                    </span>
+                    <span
+                      className={`text-xs font-bold font-lexend ${(() => {
+                        const expiry = new Date(memberData.valid_until);
+                        const now = new Date();
+                        const diffDays = Math.ceil(
+                          (expiry.getTime() - now.getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        );
+                        if (expiry < now)
+                          return "text-[#9F1239] dark:text-[#F87171]";
+                        if (diffDays <= 3)
+                          return "text-[#92400E] dark:text-[#FBBF24]";
+                        return "text-[#166534] dark:text-[#4ADE80]";
+                      })()}`}
+                    >
+                      {new Date(memberData.valid_until).toLocaleDateString(
+                        "en-GB",
+                        { day: "2-digit", month: "short", year: "numeric" },
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-500 font-lexend">
+                      Status
+                    </span>
+                    <StatusTag
+                      type={(() => {
+                        const expiry = new Date(memberData.valid_until);
+                        const now = new Date();
+                        const diffDays = Math.ceil(
+                          (expiry.getTime() - now.getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        );
+
+                        if (expiry < now) return "Expired";
+                        if (diffDays <= 3) return "Expiring";
+                        return "Active";
+                      })()}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  <div className="md:col-span-2">
+                    <label className={labelBase}>Membership Type</label>
+                    <select
+                      value={membershipTypeId}
+                      onChange={(e) => setMembershipTypeId(e.target.value)}
+                      className={inputBase}
+                    >
+                      {membershipOptions.map((mt) => (
+                        <option key={mt.id} value={mt.id}>
+                          {mt.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className={labelBase}>Duration (Months)</label>
+                    <input
+                      type="text"
+                      min="1"
+                      required
+                      value={durationMonths}
+                      onChange={(e) =>
+                        setDurationMonths(parseInt(e.target.value) || 0)
+                      }
+                      className={inputBase}
+                      placeholder="Enter number of months"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4 mt-2 border-t border-stroke dark:border-white/10">
+                  <PrimaryButton type="submit" disabled={saving}>
+                    {saving ? "Processing..." : "Confirm Renewal"}
+                  </PrimaryButton>
+                </div>
+              </form>
             )}
           </div>
         </div>
