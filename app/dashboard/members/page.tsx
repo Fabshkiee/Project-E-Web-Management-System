@@ -8,6 +8,7 @@ import AddMemberModal from "@/components/dashboard/add-member-modal";
 import { SearchFilter } from "@/components/dashboard/search-filter";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
+import { DataTable } from "@/components/dashboard/data-table";
 
 const MembersColumn = [
   {
@@ -112,6 +113,19 @@ export default function Members() {
       />
 
       {/* Members Table */}
+      <section
+        aria-labelledby="members-title"
+        className="lg:col-span-8 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm flex flex-col"
+      >
+        <div className="flex-1 flex flex-col">
+          <DataTable
+            columns={MembersColumn}
+            className="flex-1"
+            emptyMessage="No members found."
+            data={[]}
+          />
+        </div>
+      </section>
 
       <AddMemberModal
         isOpen={isModalOpen}
