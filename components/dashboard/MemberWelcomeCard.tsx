@@ -40,7 +40,7 @@ export default function MemberWelcomeCard({
   const displaySubtitle = subtitle || `Welcome to the family, ${firstName}`;
 
   return (
-    <div className="flex flex-col items-center gap-5 py-2 animate-in fade-in zoom-in-95 duration-500">
+    <div className="flex flex-col items-center gap-5 py-2 w-full max-w-[440px] mx-auto animate-in fade-in zoom-in-95 duration-500">
       {/* Header */}
       <div className="text-center">
         <h3 className="text-xl font-bold font-lexend text-foreground mb-0.5">
@@ -83,26 +83,26 @@ export default function MemberWelcomeCard({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* ID */}
           <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-white/2 border border-stroke dark:border-white/5">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <FingerprintIcon className="w-3.5 h-3.5 text-gray-400" />
-              <span className="text-[11px] font-lexend text-gray-500">
+              <span className="text-[11px] font-lexend text-gray-500 truncate">
                 Member ID
               </span>
             </div>
-            <span className="text-xs font-bold font-lexend text-foreground tracking-wider">
+            <span className="text-xs font-bold font-lexend text-foreground tracking-wider flex-shrink-0 ml-4">
               {member.short_id}
             </span>
           </div>
 
           {/* Password */}
           <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-white/2 border border-stroke dark:border-white/5">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <LockIcon className="w-3.5 h-3.5 text-gray-400" />
-              <span className="text-[11px] font-lexend text-gray-500">
+              <span className="text-[11px] font-lexend text-gray-500 truncate">
                 Password
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0 ml-4">
               <span className="text-xs font-bold font-lexend text-foreground tracking-wider">
                 {showPassword ? `Member${member.short_id}` : "••••••••"}
               </span>
@@ -121,13 +121,13 @@ export default function MemberWelcomeCard({
 
           {/* Valid Until */}
           <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-white/2 border border-stroke dark:border-white/5">
-            <div className="flex items-center gap-2.5">
-              <CalendarIcon className="w-3.5 h-3.5 text-gray-400 opacity-50" />
-              <span className="text-[11px] font-lexend text-gray-500">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <CalendarIcon className="w-3.5 h-3.5 text-gray-400" />
+              <span className="text-[11px] font-lexend text-gray-500 truncate">
                 Valid Until
               </span>
             </div>
-            <span className="text-[11px] font-bold font-lexend text-foreground">
+            <span className="text-xs font-bold font-lexend text-foreground flex-shrink-0 ml-4">
               {new Date(member.valid_until).toLocaleDateString("en-GB", {
                 day: "2-digit",
                 month: "short",
@@ -138,11 +138,13 @@ export default function MemberWelcomeCard({
 
           {/* Coach */}
           <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-white/2 border border-stroke dark:border-white/5">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <CoachIcon className="w-3.5 h-3.5 text-gray-400" />
-              <span className="text-[11px] font-lexend text-gray-500">Coach</span>
+              <span className="text-[11px] font-lexend text-gray-500 truncate">
+                Coach
+              </span>
             </div>
-            <span className="text-[11px] font-bold font-lexend text-foreground">
+            <span className="text-xs font-bold font-lexend text-foreground flex-shrink-0 ml-4">
               {member.coach_name}
             </span>
           </div>
