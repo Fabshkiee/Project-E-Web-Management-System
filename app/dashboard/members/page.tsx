@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PageTitle from "@/components/dashboard/page-title";
 import { ExportPDF, PlusIcon } from "@/components/ui/Icons";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
@@ -9,21 +9,23 @@ import { SearchFilter } from "@/components/dashboard/search-filter";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { DataTable } from "@/components/dashboard/data-table";
+import { getMembersList, MemberListItem } from "@/lib/api/dashboard";
+import { Pagination } from "@/components/ui/Pagination";
 
 const MembersColumn = [
   {
     header: "Member",
-    accessor: (item: any) => (
+    accessor: (item: MemberListItem) => (
       <div className="flex items-center gap-4">
         <div className="transition-transform duration-300 group-hover:scale-110">
-          <UserAvatar name={item.name || "Unknown"} />
+          <UserAvatar name={item.full_name || "Unknown"} />
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-foreground text-sm font-lexend">
-            {item.name || "Unknown Member"}
+            {item.full_name || "Unknown Member"}
           </span>
           <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
-            ID: {item.id}
+            ID: {item.member_id}
           </span>
         </div>
       </div>
@@ -31,34 +33,52 @@ const MembersColumn = [
   },
   {
     header: "Status",
-    accessor: (item: any) => <StatusTag type={item.status as any} />,
+    accessor: (item: MemberListItem) => (
+      <StatusTag type={item.payment_status as any} />
+    ),
   },
   {
     header: "Dates",
-    accessor: (item: any) => (
+    accessor: (item: MemberListItem) => (
       <div className="flex flex-col gap-0.5">
         <div className="text-[11px] text-secondary font-medium font-lexend">
-          <span className="opacity-60">Started:</span> {item.start_date}
+          <span className="opacity-60">Started:</span>{" "}
+          {new Date(item.start_date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
         </div>
-        <div className={`text-[11px] font-medium font-lexend ${item.status === 'Expired' ? 'text-red-500' : 'text-secondary'}`}>
-          <span className="opacity-60">{item.status === 'Expired' ? 'Expired:' : 'Expires:'}</span> {item.end_date}
+        <div
+          className={`text-[11px] font-medium font-lexend ${item.payment_status === "Expired" ? "text-red-500" : "text-secondary"}`}
+        >
+          <span className="opacity-60">
+            {item.payment_status === "Expired" ? "Expired:" : "Expires:"}
+          </span>{" "}
+          {new Date(item.end_date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
         </div>
       </div>
     ),
   },
   {
     header: "Membership",
-    accessor: (item: any) => (
+    accessor: (item: MemberListItem) => (
       <span className="text-sm font-medium text-foreground font-lexend">
-        {item.membershiptype}
+        {item.membership_type}
       </span>
     ),
   },
   {
     header: "Coach",
-    accessor: (item: any) => (
-      <span className={`text-sm font-medium font-lexend ${item.coach === 'None' ? 'text-gray-300' : 'text-secondary'}`}>
-        {item.coach === 'None' ? 'None' : `Coach ${item.coach}`}
+    accessor: (item: MemberListItem) => (
+      <span
+        className={`text-sm font-medium font-lexend ${item.coach === "None" ? "text-gray-300" : "text-secondary"}`}
+      >
+        {item.coach === "None" ? "None" : `Coach ${item.coach}`}
       </span>
     ),
   },
@@ -69,6 +89,37 @@ export default function Members() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [coachFilter, setCoachFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [members, setMembers] = useState<MemberListItem[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const { members, totalCount } = await getMembersList(
+          currentPage,
+          itemsPerPage,
+        );
+        setMembers(members);
+        setTotalCount(totalCount);
+      } catch (error) {
+        console.error("Error fetching members:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [currentPage]);
+
+  // Client-side search
+  const filteredMembers = members.filter(
+    (m) =>
+      m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.member_id.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <main className="space-y-8">
@@ -115,19 +166,21 @@ export default function Members() {
         ]}
       />
 
-      {/* Members Table */}
-      <section
-        aria-labelledby="members-title"
-        className="lg:col-span-8 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm flex flex-col"
-      >
-        <div className="flex-1 flex flex-col">
-          <DataTable
-            columns={MembersColumn}
-            className="flex-1"
-            emptyMessage="No members found."
-            data={[]}
-          />
-        </div>
+      {/* Members Table Section */}
+      <section className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm flex flex-col">
+        <DataTable
+          columns={MembersColumn}
+          className="border-0 rounded-none"
+          emptyMessage={loading ? "Loading members..." : "No members found."}
+          data={filteredMembers}
+        />
+
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalCount}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+        />
       </section>
 
       <AddMemberModal
