@@ -73,12 +73,25 @@ export async function getMemberFormOptions() {
   
   const [mtRes, staffRes] = await Promise.all([
     supabase.from("membership_types").select("id, name"),
-    supabase.from("users").select("id, full_name, role").in("role", ["Staff", "Admin"])
+    supabase
+      .from("staff")
+      .select(`
+        id,
+        profile:users (
+          full_name
+        )
+      `)
   ]);
+
+  // Flatten the coach data so the UI gets { id, full_name }
+  const coaches = (staffRes.data || []).map((s: any) => ({
+    id: s.id,
+    full_name: s.profile?.full_name || "Unknown Coach"
+  }));
 
   return {
     membershipTypes: mtRes.data || [],
-    coaches: staffRes.data || []
+    coaches: coaches
   };
 }
 
