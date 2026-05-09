@@ -5,6 +5,7 @@ import PageTitle from "@/components/dashboard/page-title";
 import { ExportPDF, PlusIcon } from "@/components/ui/Icons";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
 import AddMemberModal from "@/components/dashboard/add-member-modal";
+import MemberDetailsModal from "@/components/dashboard/member-details-modal";
 import { SearchFilter } from "@/components/dashboard/search-filter";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
@@ -103,6 +104,7 @@ const MembersColumn = [
 
 export default function Members() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
@@ -299,6 +301,7 @@ export default function Members() {
           className="border-0 rounded-none h-fit"
           emptyMessage={loading ? "Loading members..." : "No members found."}
           data={members}
+          onRowClick={(item) => setSelectedMemberId(item.id)}
         />
 
         <Pagination
@@ -313,6 +316,12 @@ export default function Members() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={() => setRealtimeTrigger((prev) => prev + 1)}
+      />
+
+      <MemberDetailsModal
+        isOpen={!!selectedMemberId}
+        onClose={() => setSelectedMemberId(null)}
+        userId={selectedMemberId}
       />
     </main>
   );
