@@ -49,7 +49,7 @@ const MembersColumn = [
     header: "Status",
     className: "w-[15%]",
     accessor: (item: MemberListItem) => (
-      <StatusTag type={item.payment_status as any} />
+      <StatusTag type={item.member_status as any} />
     ),
   },
   {
@@ -66,10 +66,16 @@ const MembersColumn = [
           })}
         </div>
         <div
-          className={`text-[11px] font-medium font-lexend ${item.payment_status === "Expired" ? "text-red-500" : "text-secondary"}`}
+          className={`text-[11px] font-medium font-lexend ${
+            item.member_status === "Expired"
+              ? "text-[#9F1239] dark:text-[#F87171]"
+              : item.member_status === "Expiring"
+                ? "text-[#92400E] dark:text-[#FBBF24]"
+                : "text-secondary"
+          }`}
         >
           <span className="opacity-60">
-            {item.payment_status === "Expired" ? "Expired:" : "Expires:"}
+            {item.member_status === "Expired" ? "Expired:" : "Expires:"}
           </span>{" "}
           {new Date(item.end_date).toLocaleDateString("en-US", {
             month: "short",

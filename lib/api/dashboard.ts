@@ -22,7 +22,7 @@ export interface MemberListItem {
   start_date: string;
   end_date: string;
   coach: string;
-  payment_status: string;
+  member_status: string;
 }
 
 export interface MembersListResponse {
@@ -165,9 +165,9 @@ export async function createMemberProfile(payload: CreateMemberPayload) {
 
 export async function getMemberDetails(userId: string) {
   const supabase = createClient();
-  
+
   const { data, error } = await supabase.rpc("get_member_details", {
-    p_user_id: userId
+    p_user_id: userId,
   });
 
   if (error) {
@@ -186,13 +186,13 @@ export async function updateMemberProfile(payload: {
   coachId: string | null;
 }) {
   const supabase = createClient();
-  
+
   const { data, error } = await supabase.rpc("update_member_profile", {
     p_user_id: payload.userId,
     p_full_name: payload.fullName,
     p_nickname: payload.nickname,
     p_contact_number: payload.contactNumber,
-    p_coach_id: payload.coachId === "none" ? null : payload.coachId
+    p_coach_id: payload.coachId === "none" ? null : payload.coachId,
   });
 
   if (error) throw new Error(error.message);
