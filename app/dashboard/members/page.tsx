@@ -100,6 +100,7 @@ export default function Members() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
   const [coachFilter, setCoachFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [members, setMembers] = useState<MemberListItem[]>([]);
@@ -111,10 +112,22 @@ export default function Members() {
     async function fetchData() {
       setLoading(true);
       try {
+        // Map UI filter to API logic
+        let apiStatus = statusFilter;
+        let apiSort = "newest";
+
+        if (statusFilter === "newest" || statusFilter === "oldest") {
+          apiStatus = "all";
+          apiSort = statusFilter;
+        }
+
         const { members, totalCount } = await getMembersList(
           currentPage,
           itemsPerPage,
-          searchQuery
+          searchQuery,
+          apiStatus,
+          apiSort,
+          dateFilter,
         );
         setMembers(members);
         setTotalCount(totalCount);
@@ -130,10 +143,20 @@ export default function Members() {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, statusFilter, dateFilter]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (val: string) => {
+    setStatusFilter(val);
+    setCurrentPage(1);
+  };
+
+  const handleDateChange = (val: string) => {
+    setDateFilter(val);
     setCurrentPage(1);
   };
 
@@ -163,11 +186,26 @@ export default function Members() {
           {
             label: "Status",
             value: statusFilter,
-            onChange: setStatusFilter,
+            onChange: handleStatusChange,
             options: [
               { label: "Active", value: "active" },
               { label: "Expired", value: "expired" },
               { label: "Expiring", value: "expiring" },
+              { label: "Newest Join Date", value: "newest" },
+              { label: "Oldest Join Date", value: "oldest" },
+            ],
+          },
+          {
+            label: "Dates",
+            value: dateFilter,
+            onChange: handleDateChange,
+            options: [
+              { label: "All Time", value: "all" },
+              { label: "This Month", value: "month" },
+              { label: "Last Month", value: "last_month" },
+              { label: "Last 3 Months", value: "3_months" },
+              { label: "Last 6 Months", value: "6_months" },
+              { label: "Last 1 Year", value: "1_year" },
             ],
           },
           {
