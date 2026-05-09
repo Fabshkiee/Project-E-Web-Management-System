@@ -22,25 +22,32 @@ interface MemberWelcomeCardProps {
     membership_name: string;
     coach_name: string;
   };
-  onDone: () => void;
+  onDone?: () => void;
+  title?: string;
+  subtitle?: string;
+  showDoneButton?: boolean;
 }
 
 export default function MemberWelcomeCard({
   member,
   onDone,
+  title = "Member Registered!",
+  subtitle,
+  showDoneButton = true,
 }: MemberWelcomeCardProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const firstName = member.nickname || member.full_name.split(" ")[0];
+  const displaySubtitle = subtitle || `Welcome to the family, ${firstName}`;
 
   return (
     <div className="flex flex-col items-center gap-5 py-2 animate-in fade-in zoom-in-95 duration-500">
       {/* Header */}
       <div className="text-center">
         <h3 className="text-xl font-bold font-lexend text-foreground mb-0.5">
-          Member Registered!
+          {title}
         </h3>
         <p className="text-[13px] text-gray-500 dark:text-[#9CA3AF] font-lexend">
-          Welcome to the family,{" "}
-          {member.nickname || member.full_name.split(" ")[0]}
+          {displaySubtitle}
         </p>
       </div>
 
@@ -142,12 +149,14 @@ export default function MemberWelcomeCard({
         </div>
       </div>
 
-      <button
-        onClick={onDone}
-        className="w-full py-3 bg-primary text-white rounded-2xl font-bold font-lexend hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
-      >
-        Done
-      </button>
+      {showDoneButton && (
+        <button
+          onClick={onDone}
+          className="w-full py-3 bg-primary text-white rounded-2xl font-bold font-lexend hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
+        >
+          Done
+        </button>
+      )}
     </div>
   );
 }
