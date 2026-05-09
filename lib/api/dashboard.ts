@@ -198,3 +198,22 @@ export async function updateMemberProfile(payload: {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function renewMember(payload: {
+  memberId: string;
+  membershipTypeId: string | number;
+  durationMonths: number;
+}) {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("renew_member_membership", {
+    p_member_id: payload.memberId,
+    p_membership_type_id: Number(payload.membershipTypeId),
+    p_duration_months: payload.durationMonths,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return true;
+}
