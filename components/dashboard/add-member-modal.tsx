@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/lib/contexts/ToastContext";
 import Modal from "../ui/Modal";
 import MemberWelcomeCard from "./MemberWelcomeCard";
+import { Select } from "../ui/Select";
 
 interface AddMemberModalProps {
   isOpen: boolean;
@@ -45,10 +46,6 @@ export default function AddMemberModal({
   // Success state
   const [newMember, setNewMember] = useState<any>(null);
 
-  // Dropdown states
-  const [isMembershipOpen, setIsMembershipOpen] = useState(false);
-  const [isCoachOpen, setIsCoachOpen] = useState(false);
-
   // Fetch Options from DB
   useEffect(() => {
     async function loadOptions() {
@@ -76,8 +73,6 @@ export default function AddMemberModal({
       setDuration("");
       setCoach("");
       setHasDiscount(false);
-      setIsMembershipOpen(false);
-      setIsCoachOpen(false);
     }
   }, [isOpen]);
 
@@ -240,64 +235,24 @@ export default function AddMemberModal({
             </div>
 
             {/* Membership Dropdown */}
-            <div className="md:col-span-1 relative">
-              <label className={labelBase}>Membership</label>
-              <div
-                className={`${inputBase} flex items-center justify-between cursor-pointer ${isMembershipOpen ? "border-primary ring-2 ring-primary/30" : ""}`}
-                onClick={() => setIsMembershipOpen(!isMembershipOpen)}
-              >
-                <span
-                  className={membership ? "text-foreground" : "text-[#9CA3AF]"}
-                >
-                  {membership || "Select plan"}
-                </span>
-                <ChevronDownIcon
-                  className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isMembershipOpen ? "rotate-180" : ""}`}
-                />
-              </div>
-
-              {isMembershipOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setIsMembershipOpen(false)}
-                  />
-                  <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200 max-h-48 overflow-y-auto">
-                    {isLoadingOptions ? (
-                      <div className="px-4 py-2 text-sm text-gray-500">
-                        Loading...
-                      </div>
-                    ) : membershipOptions.length > 0 ? (
-                      membershipOptions.map((opt) => (
-                        <div
-                          key={opt.id}
-                          className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                          onClick={() => {
-                            setMembership(opt.name);
-                            setIsMembershipOpen(false);
-                          }}
-                        >
-                          {opt.name}
-                        </div>
-                      ))
-                    ) : (
-                      // Fallback to static if DB fails
-                      MEMBERSHIP_OPTIONS.map((opt) => (
-                        <div
-                          key={opt}
-                          className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                          onClick={() => {
-                            setMembership(opt);
-                            setIsMembershipOpen(false);
-                          }}
-                        >
-                          {opt}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
+            <div className="md:col-span-1">
+              <Select
+                label="Membership"
+                placeholder="Select plan"
+                value={membership}
+                onChange={(val) => setMembership(val)}
+                options={
+                  membershipOptions.length > 0
+                    ? membershipOptions.map((opt) => ({
+                        label: opt.name,
+                        value: opt.name,
+                      }))
+                    : MEMBERSHIP_OPTIONS.map((opt) => ({
+                        label: opt,
+                        value: opt,
+                      }))
+                }
+              />
             </div>
 
             {/* Duration Input */}
@@ -332,64 +287,24 @@ export default function AddMemberModal({
 
             {/* Conditional Coach Dropdown */}
             {membership === "Coaching" && (
-              <div className="md:col-span-1 relative animate-in fade-in slide-in-from-right-2 duration-300">
-                <label className={labelBase}>Assign Coach</label>
-                <div
-                  className={`${inputBase} flex items-center justify-between cursor-pointer ${isCoachOpen ? "border-primary ring-2 ring-primary/30" : ""}`}
-                  onClick={() => setIsCoachOpen(!isCoachOpen)}
-                >
-                  <span
-                    className={coach ? "text-foreground" : "text-[#9CA3AF]"}
-                  >
-                    {coach || "Select a coach"}
-                  </span>
-                  <ChevronDownIcon
-                    className={`w-4 h-4 text-[#9CA3AF] transition-transform duration-200 ${isCoachOpen ? "rotate-180" : ""}`}
-                  />
-                </div>
-
-                {isCoachOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setIsCoachOpen(false)}
-                    />
-                    <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#1f1f1f] border border-stroke dark:border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-1 duration-200 max-h-48 overflow-y-auto">
-                      {isLoadingOptions ? (
-                        <div className="px-4 py-2 text-sm text-gray-500">
-                          Loading...
-                        </div>
-                      ) : coachOptions.length > 0 ? (
-                        coachOptions.map((opt) => (
-                          <div
-                            key={opt.id}
-                            className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                            onClick={() => {
-                              setCoach(opt.full_name);
-                              setIsCoachOpen(false);
-                            }}
-                          >
-                            {opt.full_name}
-                          </div>
-                        ))
-                      ) : (
-                        // Fallback to static if DB fails
-                        COACH_OPTIONS.map((opt) => (
-                          <div
-                            key={opt}
-                            className="px-4 py-2 text-sm font-lexend text-foreground hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                            onClick={() => {
-                              setCoach(opt);
-                              setIsCoachOpen(false);
-                            }}
-                          >
-                            {opt}
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </>
-                )}
+              <div className="md:col-span-1 animate-in fade-in slide-in-from-right-2 duration-300">
+                <Select
+                  label="Assign Coach"
+                  placeholder="Select a coach"
+                  value={coach}
+                  onChange={(val) => setCoach(val)}
+                  options={
+                    coachOptions.length > 0
+                      ? coachOptions.map((opt) => ({
+                          label: opt.full_name,
+                          value: opt.full_name,
+                        }))
+                      : COACH_OPTIONS.map((opt) => ({
+                          label: opt,
+                          value: opt,
+                        }))
+                  }
+                />
               </div>
             )}
           </div>

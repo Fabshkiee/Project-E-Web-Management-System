@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/dashboard";
 import MemberWelcomeCard from "./MemberWelcomeCard";
 import { StatusTag } from "@/components/ui/StatusTag";
+import { Select } from "../ui/Select";
 import { useToast } from "@/lib/contexts/ToastContext";
 import { PrimaryButton } from "../ui/ActionButton";
 
@@ -255,19 +256,18 @@ export default function MemberDetailsModal({
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className={labelBase}>Assigned Coach</label>
-                    <select
-                      value={coachId}
-                      onChange={(e) => setCoachId(e.target.value)}
-                      className={inputBase}
-                    >
-                      <option value="none">No Coach (Self-Guided)</option>
-                      {coachOptions.map((coach) => (
-                        <option key={coach.id} value={coach.id}>
-                          {coach.full_name}
-                        </option>
-                      ))}
-                    </select>
+                    <Select
+                      label="Assigned Coach"
+                      value={coachId || "none"}
+                      onChange={(val) => setCoachId(val === "none" ? null : val)}
+                      options={[
+                        { label: "No Coach (Self-Guided)", value: "none" },
+                        ...coachOptions.map((coach) => ({
+                          label: coach.full_name,
+                          value: coach.id,
+                        })),
+                      ]}
+                    />
                   </div>
                 </div>
 
@@ -345,18 +345,15 @@ export default function MemberDetailsModal({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                   <div className="md:col-span-2">
-                    <label className={labelBase}>Membership Type</label>
-                    <select
+                    <Select
+                      label="Membership Type"
                       value={membershipTypeId}
-                      onChange={(e) => setMembershipTypeId(e.target.value)}
-                      className={inputBase}
-                    >
-                      {membershipOptions.map((mt) => (
-                        <option key={mt.id} value={mt.id}>
-                          {mt.name}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => setMembershipTypeId(val)}
+                      options={membershipOptions.map((mt) => ({
+                        label: mt.name,
+                        value: mt.id,
+                      }))}
+                    />
                   </div>
 
                   <div className="md:col-span-2">
