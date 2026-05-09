@@ -34,12 +34,13 @@ export interface MembersListResponse {
  * Fetches a paginated list of members using the get_member_management_list RPC
  */
 export async function getMembersList(
-  page: number = 1, 
+  page: number = 1,
   itemsPerPage: number = 10,
   searchQuery: string = "",
   statusFilter: string = "all",
   sortBy: string = "newest",
-  dateFilter: string = "all"
+  dateFilter: string = "all",
+  coachFilter: string = "all",
 ): Promise<MembersListResponse> {
   const supabase = createClient();
   const offset = (page - 1) * itemsPerPage;
@@ -50,7 +51,8 @@ export async function getMembersList(
     p_search_query: searchQuery,
     p_status_filter: statusFilter,
     p_sort_by: sortBy,
-    p_date_range: dateFilter
+    p_date_range: dateFilter,
+    p_coach_filter: coachFilter,
   });
 
   if (error) {
@@ -59,7 +61,7 @@ export async function getMembersList(
 
   return {
     members: (data.members || []) as MemberListItem[],
-    totalCount: data.total_count || 0
+    totalCount: data.total_count || 0,
   };
 }
 
@@ -119,28 +121,26 @@ export interface CreateMemberPayload {
  */
 export async function getMemberFormOptions() {
   const supabase = createClient();
-  
+
   const [mtRes, staffRes] = await Promise.all([
     supabase.from("membership_types").select("id, name"),
-    supabase
-      .from("staff")
-      .select(`
+    supabase.from("staff").select(`
         id,
         profile:users (
           full_name
         )
-      `)
+      `),
   ]);
 
   // Flatten the coach data so the UI gets { id, full_name }
   const coaches = (staffRes.data || []).map((s: any) => ({
     id: s.id,
-    full_name: s.profile?.full_name || "Unknown Coach"
+    full_name: s.profile?.full_name || "Unknown Coach",
   }));
 
   return {
     membershipTypes: mtRes.data || [],
-    coaches: coaches
+    coaches: coaches,
   };
 }
 
@@ -156,9 +156,10 @@ export async function createMemberProfile(payload: CreateMemberPayload) {
   }
 
   // The RPC returns a JSON object. If it failed internally, it sets success: false.
-  if (data && typeof data === 'object' && !data.success) {
+  if (data && typeof data === "object" && !data.success) {
     throw new Error(data.error || "Failed to create member");
   }
 
   return data;
 }
+

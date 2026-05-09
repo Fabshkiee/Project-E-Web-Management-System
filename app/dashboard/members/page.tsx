@@ -9,7 +9,7 @@ import { SearchFilter } from "@/components/dashboard/search-filter";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { DataTable } from "@/components/dashboard/data-table";
-import { getMembersList, MemberListItem } from "@/lib/api/dashboard";
+import { getMembersList, MemberListItem, getMemberFormOptions } from "@/lib/api/dashboard";
 import { Pagination } from "@/components/ui/Pagination";
 
 const toTitleCase = (str: string) => {
@@ -102,11 +102,32 @@ export default function Members() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [coachFilter, setCoachFilter] = useState("all");
+  const [coachOptions, setCoachOptions] = useState<{label: string, value: string}[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [members, setMembers] = useState<MemberListItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 5;
+
+  useEffect(() => {
+    async function fetchCoaches() {
+      try {
+        const { coaches } = await getMemberFormOptions();
+        const options = coaches.map((c) => ({
+          label: "Coach " + c.full_name.split(" ")[0],
+          value: c.full_name,
+        }));
+        setCoachOptions([
+          { label: "All Coaches", value: "all" },
+          ...options,
+          { label: "None", value: "none" },
+        ]);
+      } catch (error) {
+        console.error("Error fetching coaches:", error);
+      }
+    }
+    fetchCoaches();
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -128,6 +149,7 @@ export default function Members() {
           apiStatus,
           apiSort,
           dateFilter,
+          coachFilter,
         );
         setMembers(members);
         setTotalCount(totalCount);
@@ -143,7 +165,7 @@ export default function Members() {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchQuery, statusFilter, dateFilter]);
+  }, [currentPage, searchQuery, statusFilter, dateFilter, coachFilter]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -157,6 +179,11 @@ export default function Members() {
 
   const handleDateChange = (val: string) => {
     setDateFilter(val);
+    setCurrentPage(1);
+  };
+
+  const handleCoachChange = (val: string) => {
+    setCoachFilter(val);
     setCurrentPage(1);
   };
 
@@ -211,10 +238,10 @@ export default function Members() {
           {
             label: "Coach",
             value: coachFilter,
-            onChange: setCoachFilter,
-            options: [
-              { label: "Coach Eric", value: "eric" },
-              { label: "Coach Sarah", value: "sarah" },
+            onChange: handleCoachChange,
+            options: coachOptions.length > 0 ? coachOptions : [
+              { label: "All Coaches", value: "all" },
+              { label: "None", value: "none" },
             ],
           },
         ]}
