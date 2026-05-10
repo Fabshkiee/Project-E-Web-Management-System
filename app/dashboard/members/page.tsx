@@ -125,6 +125,7 @@ export default function Members() {
   const [members, setMembers] = useState<MemberListItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -238,7 +239,7 @@ export default function Members() {
 
   const handleExport = async () => {
     try {
-      setLoading(true);
+      setExporting(true);
 
       let apiStatus = statusFilter;
       let apiSort = "newest";
@@ -342,7 +343,7 @@ export default function Members() {
     } catch (error) {
       console.error("Export failed:", error);
     } finally {
-      setLoading(false);
+      setExporting(false);
     }
   };
 
@@ -356,10 +357,10 @@ export default function Members() {
         <div className="flex gap-3">
           <SecondaryButton
             onClick={handleExport}
-            disabled={loading}
+            disabled={exporting}
             icon={<ExportPDF className="w-6 h-6" />}
           >
-            {loading ? "Exporting..." : "Export List (PDF)"}
+            {exporting ? "Exporting..." : "Export List (PDF)"}
           </SecondaryButton>
           <PrimaryButton
             onClick={() => setIsModalOpen(true)}
