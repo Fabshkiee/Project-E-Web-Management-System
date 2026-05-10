@@ -178,7 +178,6 @@ export default function Members() {
     async function fetchData() {
       setLoading(true);
       try {
-        // Map UI filter to API logic
         let apiStatus = statusFilter;
         let apiSort = "newest";
 
@@ -187,17 +186,18 @@ export default function Members() {
           apiSort = statusFilter;
         }
 
-        const { members, totalCount } = await getMembersList(
-          currentPage,
-          itemsPerPage,
-          searchQuery,
-          apiStatus,
-          apiSort,
-          dateFilter,
-          coachFilter,
-        );
-        setMembers(members);
-        setTotalCount(totalCount);
+        const { members: fetchedMembers, totalCount: fetchedTotal } =
+          await getMembersList(
+            currentPage,
+            itemsPerPage,
+            searchQuery,
+            apiStatus,
+            apiSort,
+            dateFilter,
+            coachFilter,
+          );
+        setMembers(fetchedMembers);
+        setTotalCount(fetchedTotal);
       } catch (error) {
         console.error("Error fetching members:", error);
       } finally {
@@ -205,10 +205,7 @@ export default function Members() {
       }
     }
 
-    const timer = setTimeout(() => {
-      fetchData();
-    }, 400);
-
+    const timer = setTimeout(fetchData, 400);
     return () => clearTimeout(timer);
   }, [
     currentPage,
@@ -243,7 +240,6 @@ export default function Members() {
     try {
       setLoading(true);
 
-      // Map UI filter to API logic
       let apiStatus = statusFilter;
       let apiSort = "newest";
 
@@ -252,7 +248,6 @@ export default function Members() {
         apiSort = statusFilter;
       }
 
-      // Fetch all members matching current filters (up to 1000)
       const { members: allMembers } = await getMembersList(
         1,
         1000,
