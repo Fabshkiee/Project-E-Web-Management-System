@@ -18,6 +18,7 @@ export interface MemberListItem {
   id: string;
   full_name: string;
   member_id: string;
+  contact_number: string | null;
   membership_type: string;
   start_date: string;
   end_date: string;
@@ -225,7 +226,7 @@ export async function terminateMembership(userId: string) {
   });
 
   if (error) throw new Error(error.message);
-  
+
   if (data && typeof data === "object" && !data.success) {
     throw new Error(data.error || "Failed to terminate membership");
   }
