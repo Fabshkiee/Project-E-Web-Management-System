@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/Icons"; // Use a disk/save icon
 import { Toggle } from "@/components/dashboard/toggle-button";
 import { DataTable } from "@/components/dashboard/data-table";
+import { useState } from "react";
 
 const columns = [
   { header: "MEMBERSHIP TYPE", accessor: "type" as const },
@@ -39,6 +40,8 @@ const pricingData = [
 ];
 
 export default function Settings() {
+  const [autoExpiry, setAutoExpiry] = useState(false);
+  const [inactiveDeletion, setInactiveDeletion] = useState(false);
   return (
     <main className="space-y-8 h-fit">
       {/* Title page and Save button */}
@@ -56,7 +59,7 @@ export default function Settings() {
         <div className="bg-white dark:bg-[#1a1a1a] border border-stroke dark:border-white/5 rounded-2xl p-8 gap-8 flex flex-col">
           {/* CONFIG TITLE CARD */}
           <div className="flex items-center gap-3 pb-6 border-b border-[#F3F4F6] dark:border-white/5">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">
               <MonitorIcon />
             </div>
             <h3 className="font-bold text-lg">Membership & Access</h3>
@@ -69,6 +72,7 @@ export default function Settings() {
             <div className="flex items-center justify-between ">
               <input
                 type="number"
+                min="0"
                 placeholder="e.g. 7"
                 className="w-full px-2.5 py-2.5 bg-white dark:bg-[#1a1a1a] border border-stroke dark:border-white/5 rounded-md text-sm font-lexend focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all shadow-sm placeholder:text-gray-400 text-foreground"
               />
@@ -83,8 +87,8 @@ export default function Settings() {
             <Toggle
               label="Auto Expiry Blocking"
               description="Prevent expired Members from scanning in"
-              checked={false}
-              onChange={() => {}}
+              checked={autoExpiry}
+              onChange={setAutoExpiry}
             />
           </div>
         </div>
@@ -93,7 +97,7 @@ export default function Settings() {
         <div className="bg-white dark:bg-[#1a1a1a] border border-stroke dark:border-white/5 rounded-2xl p-8 gap-8 flex flex-col">
           {/* CONFIG TITLE CARD */}
           <div className="flex items-center gap-3 pb-6 border-b border-[#F3F4F6] dark:border-white/5">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-orange-50 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
               <CleanIcon />
             </div>
             <h3 className="font-bold text-lg">Automated Cleanup</h3>
@@ -104,8 +108,8 @@ export default function Settings() {
               <Toggle
                 label="Inactive Member Deletion"
                 description="Automatically remove old inactive accounts"
-                checked={false}
-                onChange={() => {}}
+                checked={inactiveDeletion}
+                onChange={setInactiveDeletion}
               />
             </div>
 
@@ -128,7 +132,7 @@ export default function Settings() {
       </div>
       <div className="bg-white dark:bg-[#1a1a1a] border border-stroke dark:border-white/5 rounded-2xl p-8 gap-8 flex flex-col">
         <div className="flex items-center gap-3 pb-6 border-b border-[#F3F4F6] dark:border-white/5">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-purple-50 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400">
             <MoneyPurple />
           </div>
           <h3 className="font-bold text-lg">Membership Types & Pricing</h3>
