@@ -103,7 +103,7 @@ export default function Footer() {
                 height={26}
               />
               <span className="text-white font-bold text-sm tracking-wide">
-                Project-E Gym
+                Project-E Fitness
               </span>
             </Link>
             <p className="text-[#A1A1AA] text-sm leading-relaxed">

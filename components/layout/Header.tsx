@@ -46,7 +46,7 @@ export default function Header() {
             priority
           />
           <span className="text-white font-semibold text-lg tracking-wide group-hover:text-gray-200 transition-colors duration-200">
-            Project-E Gym
+            Project-E Fitness
           </span>
         </Link>
 
