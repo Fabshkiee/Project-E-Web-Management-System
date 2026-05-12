@@ -15,6 +15,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { Pagination } from "@/components/ui/Pagination";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { DatePicker } from "@/components/ui/DatePicker";
 import React, { useState, useEffect } from "react";
 import {
   getMemberCards,
@@ -42,8 +43,10 @@ export default function AttendanceTracking() {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dateFilter, setDateFilter] = useState("today");
+  const [dateFilter, setDateFilter] = useState("all"); // Default to All Time
   const [statusFilter, setStatusFilter] = useState("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [tableLoading, setTableLoading] = useState(true);
 
   const itemsPerPage = 5;
@@ -84,6 +87,8 @@ export default function AttendanceTracking() {
           searchQuery,
           dateFilter,
           statusFilter,
+          startDate,
+          endDate,
         );
         setAttendanceLogs(logs);
         setTotalCount(totalCount);
@@ -94,7 +99,7 @@ export default function AttendanceTracking() {
       }
     }
     fetchLogs();
-  }, [currentPage, searchQuery, dateFilter, statusFilter]);
+  }, [currentPage, searchQuery, dateFilter, statusFilter, startDate, endDate]);
 
   // Columns configuration for DataTable
   const columns = [
@@ -221,13 +226,23 @@ export default function AttendanceTracking() {
             label: "Date",
             value: dateFilter,
             options: [
+              { label: "All Time", value: "all" },
               { label: "Today", value: "today" },
               { label: "Yesterday", value: "yesterday" },
-              { label: "This Week", value: "week" },
+              { label: "This Week", value: "this_week" },
+              { label: "Last 7 Days", value: "last_7_days" },
+              { label: "This Month", value: "this_month" },
+              { label: "Custom Range", value: "custom" },
             ],
+
             onChange: (val) => {
               setDateFilter(val);
               setCurrentPage(1);
+
+              if (val !== "custom") {
+                setStartDate("");
+                setEndDate("");
+              }
             },
           },
           {
@@ -245,6 +260,31 @@ export default function AttendanceTracking() {
           },
         ]}
       />
+
+      {/* Custom Date Range Pickers (Conditional) */}
+      {dateFilter === "custom" && (
+        <div className="flex gap-4 p-5 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+          <DatePicker
+            label="Start Date"
+            value={startDate}
+            onChange={(val) => {
+              setStartDate(val);
+              setCurrentPage(1);
+            }}
+            className="flex-1"
+          />
+
+          <DatePicker
+            label="End Date"
+            value={endDate}
+            onChange={(val) => {
+              setEndDate(val);
+              setCurrentPage(1);
+            }}
+            className="flex-1"
+          />
+        </div>
+      )}
 
       {/* 4. Attendance Table */}
       <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm">

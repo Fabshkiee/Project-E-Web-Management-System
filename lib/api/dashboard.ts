@@ -52,6 +52,8 @@ export async function getMembersList(
   sortBy: string = "newest",
   dateFilter: string = "all",
   coachFilter: string = "all",
+  startDate?: string,
+  endDate?: string,
 ): Promise<MembersListResponse> {
   const supabase = createClient();
   const offset = (page - 1) * itemsPerPage;
@@ -64,6 +66,8 @@ export async function getMembersList(
     p_sort_by: sortBy,
     p_date_range: dateFilter,
     p_coach_filter: coachFilter,
+    p_start_date: startDate || null,
+    p_end_date: endDate || null,
   });
 
   if (error) {
@@ -271,8 +275,10 @@ export async function getAttendanceList(
   page: number = 1,
   limit: number = 5,
   searchQuery: string = "",
-  dateFilter: string = "today",
+  dateFilter: string = "all",
   statusFilter: string = "all",
+  startDate?: string,
+  endDate?: string,
 ) {
   const supabase = createClient();
   const offset = (page - 1) * limit;
@@ -283,6 +289,8 @@ export async function getAttendanceList(
     p_status_filter: statusFilter,
     p_limit: limit,
     p_offset: offset,
+    p_start_date: startDate || null,
+    p_end_date: endDate || null,
   });
 
   if (error) throw new Error(error.message);

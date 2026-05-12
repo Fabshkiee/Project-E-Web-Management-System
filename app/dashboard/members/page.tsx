@@ -12,6 +12,7 @@ import { SearchFilter } from "@/components/dashboard/search-filter";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { DataTable } from "@/components/dashboard/data-table";
+import { DatePicker } from "@/components/ui/DatePicker";
 import {
   getMembersList,
   MemberListItem,
@@ -138,6 +139,8 @@ export default function Members() {
   const [members, setMembers] = useState<MemberListItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [exporting, setExporting] = useState(false);
   const itemsPerPage = 5;
 
@@ -209,6 +212,8 @@ export default function Members() {
             apiSort,
             dateFilter,
             coachFilter,
+            startDate,
+            endDate,
           );
         setMembers(fetchedMembers);
         setTotalCount(fetchedTotal);
@@ -228,6 +233,8 @@ export default function Members() {
     dateFilter,
     coachFilter,
     realtimeTrigger,
+    startDate,
+    endDate,
   ]);
 
   const handleSearch = (query: string) => {
@@ -402,14 +409,21 @@ export default function Members() {
           {
             label: "Dates",
             value: dateFilter,
-            onChange: handleDateChange,
+            onChange: (val) => {
+              handleDateChange(val);
+              if (val !== "custom") {
+                setStartDate("");
+                setEndDate("");
+              }
+            },
             options: [
               { label: "All Time", value: "all" },
-              { label: "This Month", value: "month" },
-              { label: "Last Month", value: "last_month" },
-              { label: "Last 3 Months", value: "3_months" },
-              { label: "Last 6 Months", value: "6_months" },
-              { label: "Last 1 Year", value: "1_year" },
+              { label: "Today", value: "today" },
+              { label: "Yesterday", value: "yesterday" },
+              { label: "This Week", value: "this_week" },
+              { label: "Last 7 Days", value: "last_7_days" },
+              { label: "This Month", value: "this_month" },
+              { label: "Custom", value: "custom" },
             ],
           },
           {
@@ -426,6 +440,30 @@ export default function Members() {
           },
         ]}
       />
+
+      {/* Custom Date Range Pickers (Conditional) */}
+      {dateFilter === "custom" && (
+        <div className="flex gap-4 p-5 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+          <DatePicker
+            label="Start Date"
+            value={startDate}
+            onChange={(val) => {
+              setStartDate(val);
+              setCurrentPage(1);
+            }}
+            className="flex-1"
+          />
+          <DatePicker
+            label="End Date"
+            value={endDate}
+            onChange={(val) => {
+              setEndDate(val);
+              setCurrentPage(1);
+            }}
+            className="flex-1"
+          />
+        </div>
+      )}
 
       {/* Members Table Section */}
       <section className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm">
