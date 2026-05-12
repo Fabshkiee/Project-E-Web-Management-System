@@ -13,25 +13,6 @@ import { Pagination } from "@/components/ui/Pagination";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 
-
-// Extracts the first letter of the first and last name (e.g., "Marcus Johnson" -> "MJ")
-const getInitials = (name: string) => {
-  if (!name) return "";
-  return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-};
-
-// Assigns a consistent color theme based on the name length
-const getAvatarStyle = (name: string) => {
-  if (!name) return "bg-gray-100 text-gray-600";
-  const colors = [
-    "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400",
-    "bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
-    "bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
-    "bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400",
-  ];
-  return colors[name.length % colors.length];
-};
-
 export default function AttendanceTracking() {
   // Mock Data for the DataTable
   const mockData = [
@@ -49,13 +30,11 @@ export default function AttendanceTracking() {
       accessor: (item: any) => (
         <div className="flex items-center gap-4">
           {/* Avatar Bubble */}
-          <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm ${getAvatarStyle(item.member)}`}>
-            {getInitials(item.member)}
-          </div>
+          <UserAvatar name={item.member} />
           {/* Name and ID */}
           <div>
-            <p className="font-bold text-gray-900 dark:text-white">{item.member}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">ID: {item.memberId}</p>
+            <p className="font-medium text-foreground">{item.member}</p>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-secondary mt-0.5">ID: {item.memberId}</p>
           </div>
         </div>
       ) 
@@ -64,32 +43,22 @@ export default function AttendanceTracking() {
       header: "CHECK-IN TIME", 
       accessor: (item: any) => (
         <div>
-          <p className="font-bold text-gray-900 dark:text-white">{item.time}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Today</p>
+          <p className="font-medium text-foreground">{item.time}</p>
+          <p className="text-[11px] font-medium uppercase tracking-wider text-secondary mt-0.5">Today</p>
         </div>
       ) 
     },
     { 
       header: "STATUS", 
-      accessor: (item: any) => {
-        const isActive = item.status.toLowerCase() === "active";
-        return (
-          <span
-            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-              isActive
-                ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400"
-                : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"
-            }`}
-          >
-            {item.status}
-          </span>
-        );
-      }
+      accessor: (item: any) => (
+        // FIXED: Using 'type' prop instead of 'status'
+        <StatusTag type={item.status} />
+      )
     },
   ];
 
   return (
-  <div className="p-6 max-w-7xl mx-auto space-y-6 min-h-screen">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 min-h-screen">
       
       {/* 1. Page Header */}
       <header className="flex justify-between items-center">
@@ -132,12 +101,14 @@ export default function AttendanceTracking() {
           {
             label: "Date",
             value: "today",
-            options: [{ label: "Today", value: "today" }]
+            options: [{ label: "Today", value: "today" }],
+            onChange: (val) => console.log(`Date changed: ${val}`)
           },
           {
             label: "Status",
             value: "all",
-            options: [{ label: "Status: All", value: "all" }]
+            options: [{ label: "Status: All", value: "all" }],
+            onChange: (val) => console.log(`Status changed: ${val}`)
           }
         ]}
       />
