@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import PageTitle from "@/components/dashboard/page-title";
 import { ExportPDF, PlusIcon } from "@/components/ui/Icons";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+// Remove static imports to save memory and bundle size
+// import jsPDF from "jspdf";
+// import autoTable from "jspdf-autotable";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
 import AddMemberModal from "@/components/dashboard/add-member-modal";
 import MemberDetailsModal from "@/components/dashboard/member-details-modal";
@@ -278,6 +279,10 @@ export default function Members() {
         dateFilter,
         coachFilter,
       );
+
+      // Dynamically load heavy PDF libraries only when needed
+      const { default: jsPDF } = await import("jspdf");
+      const { default: autoTable } = await import("jspdf-autotable");
 
       const doc = new jsPDF();
 
