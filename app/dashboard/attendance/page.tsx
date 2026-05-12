@@ -3,11 +3,11 @@
 import PageTitle from "@/components/dashboard/page-title";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
 import {
-  ExportPNG,
   PlusIcon,
   CheckedInToday,
   CalendarIcon,
   PeakHours,
+  DownloadIcon,
 } from "@/components/ui/Icons";
 import { StatCard } from "@/components/ui/StatCard";
 import { SearchFilter } from "@/components/dashboard/search-filter";
@@ -48,6 +48,7 @@ export default function AttendanceTracking() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tableLoading, setTableLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
 
   const itemsPerPage = 5;
 
@@ -174,6 +175,86 @@ export default function AttendanceTracking() {
     },
   ];
 
+  // Export to CSV Logic
+  const handleExportCSV = async () => {
+    try {
+      setExporting(true);
+      // Fetch all logs matching current filters (up to a reasonable limit)
+      const { logs } = await getAttendanceList(
+        1,
+        3000, // Fetch up to 3000 logs for export
+        searchQuery,
+        dateFilter,
+        statusFilter,
+        startDate,
+        endDate,
+      );
+
+      if (logs.length === 0) {
+        alert("No logs found to export.");
+        return;
+      }
+
+      // CSV Header
+      const headers = [
+        "Full Name",
+        "Short ID",
+        "Type",
+        "Membership/Role",
+        "Check-in Time",
+        "Status",
+      ];
+
+      // Filter Summary Rows
+      const filterInfo = [
+        ["Report", "Attendance Logs Export"],
+        ["Generated", new Date().toLocaleString()],
+        [
+          "Filters",
+          `Date: ${dateFilter.toUpperCase()} | Status: ${statusFilter.toUpperCase()} | Search: ${searchQuery || "None"}`,
+        ],
+        ...(dateFilter === "custom"
+          ? [["Date Range", `${startDate} to ${endDate}`]]
+          : []),
+        [], // Empty row separator
+      ];
+
+      // Map logs to CSV rows
+      const dataRows = logs.map((log) => [
+        `"${log.full_name}"`,
+        `"${log.short_id}"`,
+        `"${log.type}"`,
+        `"${log.type === "staff" ? log.staff_subrole || "Staff" : log.membership_type || "No Plan"}"`,
+        `"${new Date(log.check_in_time).toLocaleString("en-US")}"`,
+        `"${log.status}"`,
+      ]);
+
+      const csvContent = [
+        ...filterInfo.map((row) => row.join(",")),
+        headers.join(","),
+        ...dataRows.map((e) => e.join(",")),
+      ].join("\n");
+
+      // Download Logic
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `attendance_logs_${new Date().toISOString().split("T")[0]}.csv`,
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("CSV Export failed:", error);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* 1. Page Header */}
@@ -183,8 +264,12 @@ export default function AttendanceTracking() {
           subtitle="Monitor real-time gym check-ins and history."
         />
         <div className="flex gap-3">
-          <SecondaryButton icon={<ExportPNG />}>
-            Export Logs (CSV)
+          <SecondaryButton
+            onClick={handleExportCSV}
+            disabled={exporting}
+            icon={<DownloadIcon className="w-5 h-5" />}
+          >
+            {exporting ? "Exporting..." : "Export Logs (CSV)"}
           </SecondaryButton>
           <PrimaryButton icon={<PlusIcon />}>Manual Check-in</PrimaryButton>
         </div>
