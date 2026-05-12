@@ -320,3 +320,53 @@ export async function manualCheckIn(userId: string, status: string) {
 
   return true;
 }
+
+export interface StaffListItem {
+  id: string;
+  name: string;
+  staff_id: string;
+  role: string;
+  contact: string;
+  last_active: string;
+}
+
+export interface StaffListResponse {
+  staff: StaffListItem[];
+  totalCount: number;
+}
+
+/**
+ * Fetches a paginated list of staff members
+ */
+export async function getStaffList(
+  page: number = 1,
+  itemsPerPage: number = 10,
+  searchQuery: string = "",
+  roleFilter: string = "all",
+): Promise<StaffListResponse> {
+  const supabase = createClient();
+  const offset = (page - 1) * itemsPerPage;
+
+  const { data, error } = await supabase.rpc("get_staff_management_list", {
+    p_limit: Math.floor(itemsPerPage),
+    p_offset: Math.floor(offset),
+    p_search_query: searchQuery,
+    p_role_filter: roleFilter,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    staff: (data.staff || []) as StaffListItem[],
+    totalCount: data.total_count || 0,
+  };
+}
+
+export interface CreateStaffPayload {
+  p_full_name: string;
+  p_short_id: string | null;
+  p_contact_number: string | null;
+  p_subrole: string;
+}
