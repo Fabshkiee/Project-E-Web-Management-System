@@ -166,7 +166,7 @@ export default function AttendanceTracking() {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-5">
+    <div className="space-y-5">
       {/* 1. Page Header */}
       <header className="flex justify-between items-center">
         <PageTitle
