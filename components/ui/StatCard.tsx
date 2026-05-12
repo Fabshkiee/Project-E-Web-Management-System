@@ -45,7 +45,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 }) => {
   return (
     <div
-      className={`bg-white dark:bg-[#0f0f0f] rounded-2xl border border-stroke dark:border-white/10 p-6 shadow-sm flex items-center justify-between ${className}`}
+      className={`bg-white dark:bg-surface rounded-2xl border border-stroke dark:border-white/10 p-6 shadow-sm flex items-center justify-between ${className}`}
     >
       <div className="flex flex-col gap-2">
         <h3 className="text-[11px] font-bold font-lexend text-secondary dark:text-gray-400 uppercase tracking-wider">

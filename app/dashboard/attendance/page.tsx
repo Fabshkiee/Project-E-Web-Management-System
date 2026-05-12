@@ -1,7 +1,5 @@
 "use client";
 
-import React from 'react';
-
 // 1. Imports from your UI and Dashboard component folders
 import PageTitle from "@/components/dashboard/page-title";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
