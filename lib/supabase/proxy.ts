@@ -33,13 +33,23 @@ export async function updateSession(request: NextRequest) {
   // getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
+  // Quick check for session cookie to avoid unnecessary network calls
+  const hasSession = request.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
+  
+  const isDashboard = request.nextUrl.pathname.startsWith("/dashboard");
+  const isPortal = request.nextUrl.pathname.startsWith("/portal");
+  const isLoginPage = request.nextUrl.pathname === "/login";
+
+  if (!hasSession && (isDashboard || isPortal)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // 2. Only call getUser if we likely have a session or need to verify it
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const isDashboard = request.nextUrl.pathname.startsWith("/dashboard");
-  const isPortal = request.nextUrl.pathname.startsWith("/portal");
-  const isLoginPage = request.nextUrl.pathname === "/login"; // Check if they are on the login screen
 
   if (!user && (isDashboard || isPortal)) {
     // no user, redirecting the user to the login page
