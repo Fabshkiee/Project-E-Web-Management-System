@@ -222,7 +222,12 @@ export default function Dashboard() {
             </button>
           </header>
           <div className="flex-1 flex flex-col">
-            <DataTable columns={attendanceColumns} data={attendance} className="flex-1" />
+            <DataTable
+              columns={attendanceColumns}
+              data={attendance}
+              isLoading={loading}
+              className="flex-1"
+            />
           </div>
         </section>
 

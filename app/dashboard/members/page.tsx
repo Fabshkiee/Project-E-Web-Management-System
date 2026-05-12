@@ -432,8 +432,9 @@ export default function Members() {
         <DataTable
           columns={MembersColumn}
           className="border-0 rounded-none h-fit"
-          emptyMessage={loading ? "Loading members..." : "No members found."}
+          emptyMessage="No members found."
           data={members}
+          isLoading={loading}
           onRowClick={(item) => setSelectedMemberId(item.id)}
         />
 
