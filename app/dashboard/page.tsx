@@ -63,6 +63,7 @@ const attendanceColumns = [
     accessor: (item: RecentAttendance) => (
       <span className="text-sm font-medium text-secondary font-lexend">
         {item.membershiptype}
+        {item.membershiptype === null && item.staff_subrole}
       </span>
     ),
   },
