@@ -17,22 +17,39 @@ import { Pagination } from "@/components/ui/Pagination";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import React, { useState, useEffect } from "react";
-import { getMemberCards } from "@/lib/api/dashboard"; // for checkin today
+import { getMemberCards, getPeakHours } from "@/lib/api/dashboard"; // for checkin today
 
 export default function AttendanceTracking() {
-  const [todayCount, setTodayCount] = useState<number | string>("...");
+  const [todayCount, setTodayCount] = useState<number>(0);
+  const [peakHour, setPeakHour] = useState<string>("...");
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchData() {
       try {
-        const stats = await getMemberCards();
-        // Just extract the checkin today card value
-        setTodayCount(stats["Today Check-ins Card"].value);
+        setLoading(true);
+        // Fetch both in parallel
+        const [stats, peakData] = await Promise.all([
+          getMemberCards(),
+          getPeakHours(),
+        ]);
+
+        if (stats && stats["Today Check-ins Card"]) {
+          setTodayCount(stats["Today Check-ins Card"].value);
+        }
+
+        if (peakData && peakData.peak_window) {
+          setPeakHour(peakData.peak_window);
+        } else {
+          setPeakHour("N/A");
+        }
       } catch (error) {
-        console.error("Error fetching check-in stats:", error);
-        setTodayCount(0); // Fallback
+        console.error("Error fetching attendance stats:", error);
+      } finally {
+        setLoading(false);
       }
     }
-    fetchStats();
+    fetchData();
   }, []);
 
   // Columns configuration for DataTable
@@ -94,18 +111,21 @@ export default function AttendanceTracking() {
         <StatCard
           title="Checked in Today"
           value={todayCount}
+          isLoading={loading}
           icon={<CheckedInToday />}
           color="blue"
         />
         <StatCard
           title="Peak Hours (Avg)"
-          value="5pm - 7pm"
+          value={peakHour}
+          isLoading={loading}
           icon={<PeakHours />}
           color="orange"
         />
         <StatCard
           title="Weekly Attendance"
           value="856"
+          isLoading={loading}
           icon={<CalendarIcon />}
           color="purple"
         />
