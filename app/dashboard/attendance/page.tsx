@@ -1,6 +1,5 @@
 "use client";
 
-// 1. Imports from your UI and Dashboard component folders
 import PageTitle from "@/components/dashboard/page-title";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
 import {
@@ -21,87 +20,153 @@ import {
   getMemberCards,
   getPeakHours,
   getWeeklyAttendance,
-} from "@/lib/api/dashboard"; // for checkin today
+  getAttendanceList,
+  AttendanceLogItem,
+} from "@/lib/api/dashboard";
+
+const toTitleCase = (str: string) => {
+  return str.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
+  );
+};
 
 export default function AttendanceTracking() {
   const [todayCount, setTodayCount] = useState<number>(0);
   const [peakHour, setPeakHour] = useState<string>("...");
   const [weeklyAttendance, setWeeklyAttendance] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
 
+  // Table State
+  const [attendanceLogs, setAttendanceLogs] = useState<AttendanceLogItem[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFilter, setDateFilter] = useState("today");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [tableLoading, setTableLoading] = useState(true);
+
+  const itemsPerPage = 5;
+
+  // Fetch Stats (Today, Peak, Weekly)
   useEffect(() => {
-    async function fetchData() {
+    async function fetchStats() {
       try {
-        setLoading(true);
-        // Fetch both in parallel
+        setStatsLoading(true);
         const [stats, peakData, weeklyData] = await Promise.all([
           getMemberCards(),
           getPeakHours(),
           getWeeklyAttendance(),
         ]);
 
-        if (stats && stats["Today Check-ins Card"]) {
+        if (stats?.["Today Check-ins Card"]) {
           setTodayCount(stats["Today Check-ins Card"].value);
         }
-
-        if (peakData && peakData.peak_window) {
-          setPeakHour(peakData.peak_window);
-        } else {
-          setPeakHour("N/A");
-        }
-
-        if (weeklyData !== null && weeklyData !== undefined) {
-          setWeeklyAttendance(weeklyData);
-        }
+        setPeakHour(peakData?.peak_window || "N/A");
+        if (weeklyData !== null) setWeeklyAttendance(weeklyData);
       } catch (error) {
         console.error("Error fetching attendance stats:", error);
       } finally {
-        setLoading(false);
+        setStatsLoading(false);
       }
     }
-    fetchData();
+    fetchStats();
   }, []);
+
+  // Fetch Attendance List
+  useEffect(() => {
+    async function fetchLogs() {
+      try {
+        setTableLoading(true);
+        const { logs, totalCount } = await getAttendanceList(
+          currentPage,
+          itemsPerPage,
+          searchQuery,
+          dateFilter,
+          statusFilter,
+        );
+        setAttendanceLogs(logs);
+        setTotalCount(totalCount);
+      } catch (error) {
+        console.error("Error fetching logs:", error);
+      } finally {
+        setTableLoading(false);
+      }
+    }
+    fetchLogs();
+  }, [currentPage, searchQuery, dateFilter, statusFilter]);
 
   // Columns configuration for DataTable
   const columns = [
     {
-      header: "MEMBER",
-      accessor: (item: any) => (
+      header: "Member",
+      accessor: (item: AttendanceLogItem) => (
         <div className="flex items-center gap-4">
-          {/* Avatar Bubble */}
-          <UserAvatar name={item.member} />
-          {/* Name and ID */}
-          <div>
-            <p className="font-medium text-foreground">{item.member}</p>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-secondary mt-0.5">
-              ID: {item.memberId}
-            </p>
+          <UserAvatar name={item.full_name} />
+          <div className="flex flex-col">
+            <span className="font-medium text-foreground text-sm font-lexend">
+              {toTitleCase(item.full_name)}
+            </span>
+            <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
+              ID: {item.short_id}
+            </span>
           </div>
         </div>
       ),
     },
     {
-      header: "CHECK-IN TIME",
-      accessor: (item: any) => (
-        <div>
-          <p className="font-medium text-foreground">{item.time}</p>
-          <p className="text-[11px] font-medium uppercase tracking-wider text-secondary mt-0.5">
-            Today
-          </p>
+      header: "Membership",
+      accessor: (item: AttendanceLogItem) => (
+        <div className="flex flex-col">
+          <span className="font-medium text-foreground text-sm font-lexend">
+            {item.type === "staff"
+              ? toTitleCase(item.staff_subrole || "Staff")
+              : toTitleCase(item.membership_type || "No Plan")}
+          </span>
+          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
+            {item.type}
+          </span>
         </div>
       ),
     },
     {
-      header: "STATUS",
-      accessor: (item: any) => (
-        // FIXED: Using 'type' prop instead of 'status'
-        <StatusTag type={item.status} />
+      header: "Check-in Time",
+      accessor: (item: AttendanceLogItem) => {
+        const checkInDate = new Date(item.check_in_time);
+
+        const formattedTime = checkInDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+
+        const formattedDate = checkInDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        });
+
+        return (
+          <div className="flex flex-col">
+            <span className="font-medium text-foreground text-sm font-lexend">
+              {formattedTime}
+            </span>
+            <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
+              {dateFilter === "today" ? "Today" : formattedDate}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      header: "Status",
+      accessor: (item: AttendanceLogItem) => (
+        <StatusTag type={item.status as any} />
       ),
     },
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 min-h-screen">
+    <div className="p-6 max-w-7xl mx-auto space-y-5">
       {/* 1. Page Header */}
       <header className="flex justify-between items-center">
         <PageTitle
@@ -121,21 +186,21 @@ export default function AttendanceTracking() {
         <StatCard
           title="Checked in Today"
           value={todayCount}
-          isLoading={loading}
+          isLoading={statsLoading}
           icon={<CheckedInToday />}
           color="blue"
         />
         <StatCard
           title="Peak Hours (Avg)"
           value={peakHour}
-          isLoading={loading}
+          isLoading={statsLoading}
           icon={<PeakHours />}
           color="orange"
         />
         <StatCard
           title="Weekly Attendance"
           value={weeklyAttendance}
-          isLoading={loading}
+          isLoading={statsLoading}
           icon={<CalendarIcon />}
           color="purple"
         />
@@ -143,33 +208,53 @@ export default function AttendanceTracking() {
 
       {/* 3. Search & Filter Bar */}
       <SearchFilter
-        onSearch={(q) => console.log(q)}
+        onSearch={(q) => {
+          setSearchQuery(q);
+          setCurrentPage(1); // Reset to first page on search
+        }}
         filters={[
           {
             label: "Date",
-            value: "today",
-            options: [{ label: "Today", value: "today" }],
-            onChange: (val) => console.log(`Date changed: ${val}`),
+            value: dateFilter,
+            options: [
+              { label: "Today", value: "today" },
+              { label: "Yesterday", value: "yesterday" },
+              { label: "This Week", value: "week" },
+            ],
+            onChange: (val) => {
+              setDateFilter(val);
+              setCurrentPage(1);
+            },
           },
           {
             label: "Status",
-            value: "all",
-            options: [{ label: "Status: All", value: "all" }],
-            onChange: (val) => console.log(`Status changed: ${val}`),
+            value: statusFilter,
+            options: [
+              { label: "All", value: "all" },
+              { label: "Active", value: "Active" },
+              { label: "Expired", value: "Expired" },
+            ],
+            onChange: (val) => {
+              setStatusFilter(val);
+              setCurrentPage(1);
+            },
           },
         ]}
       />
 
       {/* 4. Attendance Table */}
-      {/* Wrap DataTable and Pagination in a standard container card */}
       <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm">
-        <DataTable columns={columns} data={[]} />
+        <DataTable
+          columns={columns}
+          data={attendanceLogs}
+          isLoading={tableLoading}
+        />
 
         <Pagination
-          currentPage={1}
-          totalItems={124}
-          itemsPerPage={5}
-          onPageChange={(page) => console.log(page)}
+          currentPage={currentPage}
+          totalItems={totalCount}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => setCurrentPage(page)}
         />
       </div>
     </div>
