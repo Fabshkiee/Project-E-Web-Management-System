@@ -87,6 +87,7 @@ export interface RecentAttendance {
   full_name: string;
   check_in_time: string;
   membershiptype: string;
+  staff_subrole: string | null;
   status: "Active" | "Expired" | "Expiring";
 }
 
