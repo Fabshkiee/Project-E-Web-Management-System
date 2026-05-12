@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { getDb } from "@/lib/powersync/PowerSync";
 
 export interface MemberCardData {
   value: number;
@@ -299,4 +300,21 @@ export async function getAttendanceList(
     logs: (data.logs ?? []) as AttendanceLogItem[],
     totalCount: (data.total_count ?? 0) as number,
   };
+}
+
+/**
+ * Manually records an attendance log entry.
+ * Uses PowerSync directly to ensure offline support and automatic sync.
+ */
+export async function manualCheckIn(userId: string, status: string) {
+  const db = getDb();
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    "INSERT INTO attendance_logs (id, user_id, check_in_time, status_at_scan) VALUES (?, ?, ?, ?)",
+    [id, userId, now, status],
+  );
+
+  return true;
 }
