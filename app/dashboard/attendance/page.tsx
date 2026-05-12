@@ -100,6 +100,7 @@ export default function AttendanceTracking() {
   const columns = [
     {
       header: "Member",
+      className: "w-[30%]",
       accessor: (item: AttendanceLogItem) => (
         <div className="flex items-center gap-4">
           <UserAvatar name={item.full_name} />
@@ -116,6 +117,7 @@ export default function AttendanceTracking() {
     },
     {
       header: "Membership",
+      className: "w-[25%]",
       accessor: (item: AttendanceLogItem) => (
         <div className="flex flex-col">
           <span className="font-medium text-foreground text-sm font-lexend">
@@ -131,6 +133,7 @@ export default function AttendanceTracking() {
     },
     {
       header: "Check-in Time",
+      className: "w-[25%]",
       accessor: (item: AttendanceLogItem) => {
         const checkInDate = new Date(item.check_in_time);
 
@@ -159,6 +162,7 @@ export default function AttendanceTracking() {
     },
     {
       header: "Status",
+      className: "w-[20%]",
       accessor: (item: AttendanceLogItem) => (
         <StatusTag type={item.status as any} />
       ),
