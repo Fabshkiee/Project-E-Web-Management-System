@@ -83,6 +83,7 @@ export async function getMembersList(
 
 export interface RecentAttendance {
   member_short_id: string;
+  staff_short_id: string;
   full_name: string;
   check_in_time: string;
   membershiptype: string;

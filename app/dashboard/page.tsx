@@ -39,7 +39,9 @@ const attendanceColumns = [
             {item.full_name || "Unknown Member"}
           </span>
           <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
-            ID: {item.member_short_id}
+            {item.staff_short_id === null
+              ? "ID: " + item.member_short_id
+              : "ID: " + item.staff_short_id}
           </span>
         </div>
       </div>
