@@ -98,6 +98,19 @@ const MembersColumn = [
     ),
   },
   {
+    header: "Contact Number",
+    className: "w-[20%]",
+    accessor: (item: MemberListItem) => (
+      <span
+        className={`text-sm font-medium font-lexend ${
+          item.contact_number === null ? "text-gray-400" : "text-secondary"
+        }`}
+      >
+        {item.contact_number === null ? "None" : item.contact_number}
+      </span>
+    ),
+  },
+  {
     header: "Coach",
     className: "w-[20%]",
     accessor: (item: MemberListItem) => (
