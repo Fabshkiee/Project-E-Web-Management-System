@@ -129,7 +129,7 @@ export default function Staff() {
   );
 
   return (
-    <main className="space-y-8 h-fit">
+    <div className="space-y-8">
       <header className="flex justify-between items-center">
         <PageTitle
           title="Staff Management"
@@ -183,6 +183,6 @@ export default function Staff() {
           onPageChange={setCurrentPage}
         />
       </section>
-    </main>
+    </div>
   );
 }

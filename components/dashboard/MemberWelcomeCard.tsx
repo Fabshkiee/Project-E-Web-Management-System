@@ -212,7 +212,7 @@ export default function MemberWelcomeCard({
           disabled={downloading}
           className="flex items-center justify-center gap-2 px-4 py-2 bg-[#1a1a1a] border border-white/10 rounded-xl text-[11px] font-bold font-lexend text-white hover:bg-white/10 transition-all disabled:opacity-50"
         >
-          <ExportPNG className="w-3.5 h-3.5 text-green-500" />
+          <ExportPNG className="w-3.5 h-3.5" />
           {downloading ? "Processing..." : "Download PNG"}
         </button>
         <button

@@ -7,6 +7,7 @@ interface TableColumn<T> {
 interface DataTableProps<T> {
   columns: TableColumn<T>[];
   data: T[];
+  isLoading?: boolean; // Added this
   emptyMessage?: string;
   onRowClick?: (item: T) => void;
   className?: string;
@@ -15,6 +16,7 @@ interface DataTableProps<T> {
 export const DataTable = <T,>({
   columns,
   data,
+  isLoading, // Added this
   emptyMessage = "No data available",
   onRowClick,
   className = "",
@@ -37,7 +39,18 @@ export const DataTable = <T,>({
           </tr>
         </thead>
         <tbody>
-          {data.length > 0 ? (
+          {isLoading ? (
+            // Skeleton Loading State
+            [...Array(5)].map((_, i) => (
+              <tr key={i} className="border-b border-stroke dark:border-white/5 last:border-0">
+                {columns.map((_, colIdx) => (
+                  <td key={colIdx} className="px-6 py-5">
+                    <div className="h-5 bg-gray-100 dark:bg-white/5 rounded-md animate-pulse w-full max-w-[120px]" />
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : data.length > 0 ? (
             data.map((item, rowIdx) => (
               <tr
                 key={rowIdx}

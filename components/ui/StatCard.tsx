@@ -19,6 +19,7 @@ export interface StatCardProps {
     variant?: "badge" | "text";
     customColor?: string; // e.g. "text-blue-500" for custom text trend colors
   };
+  isLoading?: boolean;
   className?: string;
 }
 
@@ -41,44 +42,51 @@ export const StatCard: React.FC<StatCardProps> = ({
   icon,
   color = "blue",
   trend,
+  isLoading,
   className = "",
 }) => {
   return (
     <div
-      className={`bg-white dark:bg-[#0f0f0f] rounded-2xl border border-stroke dark:border-white/10 p-6 shadow-sm flex items-center justify-between ${className}`}
+      className={`bg-white dark:bg-surface rounded-2xl border border-stroke dark:border-white/10 p-6 shadow-sm flex items-center justify-between ${className}`}
     >
       <div className="flex flex-col gap-2">
         <h3 className="text-[11px] font-bold font-lexend text-secondary dark:text-gray-400 uppercase tracking-wider">
           {title}
         </h3>
-        <div className="flex items-end gap-3">
-          <span className="text-3xl font-bold font-lexend text-foreground dark:text-white leading-none">
-            {value}
-          </span>
-          {trend &&
-            (trend.variant === "badge" ? (
-              <span
-                className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md mb-0.5 border border-transparent ${
-                  trend.isPositive
-                    ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/30"
-                    : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30"
-                }`}
-              >
-                {trend.value}
+        <div className="flex items-center gap-3">
+          {isLoading ? (
+            <div className="h-8 w-16 bg-gray-100 dark:bg-white/5 rounded-md animate-pulse mt-1" />
+          ) : (
+            <>
+              <span className="text-3xl font-bold font-lexend text-foreground dark:text-white leading-none">
+                {value}
               </span>
-            ) : (
-              <span
-                className={`text-xs font-bold mb-0.5 ${
-                  trend.customColor
-                    ? trend.customColor
-                    : trend.isPositive
-                      ? "text-green-500"
-                      : "text-red-500"
-                }`}
-              >
-                {trend.value}
-              </span>
-            ))}
+              {trend &&
+                (trend.variant === "badge" ? (
+                  <span
+                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md mb-0.5 border border-transparent ${
+                      trend.isPositive
+                        ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/30"
+                        : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30"
+                    }`}
+                  >
+                    {trend.value}
+                  </span>
+                ) : (
+                  <span
+                    className={`text-xs font-bold mb-0.5 ${
+                      trend.customColor
+                        ? trend.customColor
+                        : trend.isPositive
+                          ? "text-green-500"
+                          : "text-red-500"
+                    }`}
+                  >
+                    {trend.value}
+                  </span>
+                ))}
+            </>
+          )}
         </div>
       </div>
       <div

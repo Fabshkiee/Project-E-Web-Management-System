@@ -43,7 +43,7 @@ export default function Settings() {
   const [autoExpiry, setAutoExpiry] = useState(false);
   const [inactiveDeletion, setInactiveDeletion] = useState(false);
   return (
-    <main className="space-y-8 h-fit">
+    <div className="space-y-8">
       {/* Title page and Save button */}
       <header className="flex justify-between items-center">
         <PageTitle
@@ -149,6 +149,6 @@ export default function Settings() {
           Add New Type
         </PrimaryButton>
       </div>
-    </main>
+    </div>
   );
 }

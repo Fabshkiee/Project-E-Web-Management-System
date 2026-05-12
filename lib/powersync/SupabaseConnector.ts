@@ -114,7 +114,9 @@ export class SupabaseConnector extends BaseObserver<SupabaseConnectorListener> i
 
         if (result.error) {
           console.error(result.error);
-          throw new Error(`Could not update Supabase: ${result.error.message}`);
+          const error = new Error(`Could not update Supabase: ${result.error.message}`);
+          (error as any).code = result.error.code;
+          throw error;
         }
       }
       await transaction.complete();

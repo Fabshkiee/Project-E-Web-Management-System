@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { getDb } from "@/lib/powersync/PowerSync";
 
 export interface MemberCardData {
   value: number;
@@ -31,6 +32,16 @@ export interface MembersListResponse {
   totalCount: number;
 }
 
+export interface AttendanceLogItem {
+  type: "member" | "staff" | "unknown";
+  short_id: string;
+  full_name: string;
+  check_in_time: string;
+  membership_type: string | null;
+  staff_subrole: string | null;
+  status: string;
+}
+
 /**
  * Fetches a paginated list of members using the get_member_management_list RPC
  */
@@ -42,6 +53,8 @@ export async function getMembersList(
   sortBy: string = "newest",
   dateFilter: string = "all",
   coachFilter: string = "all",
+  startDate?: string,
+  endDate?: string,
 ): Promise<MembersListResponse> {
   const supabase = createClient();
   const offset = (page - 1) * itemsPerPage;
@@ -54,6 +67,8 @@ export async function getMembersList(
     p_sort_by: sortBy,
     p_date_range: dateFilter,
     p_coach_filter: coachFilter,
+    p_start_date: startDate || null,
+    p_end_date: endDate || null,
   });
 
   if (error) {
@@ -68,6 +83,7 @@ export async function getMembersList(
 
 export interface RecentAttendance {
   member_short_id: string;
+  staff_short_id: string;
   full_name: string;
   check_in_time: string;
   membershiptype: string;
@@ -230,6 +246,76 @@ export async function terminateMembership(userId: string) {
   if (data && typeof data === "object" && !data.success) {
     throw new Error(data.error || "Failed to terminate membership");
   }
+
+  return true;
+}
+
+export async function getPeakHours() {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("get_peak_hours");
+  if (error) {
+    console.error("Error fetching peak hours:", error);
+    return null;
+  }
+  return data;
+}
+
+export async function getWeeklyAttendance() {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("get_weekly_attendance_count");
+  if (error) {
+    console.error("Error fetching weekly attendance:", error);
+    return null;
+  }
+  return data;
+}
+
+/**
+ * Fetches the whole attendance log
+ */
+export async function getAttendanceList(
+  page: number = 1,
+  limit: number = 5,
+  searchQuery: string = "",
+  dateFilter: string = "all",
+  statusFilter: string = "all",
+  startDate?: string,
+  endDate?: string,
+) {
+  const supabase = createClient();
+  const offset = (page - 1) * limit;
+
+  const { data, error } = await supabase.rpc("get_attendance_list", {
+    p_search_query: searchQuery,
+    p_date_filter: dateFilter,
+    p_status_filter: statusFilter,
+    p_limit: limit,
+    p_offset: offset,
+    p_start_date: startDate || null,
+    p_end_date: endDate || null,
+  });
+
+  if (error) throw new Error(error.message);
+
+  return {
+    logs: (data.logs ?? []) as AttendanceLogItem[],
+    totalCount: (data.total_count ?? 0) as number,
+  };
+}
+
+/**
+ * Manually records an attendance log entry.
+ * Uses PowerSync directly to ensure offline support and automatic sync.
+ */
+export async function manualCheckIn(userId: string, status: string) {
+  const db = getDb();
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    "INSERT INTO attendance_logs (id, user_id, check_in_time, status_at_scan) VALUES (?, ?, ?, ?)",
+    [id, userId, now, status],
+  );
 
   return true;
 }
