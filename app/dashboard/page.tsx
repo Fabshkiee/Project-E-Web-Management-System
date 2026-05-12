@@ -24,6 +24,7 @@ import { StatusTag } from "@/components/ui/StatusTag";
 import QuickActions from "@/components/dashboard/quick-actions";
 import SystemStatus from "@/components/dashboard/system-status";
 import { initPowerSync } from "@/lib/powersync/PowerSync";
+import Link from "next/link";
 
 const attendanceColumns = [
   {
@@ -100,7 +101,7 @@ export default function Dashboard() {
             month: "long",
             day: "numeric",
             year: "numeric",
-          })
+          }),
         );
         isInitialLoad.current = false;
       } catch (err) {
@@ -116,7 +117,7 @@ export default function Dashboard() {
 
     // 2. Set up realtime subscription
     const supabase = createClient();
-    
+
     if (!isPowerSyncInitialized.current) {
       initPowerSync(supabase);
       isPowerSyncInitialized.current = true;
@@ -151,7 +152,11 @@ export default function Dashboard() {
       <header>
         <PageTitle
           title="Gym Overview"
-          subtitle={formattedDate ? `Real-time statistics for ${formattedDate}` : "Loading real-time statistics..."}
+          subtitle={
+            formattedDate
+              ? `Real-time statistics for ${formattedDate}`
+              : "Loading real-time statistics..."
+          }
         />
       </header>
 
@@ -217,9 +222,12 @@ export default function Dashboard() {
             >
               Recent Attendance
             </h2>
-            <button className="text-primary font-bold p-sm-md hover:underline decoration-2 underline-offset-4">
+            <Link
+              href="/dashboard/attendance"
+              className="text-primary font-medium p-sm-md hover:underline decoration-2 underline-offset-4"
+            >
               View All
-            </button>
+            </Link>
           </header>
           <div className="flex-1 flex flex-col">
             <DataTable
