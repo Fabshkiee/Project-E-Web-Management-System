@@ -100,7 +100,7 @@ export default function ManualCheckInModal({
       } finally {
         setLoading(false);
       }
-    }, 300);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);

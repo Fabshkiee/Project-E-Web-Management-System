@@ -105,7 +105,8 @@ export default function AttendanceTracking() {
         setTableLoading(false);
       }
     }
-    fetchLogs();
+    const timer = setTimeout(fetchLogs, 400);
+    return () => clearTimeout(timer);
   }, [
     currentPage,
     searchQuery,
