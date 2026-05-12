@@ -31,6 +31,16 @@ export interface MembersListResponse {
   totalCount: number;
 }
 
+export interface AttendanceLogItem {
+  type: "member" | "staff" | "unknown";
+  short_id: string;
+  full_name: string;
+  check_in_time: string;
+  membership_type: string | null;
+  staff_subrole: string | null;
+  status: string;
+}
+
 /**
  * Fetches a paginated list of members using the get_member_management_list RPC
  */
@@ -252,4 +262,33 @@ export async function getWeeklyAttendance() {
     return null;
   }
   return data;
+}
+
+/**
+ * Fetches the whole attendance log
+ */
+export async function getAttendanceList(
+  page: number = 1,
+  limit: number = 5,
+  searchQuery: string = "",
+  dateFilter: string = "today",
+  statusFilter: string = "all",
+) {
+  const supabase = createClient();
+  const offset = (page - 1) * limit;
+
+  const { data, error } = await supabase.rpc("get_attendance_list", {
+    p_search_query: searchQuery,
+    p_date_filter: dateFilter,
+    p_status_filter: statusFilter,
+    p_limit: limit,
+    p_offset: offset,
+  });
+
+  if (error) throw new Error(error.message);
+
+  return {
+    logs: (data.logs ?? []) as AttendanceLogItem[],
+    totalCount: (data.total_count ?? 0) as number,
+  };
 }
