@@ -233,3 +233,13 @@ export async function terminateMembership(userId: string) {
 
   return true;
 }
+
+export async function getPeakHours() {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("get_peak_hours");
+  if (error) {
+    console.error("Error fetching peak hours:", error);
+    return null;
+  }
+  return data;
+}
