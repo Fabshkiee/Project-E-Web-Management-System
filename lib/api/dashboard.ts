@@ -243,3 +243,13 @@ export async function getPeakHours() {
   }
   return data;
 }
+
+export async function getWeeklyAttendance() {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("get_weekly_attendance_count");
+  if (error) {
+    console.error("Error fetching weekly attendance:", error);
+    return null;
+  }
+  return data;
+}

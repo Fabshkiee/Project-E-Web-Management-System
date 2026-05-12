@@ -17,11 +17,16 @@ import { Pagination } from "@/components/ui/Pagination";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import React, { useState, useEffect } from "react";
-import { getMemberCards, getPeakHours } from "@/lib/api/dashboard"; // for checkin today
+import {
+  getMemberCards,
+  getPeakHours,
+  getWeeklyAttendance,
+} from "@/lib/api/dashboard"; // for checkin today
 
 export default function AttendanceTracking() {
   const [todayCount, setTodayCount] = useState<number>(0);
   const [peakHour, setPeakHour] = useState<string>("...");
+  const [weeklyAttendance, setWeeklyAttendance] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,9 +34,10 @@ export default function AttendanceTracking() {
       try {
         setLoading(true);
         // Fetch both in parallel
-        const [stats, peakData] = await Promise.all([
+        const [stats, peakData, weeklyData] = await Promise.all([
           getMemberCards(),
           getPeakHours(),
+          getWeeklyAttendance(),
         ]);
 
         if (stats && stats["Today Check-ins Card"]) {
@@ -42,6 +48,10 @@ export default function AttendanceTracking() {
           setPeakHour(peakData.peak_window);
         } else {
           setPeakHour("N/A");
+        }
+
+        if (weeklyData !== null && weeklyData !== undefined) {
+          setWeeklyAttendance(weeklyData);
         }
       } catch (error) {
         console.error("Error fetching attendance stats:", error);
@@ -124,7 +134,7 @@ export default function AttendanceTracking() {
         />
         <StatCard
           title="Weekly Attendance"
-          value="856"
+          value={weeklyAttendance}
           isLoading={loading}
           icon={<CalendarIcon />}
           color="purple"
