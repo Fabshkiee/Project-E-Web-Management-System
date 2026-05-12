@@ -16,6 +16,10 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { Pagination } from "@/components/ui/Pagination";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import React, { useState, useEffect } from "react";
+import { getMemberCards } from "@/lib/api/dashboard"; // for checkin today
+
+
 
 export default function AttendanceTracking() {
   // Mock Data for the DataTable
