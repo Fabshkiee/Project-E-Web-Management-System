@@ -19,47 +19,21 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import React, { useState, useEffect } from "react";
 import { getMemberCards } from "@/lib/api/dashboard"; // for checkin today
 
-
-
 export default function AttendanceTracking() {
-  // Mock Data for the DataTable
-  const mockData = [
-    {
-      id: 1,
-      member: "Marcus Johnson",
-      memberId: "#8821",
-      time: "09:45 AM",
-      status: "Active",
-    },
-    {
-      id: 2,
-      member: "Jane Smith",
-      memberId: "#7743",
-      time: "08:00 AM",
-      status: "Expired",
-    },
-    {
-      id: 3,
-      member: "Jane Smith",
-      memberId: "#7743",
-      time: "08:00 AM",
-      status: "Active",
-    },
-    {
-      id: 4,
-      member: "Jane Smith",
-      memberId: "#7743",
-      time: "08:00 AM",
-      status: "Active",
-    },
-    {
-      id: 5,
-      member: "Jane Smith",
-      memberId: "#7743",
-      time: "08:00 AM",
-      status: "Active",
-    },
-  ];
+  const [todayCount, setTodayCount] = useState<number | string>("...");
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const stats = await getMemberCards();
+        // Just extract the checkin today card value
+        setTodayCount(stats["Today Check-ins Card"].value);
+      } catch (error) {
+        console.error("Error fetching check-in stats:", error);
+        setTodayCount(0); // Fallback
+      }
+    }
+    fetchStats();
+  }, []);
 
   // Columns configuration for DataTable
   const columns = [
@@ -119,7 +93,7 @@ export default function AttendanceTracking() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard
           title="Checked in Today"
-          value="124"
+          value={todayCount}
           icon={<CheckedInToday />}
           color="blue"
         />
@@ -159,7 +133,7 @@ export default function AttendanceTracking() {
       {/* 4. Attendance Table */}
       {/* Wrap DataTable and Pagination in a standard container card */}
       <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 overflow-hidden shadow-sm">
-        <DataTable columns={columns} data={mockData} />
+        <DataTable columns={columns} data={[]} />
 
         <Pagination
           currentPage={1}
