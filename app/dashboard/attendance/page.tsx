@@ -116,6 +116,26 @@ export default function AttendanceTracking() {
     refreshTrigger,
   ]);
 
+  // Set up Supabase Realtime listener
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel("attendance-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "attendance_logs" },
+        () => {
+          setRefreshTrigger((prev) => prev + 1);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   // Initialize PowerSync
   useEffect(() => {
     const supabase = createClient();
