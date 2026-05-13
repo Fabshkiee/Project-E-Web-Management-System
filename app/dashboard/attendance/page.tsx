@@ -16,9 +16,8 @@ import { Pagination } from "@/components/ui/Pagination";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { DatePicker } from "@/components/ui/DatePicker";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { initPowerSync } from "@/lib/powersync/PowerSync";
 import {
   getMemberCards,
   getPeakHours,
@@ -54,7 +53,7 @@ export default function AttendanceTracking() {
   const [exporting, setExporting] = useState(false);
   const [isManualCheckInOpen, setIsManualCheckInOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const isPowerSyncInitialized = useRef(false);
+
 
   const itemsPerPage = 5;
 
@@ -137,14 +136,7 @@ export default function AttendanceTracking() {
     };
   }, []);
 
-  // Initialize PowerSync
-  useEffect(() => {
-    const supabase = createClient();
-    if (!isPowerSyncInitialized.current) {
-      initPowerSync(supabase);
-      isPowerSyncInitialized.current = true;
-    }
-  }, []);
+
 
   // Columns configuration for DataTable
   const columns = [

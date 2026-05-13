@@ -23,7 +23,7 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import QuickActions from "@/components/dashboard/quick-actions";
 import SystemStatus from "@/components/dashboard/system-status";
-import { initPowerSync } from "@/lib/powersync/PowerSync";
+
 import Link from "next/link";
 
 const attendanceColumns = [
@@ -87,7 +87,6 @@ export default function Dashboard() {
   const [error, setError] = useState(false);
   const [formattedDate, setFormattedDate] = useState<string>("");
   const isInitialLoad = useRef(true);
-  const isPowerSyncInitialized = useRef(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -125,10 +124,7 @@ export default function Dashboard() {
     // 2. Set up realtime subscription
     const supabase = createClient();
 
-    if (!isPowerSyncInitialized.current) {
-      initPowerSync(supabase);
-      isPowerSyncInitialized.current = true;
-    }
+
 
     const channel = supabase
       .channel("dashboard-realtime")

@@ -1,145 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { CloudIcon } from "@/components/ui/Icons";
-import { getDb } from "@/lib/powersync/PowerSync";
+import { StatusTag } from "@/components/ui/StatusTag";
 
 export default function SystemStatus() {
-  const [status, setStatus] = useState<any>(null);
-  const [lastSynced, setLastSynced] = useState<string>("Never");
-  const [isActivelySyncing, setIsActivelySyncing] = useState(false);
-  const lastSyncRef = React.useRef<Date | null>(null);
-
-  useEffect(() => {
-    let syncTimer: NodeJS.Timeout;
-    let initCheckInterval: NodeJS.Timeout;
-    let unsubscribe = () => {};
-
-    // 1. Set initial status & persistent sync time
-    const savedSync = localStorage.getItem("powersync_last_synced");
-    if (savedSync) {
-      lastSyncRef.current = new Date(savedSync);
-    }
-
-    const startListening = (db: any) => {
-      setStatus({ ...db.currentStatus });
-      unsubscribe = db.registerListener({
-        statusChanged: (statusObj: any) => {
-          const isDownloading = !!statusObj.downloading;
-          const isUploading = !!statusObj.uploading;
-
-          const newSyncTime = statusObj.lastSyncedAt;
-          const dataArrived =
-            newSyncTime &&
-            (!lastSyncRef.current ||
-              newSyncTime.getTime() > lastSyncRef.current.getTime());
-
-          if (isDownloading || isUploading || dataArrived) {
-            setIsActivelySyncing(true);
-            clearTimeout(syncTimer);
-
-            if (dataArrived) {
-              lastSyncRef.current = newSyncTime;
-              localStorage.setItem(
-                "powersync_last_synced",
-                newSyncTime.toISOString(),
-              );
-            }
-
-            if (!isDownloading && !isUploading) {
-              syncTimer = setTimeout(() => setIsActivelySyncing(false), 2500);
-            }
-          } else if (!isDownloading && !isUploading) {
-            if (isActivelySyncing) {
-              clearTimeout(syncTimer);
-              syncTimer = setTimeout(() => setIsActivelySyncing(false), 2500);
-            }
-          }
-
-          const statusUpdate = {
-            connected: !!statusObj.connected,
-            connecting: !!statusObj.connecting,
-            downloading: isDownloading,
-            uploading: isUploading,
-            lastSyncedAt: statusObj.lastSyncedAt || lastSyncRef.current,
-            hasSynced: !!statusObj.hasSynced,
-          };
-
-          setStatus(statusUpdate);
-        },
-      });
-    };
-
-    const tryInit = () => {
-      try {
-        const currentDb = getDb();
-        if (currentDb) {
-          startListening(currentDb);
-          clearInterval(initCheckInterval);
-          return true;
-        }
-      } catch (e) {
-        // Not ready yet
-      }
-      return false;
-    };
-
-    // Try immediately
-    if (!tryInit()) {
-      // If not ready, poll every second
-      initCheckInterval = setInterval(tryInit, 1000);
-    }
-
-    // 3. Update relative time every minute
-    const updateTime = () => {
-      // Use the SDK status time, or fall back to our persistent ref
-      let effectiveSyncTime: Date | null = lastSyncRef.current;
-      try {
-        effectiveSyncTime = getDb().currentStatus.lastSyncedAt || lastSyncRef.current;
-      } catch (e) {}
-      
-      if (effectiveSyncTime) {
-        const diff = Date.now() - effectiveSyncTime.getTime();
-        if (diff < 60000) setLastSynced("Just now");
-        else {
-          const mins = Math.floor(diff / 60000);
-          setLastSynced(`${mins}m ago`);
-        }
-      } else {
-        setLastSynced("Never");
-      }
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 30000);
-
-    return () => {
-      unsubscribe();
-      clearInterval(interval);
-      clearInterval(initCheckInterval);
-    };
-  }, []);
-
-  const [pendingCount, setPendingCount] = useState(0);
-
-  useEffect(() => {
-    const updatePendingCount = async () => {
-      try {
-        const currentDb = getDb();
-        const batch = await currentDb.getCrudBatch();
-        setPendingCount(batch?.crud.length || 0);
-      } catch (e) {
-        setPendingCount(0);
-      }
-    };
-
-    updatePendingCount();
-    // Poll every second when we might be uploading
-    const interval = setInterval(updatePendingCount, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const isConnected = status?.connected || false;
-  const isSyncing = isActivelySyncing;
-
   return (
     <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 p-6 shadow-sm">
       <div className="flex justify-between items-center mb-6">
@@ -155,17 +18,7 @@ export default function SystemStatus() {
             PowerSync Connection
           </h3>
           <div className="flex items-center">
-            <div
-              className={`px-3 py-1 rounded-full border-2 transition-colors inline-flex items-center justify-center ${
-                isConnected
-                  ? "bg-[#DCFCE7] border-[#8BF7D0] text-[#166534] dark:bg-[#22C55E]/10 dark:border-[#22C55E]/50 dark:text-[#4ADE80]"
-                  : "bg-gray-100 border-gray-200 text-gray-500 dark:bg-white/5 dark:border-white/10 dark:text-gray-400"
-              }`}
-            >
-              <span className="text-xs font-semibold tracking-wide leading-none whitespace-nowrap font-lexend">
-                {isConnected ? "Online" : "Connecting..."}
-              </span>
-            </div>
+            <StatusTag type="Active" />
           </div>
         </div>
 
@@ -175,7 +28,7 @@ export default function SystemStatus() {
               Last Synced
             </span>
             <span className="text-[#1F2937] dark:text-white text-sm font-bold font-lexend">
-              {lastSynced}
+              Just now
             </span>
           </div>
           <div className="flex flex-col gap-1">
@@ -183,9 +36,7 @@ export default function SystemStatus() {
               Pending Syncs
             </span>
             <span className="text-[#1F2937] dark:text-white text-sm font-bold font-lexend">
-              {pendingCount > 0 
-                ? `${pendingCount} ${pendingCount === 1 ? 'log' : 'logs'}` 
-                : isSyncing ? "Syncing..." : "0 logs"}
+              0 logs
             </span>
           </div>
         </div>
