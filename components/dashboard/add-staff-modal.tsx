@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "@/components/ui/Modal";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
 import { PlusIcon } from "@/components/ui/Icons";
@@ -34,7 +34,7 @@ export default function AddStaffModal({ onSuccess }: AddStaffModalProps) {
     p_nickname: "",
     p_short_id: "",
     p_contact_number: "",
-    p_role: "Staff",
+    p_base_role: "Staff",
     p_subrole: "Coach",
   });
 
@@ -51,7 +51,7 @@ export default function AddStaffModal({ onSuccess }: AddStaffModalProps) {
         p_nickname: "",
         p_short_id: "",
         p_contact_number: "",
-        p_role: "Staff",
+        p_base_role: "Staff",
         p_subrole: "Coach",
       });
       if (onSuccess) onSuccess();
@@ -61,6 +61,20 @@ export default function AddStaffModal({ onSuccess }: AddStaffModalProps) {
       setLoading(false);
     }
   };
+
+  //reset form when exit
+  useEffect(() => {
+    if (!isOpen) {
+      setFormData({
+        p_full_name: "",
+        p_nickname: "",
+        p_short_id: "",
+        p_contact_number: "",
+        p_base_role: "Staff",
+        p_subrole: "Coach",
+      });
+    }
+  }, [isOpen]);
 
   const inputClass =
     "w-full px-4 py-3 rounded-xl border border-stroke dark:border-white/10 bg-gray-100/50 dark:bg-transparent text-foreground text-sm font-lexend transition-all focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none";
@@ -174,8 +188,8 @@ export default function AddStaffModal({ onSuccess }: AddStaffModalProps) {
             <Select
               label="Base Role"
               options={BASE_ROLE_OPTIONS}
-              value={formData.p_role}
-              onChange={(val) => setFormData({ ...formData, p_role: val })}
+              value={formData.p_base_role}
+              onChange={(val) => setFormData({ ...formData, p_base_role: val })}
             />
 
             {/* Subrole */}
