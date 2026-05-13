@@ -31,17 +31,22 @@ const attendanceColumns = [
     header: "Member",
     accessor: (item: RecentAttendance) => (
       <div className="flex items-center gap-4">
-        <div className="transition-transform duration-300 group-hover:scale-110">
+        {/* Added shrink-0 to prevent the avatar from squishing */}
+        <div className="transition-transform duration-300 group-hover:scale-110 shrink-0">
           <UserAvatar name={item.full_name || "Unknown"} />
         </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-foreground text-sm font-lexend">
+        {/* Added min-w-0 to allow the flex container to shrink */}
+        <div className="flex flex-col min-w-0">
+          {/* Added truncate and a title attribute for hover context */}
+          <span 
+            className="font-medium text-foreground text-sm font-lexend truncate"
+            title={item.full_name || "Unknown Member"}
+          >
             {item.full_name || "Unknown Member"}
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
-            {item.staff_short_id === null
-              ? "ID: " + item.member_short_id
-              : "ID: " + item.staff_short_id}
+          {/* Added truncate here as well just in case the ID gets unexpectedly long */}
+          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary truncate">
+            ID: {item.member_short_id}
           </span>
         </div>
       </div>
@@ -63,7 +68,6 @@ const attendanceColumns = [
     accessor: (item: RecentAttendance) => (
       <span className="text-sm font-medium text-secondary font-lexend">
         {item.membershiptype}
-        {item.membershiptype === null && item.staff_subrole}
       </span>
     ),
   },
