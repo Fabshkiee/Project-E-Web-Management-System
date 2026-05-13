@@ -31,7 +31,7 @@ export const DataTable = <T,>({
             {columns.map((column, idx) => (
               <th
                 key={idx}
-                className={`px-6 py-4 text-xs font-bold uppercase tracking-widest text-muted ${column.className || ""}`}
+                className={`px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-secondary/70 ${column.className || ""}`}
               >
                 {column.header}
               </th>
@@ -42,7 +42,10 @@ export const DataTable = <T,>({
           {isLoading ? (
             // Skeleton Loading State
             [...Array(5)].map((_, i) => (
-              <tr key={i} className="border-b border-stroke dark:border-white/5 last:border-0">
+              <tr
+                key={i}
+                className="border-b border-stroke dark:border-white/5 last:border-0"
+              >
                 {columns.map((_, colIdx) => (
                   <td key={colIdx} className="px-6 py-5">
                     <div className="h-5 bg-gray-100 dark:bg-white/5 rounded-md animate-pulse w-full max-w-[120px]" />
@@ -60,8 +63,11 @@ export const DataTable = <T,>({
                 {columns.map((column, colIdx) => (
                   <td
                     key={colIdx}
-                    className={`px-6 py-5 whitespace-nowrap ${column.className || ""}`}
+                    className={`px-6 py-5 whitespace-nowrap transition-all duration-300 relative ${column.className || ""}`}
                   >
+                    {onRowClick && colIdx === 0 && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 group-hover:h-3/5 bg-primary rounded-r-full transition-all duration-300 opacity-0 group-hover:opacity-100" />
+                    )}
                     {typeof column.accessor === "function"
                       ? column.accessor(item)
                       : (item[column.accessor] as React.ReactNode)}
