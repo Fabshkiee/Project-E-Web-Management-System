@@ -140,6 +140,80 @@ export default function Staff() {
     checkRole();
   }, []);
 
+  const handleExport = async () => {
+    try {
+      setExporting(true);
+      
+      // Dynamically load heavy PDF libraries only when needed
+      const { default: jsPDF } = await import("jspdf");
+      const { default: autoTable } = await import("jspdf-autotable");
+
+      const doc = new jsPDF();
+
+      // Report Header
+      doc.setFontSize(20);
+      doc.setTextColor(17, 24, 39);
+      doc.text("Project-E: Staff Report", 14, 22);
+
+      doc.setFontSize(11);
+      doc.setTextColor(107, 114, 128);
+      doc.text(
+        `Generated on ${new Date().toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+        14,
+        30,
+      );
+
+      // Filters Summary
+      doc.setFontSize(9);
+      doc.text(
+        `Filters Applied - Role: ${roleFilter.toUpperCase()}`,
+        14,
+        38,
+      );
+
+      // Table Data
+      const tableData = staff.map((s) => [
+        s.name,
+        s.staff_id,
+        s.role,
+        s.contact,
+        s.last_active,
+      ]);
+
+      autoTable(doc, {
+        startY: 45,
+        head: [["Staff Name", "ID", "Role", "Contact", "Last Activity"]],
+        body: tableData,
+        theme: "grid",
+        headStyles: {
+          fillColor: [31, 41, 55],
+          textColor: [255, 255, 255],
+          fontSize: 10,
+          fontStyle: "bold",
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 4,
+        },
+        alternateRowStyles: {
+          fillColor: [249, 250, 251],
+        },
+      });
+
+      doc.save(`project_e_staff_report_${new Date().toISOString().split("T")[0]}.pdf`);
+    } catch (error) {
+      console.error("Export failed:", error);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <header className="flex justify-between items-center">
@@ -149,7 +223,7 @@ export default function Staff() {
         />
         <div className="flex gap-3">
           <SecondaryButton
-            // onClick={handleExport}
+            onClick={handleExport}
             disabled={exporting}
             icon={<ExportPDF className="w-6 h-6" />}
           >
