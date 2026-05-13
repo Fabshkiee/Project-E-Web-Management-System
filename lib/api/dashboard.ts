@@ -382,5 +382,24 @@ export interface CreateStaffPayload {
   p_full_name: string;
   p_short_id: string | null;
   p_contact_number: string | null;
+  p_role: string; // 'Admin' or 'Staff'
   p_subrole: string;
+}
+
+/**
+ * Calls the RPC to create a new staff profile
+ */
+export async function createStaffProfile(payload: CreateStaffPayload) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("create_staff_profile", payload);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (data && typeof data === "object" && !data.success) {
+    throw new Error(data.error || "Failed to create staff member");
+  }
+
+  return data;
 }
