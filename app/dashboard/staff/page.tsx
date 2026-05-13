@@ -10,6 +10,7 @@ import { StatusTag } from "@/components/ui/StatusTag";
 import { DataTable } from "@/components/dashboard/data-table";
 import { Pagination } from "@/components/ui/Pagination";
 import AddStaffModal from "@/components/dashboard/add-staff-modal";
+import StaffDetailsModal from "@/components/dashboard/staff-details-modal";
 import { createClient } from "@/lib/supabase/client";
 import { getStaffList, StaffListItem } from "@/lib/api/dashboard";
 
@@ -67,6 +68,7 @@ export default function Staff() {
   const [currentPage, setCurrentPage] = useState(1);
   const [exporting, setExporting] = useState(false);
   const [realtimeTrigger, setRealtimeTrigger] = useState(0);
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -269,6 +271,7 @@ export default function Staff() {
           emptyMessage="No staff members found."
           isLoading={loading}
           data={staff}
+          onRowClick={(item) => setSelectedStaffId(item.id)}
         />
 
         <Pagination
@@ -278,6 +281,12 @@ export default function Staff() {
           onPageChange={setCurrentPage}
         />
       </section>
+
+      <StaffDetailsModal
+        isOpen={!!selectedStaffId}
+        onClose={() => setSelectedStaffId(null)}
+        userId={selectedStaffId}
+      />
     </div>
   );
 }
