@@ -383,7 +383,7 @@ export interface CreateStaffPayload {
   p_nickname: string | null;
   p_short_id: string | null;
   p_contact_number: string | null;
-  p_role: string;
+  p_base_role: string;
   p_subrole: string;
 }
 
@@ -403,4 +403,45 @@ export async function createStaffProfile(payload: CreateStaffPayload) {
   }
 
   return data;
+}
+/**
+ * Calls the RPC to fetch detailed information for a single staff member
+ */
+const BASE_ROLE_OPTIONS = [
+  { label: "Staff", value: "Staff" },
+  { label: "Admin", value: "Admin" },
+];
+
+export async function getStaffDetails(userId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("get_staff_details", {
+    p_user_id: userId,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+/**
+ * Calls the RPC to update an existing staff profile
+ */
+export async function updateStaffProfile(payload: {
+  p_user_id: string;
+  p_full_name: string;
+  p_nickname: string;
+  p_contact_number: string;
+  p_role: string;
+  p_subrole: string;
+}) {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("update_staff_profile", payload);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return true;
 }
