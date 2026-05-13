@@ -5,8 +5,9 @@ import Modal from "@/components/ui/Modal";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
 import { Select } from "@/components/ui/Select";
 import { useToast } from "@/lib/contexts/ToastContext";
-import { createClient } from "@/lib/supabase/client";
 import { getStaffDetails, updateStaffProfile } from "@/lib/api/dashboard";
+
+import StaffQRCard from "./StaffQRCard";
 
 interface StaffDetailsModalProps {
   isOpen: boolean;
@@ -31,8 +32,10 @@ export default function StaffDetailsModal({
   onClose,
   userId,
 }: StaffDetailsModalProps) {
+  const [activeTab, setActiveTab] = useState<"profile" | "qr">("profile");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [staffData, setStaffData] = useState<any>(null);
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -46,18 +49,19 @@ export default function StaffDetailsModal({
   useEffect(() => {
     if (isOpen && userId) {
       fetchStaffDetails();
+      setActiveTab("profile");
     }
   }, [isOpen, userId]);
 
   const fetchStaffDetails = async () => {
     if (!userId) return;
     setLoading(true);
-    const supabase = createClient();
 
     try {
       const data = await getStaffDetails(userId);
 
       if (data) {
+        setStaffData(data);
         setFormData({
           fullName: data.full_name || "",
           nickname: data.nickname || "",
@@ -106,127 +110,176 @@ export default function StaffDetailsModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Edit Staff Member"
-      maxWidth="max-w-md"
+      title="Staff Details"
+      maxWidth="max-w-2xl"
     >
-      {loading ? (
+      {loading || !staffData ? (
         <div className="py-12 flex justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-            {/* Full Name */}
-            <div>
-              <label className={labelClass}>Full Name</label>
-              <input
-                type="text"
-                required
-                className={inputClass}
-                value={formData.fullName}
-                onKeyDown={(e) => {
-                  if (
-                    !/[a-zA-Z ]/.test(e.key) &&
-                    ![
-                      "Backspace",
-                      "Delete",
-                      "ArrowLeft",
-                      "ArrowRight",
-                      "Tab",
-                    ].includes(e.key)
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
-                }
-              />
-            </div>
-
-            {/* Nickname */}
-            <div>
-              <label className={labelClass}>Nickname (Optional)</label>
-              <input
-                type="text"
-                className={inputClass}
-                value={formData.nickname}
-                onKeyDown={(e) => {
-                  if (
-                    !/[a-zA-Z ]/.test(e.key) &&
-                    ![
-                      "Backspace",
-                      "Delete",
-                      "ArrowLeft",
-                      "ArrowRight",
-                      "Tab",
-                    ].includes(e.key)
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                onChange={(e) =>
-                  setFormData({ ...formData, nickname: e.target.value })
-                }
-              />
-            </div>
-
-            {/* Contact Number */}
-            <div className="col-span-1">
-              <label className={labelClass}>Contact Number</label>
-              <input
-                type="tel"
-                maxLength={11}
-                className={inputClass}
-                value={formData.contactNumber}
-                onKeyDown={(e) => {
-                  if (
-                    !/[0-9]/.test(e.key) &&
-                    ![
-                      "Backspace",
-                      "Delete",
-                      "ArrowLeft",
-                      "ArrowRight",
-                      "Tab",
-                    ].includes(e.key)
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                onChange={(e) =>
-                  setFormData({ ...formData, contactNumber: e.target.value })
-                }
-              />
-            </div>
-
-            {/* Base Role */}
-            <Select
-              label="Base Role"
-              options={BASE_ROLE_OPTIONS}
-              value={formData.baseRole}
-              onChange={(val) => setFormData({ ...formData, baseRole: val })}
-            />
-
-            {/* Subrole */}
-            <div className="col-span-2">
-              <Select
-                label="Subrole"
-                options={SUBROLE_OPTIONS}
-                value={formData.subrole}
-                onChange={(val) => setFormData({ ...formData, subrole: val })}
-              />
-            </div>
+        <div className="flex flex-col h-full">
+          {/* Tabs */}
+          <div className="flex gap-4 border-b border-stroke dark:border-white/10 mb-6">
+            <button
+              onClick={() => setActiveTab("profile")}
+              className={`pb-3 text-sm font-semibold font-lexend transition-colors relative ${
+                activeTab === "profile"
+                  ? "text-primary"
+                  : "text-gray-500 hover:text-foreground"
+              }`}
+            >
+              Edit Profile
+              {activeTab === "profile" && (
+                <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("qr")}
+              className={`pb-3 text-sm font-semibold font-lexend transition-colors relative ${
+                activeTab === "qr"
+                  ? "text-primary"
+                  : "text-gray-500 hover:text-foreground"
+              }`}
+            >
+              QR Profile
+              {activeTab === "qr" && (
+                <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
+              )}
+            </button>
           </div>
 
-          <div className="flex justify-end gap-3 mt-4">
-            <SecondaryButton type="button" onClick={onClose}>
-              Cancel
-            </SecondaryButton>
-            <PrimaryButton type="submit" disabled={saving}>
-              {saving ? "Saving..." : "Save Changes"}
-            </PrimaryButton>
+          <div className="flex-1">
+            {activeTab === "profile" ? (
+              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  {/* Full Name */}
+                  <div className="md:col-span-2">
+                    <label className={labelClass}>Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      className={inputClass}
+                      value={formData.fullName}
+                      onKeyDown={(e) => {
+                        if (
+                          !/[a-zA-Z ]/.test(e.key) &&
+                          ![
+                            "Backspace",
+                            "Delete",
+                            "ArrowLeft",
+                            "ArrowRight",
+                            "Tab",
+                          ].includes(e.key)
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) =>
+                        setFormData({ ...formData, fullName: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  {/* Nickname */}
+                  <div>
+                    <label className={labelClass}>Nickname (Optional)</label>
+                    <input
+                      type="text"
+                      className={inputClass}
+                      value={formData.nickname}
+                      onKeyDown={(e) => {
+                        if (
+                          !/[a-zA-Z ]/.test(e.key) &&
+                          ![
+                            "Backspace",
+                            "Delete",
+                            "ArrowLeft",
+                            "ArrowRight",
+                            "Tab",
+                          ].includes(e.key)
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) =>
+                        setFormData({ ...formData, nickname: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  {/* Contact Number */}
+                  <div>
+                    <label className={labelClass}>Contact Number</label>
+                    <input
+                      type="tel"
+                      maxLength={11}
+                      className={inputClass}
+                      value={formData.contactNumber}
+                      onKeyDown={(e) => {
+                        if (
+                          !/[0-9]/.test(e.key) &&
+                          ![
+                            "Backspace",
+                            "Delete",
+                            "ArrowLeft",
+                            "ArrowRight",
+                            "Tab",
+                          ].includes(e.key)
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          contactNumber: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* Base Role */}
+                  <Select
+                    label="Base Role"
+                    options={BASE_ROLE_OPTIONS}
+                    value={formData.baseRole}
+                    onChange={(val) =>
+                      setFormData({ ...formData, baseRole: val })
+                    }
+                  />
+
+                  {/* Subrole */}
+                  <Select
+                    label="Subrole"
+                    options={SUBROLE_OPTIONS}
+                    value={formData.subrole}
+                    onChange={(val) =>
+                      setFormData({ ...formData, subrole: val })
+                    }
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 mt-4">
+                  <SecondaryButton type="button" onClick={onClose}>
+                    Cancel
+                  </SecondaryButton>
+                  <PrimaryButton type="submit" disabled={saving}>
+                    {saving ? "Saving..." : "Save Changes"}
+                  </PrimaryButton>
+                </div>
+              </form>
+            ) : (
+              <div className="py-4">
+                <StaffQRCard
+                  staff={staffData}
+                  showDoneButton={false}
+                  title={`${staffData.full_name}'s Identity`}
+                />
+              </div>
+            )}
           </div>
-        </form>
+        </div>
       )}
     </Modal>
   );
