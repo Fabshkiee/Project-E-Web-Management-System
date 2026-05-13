@@ -38,7 +38,7 @@ const attendanceColumns = [
         {/* Added min-w-0 to allow the flex container to shrink */}
         <div className="flex flex-col min-w-0">
           {/* Added truncate and a title attribute for hover context */}
-          <span 
+          <span
             className="font-medium text-foreground text-sm font-lexend truncate"
             title={item.full_name || "Unknown Member"}
           >
@@ -46,7 +46,7 @@ const attendanceColumns = [
           </span>
           {/* Added truncate here as well just in case the ID gets unexpectedly long */}
           <span className="text-[11px] font-medium uppercase tracking-wider text-secondary truncate">
-            ID: {item.member_short_id}
+            ID: {item.member_short_id ?? item.staff_short_id}
           </span>
         </div>
       </div>
@@ -67,7 +67,7 @@ const attendanceColumns = [
     header: "Membership",
     accessor: (item: RecentAttendance) => (
       <span className="text-sm font-medium text-secondary font-lexend">
-        {item.membershiptype}
+        {item.membershiptype ?? item.staff_subrole}
       </span>
     ),
   },
