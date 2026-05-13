@@ -6,42 +6,36 @@ import jsPDF from "jspdf";
 import { QRCodeSVG } from "qrcode.react";
 import {
   FingerprintIcon,
+  BadgeIcon,
+  ExportPDF,
+  ExportPNG,
+  StaffIcon,
   LockIcon,
   EyeOpenIcon,
   EyeClosedIcon,
-  BadgeIcon,
-  CalendarIcon,
-  CoachIcon,
-  ExportPDF,
-  ExportPNG,
 } from "@/components/ui/Icons";
 
-interface MemberWelcomeCardProps {
-  member: {
+interface StaffWelcomeCardProps {
+  staff: {
     full_name: string;
     nickname?: string;
     short_id: string;
     qr_token: string;
-    valid_until: string;
-    membership_name: string;
-    coach_name: string;
+    base_role: string;
+    subrole: string;
   };
   onDone?: () => void;
   title?: string;
-  subtitle?: string;
   showDoneButton?: boolean;
 }
 
-export default function MemberWelcomeCard({
-  member,
+export default function StaffQRCard({
+  staff,
   onDone,
-  title = "Member Registered!",
-  subtitle,
+  title = "Staff Identity Card",
   showDoneButton = true,
-}: MemberWelcomeCardProps) {
+}: StaffWelcomeCardProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const firstName = member.nickname || member.full_name.split(" ")[0];
-  const displaySubtitle = subtitle || `Welcome to the family, ${firstName}`;
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
 
@@ -50,33 +44,31 @@ export default function MemberWelcomeCard({
     setDownloading(true);
 
     try {
-      // Wait for entrance animations (duration-500) to complete
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
-        backgroundColor: "#0a0a0a", // Match card background
+        backgroundColor: "#0a0a0a",
         pixelRatio: 2,
       });
 
+      const fileName = `ProjectE_Staff_${staff.full_name.trim().split(" ")[0]}`;
+
       if (format === "png") {
         const link = document.createElement("a");
-        link.download = `ProjectE_ID_${
-          member.full_name.trim().split(" ")[0]
-        }.png`;
+        link.download = `${fileName}.png`;
         link.href = dataUrl;
         link.click();
       } else {
         const pdf: any = new jsPDF();
         const imgProps: any = pdf.getImageProperties(dataUrl);
-        // Create a PDF with custom dimensions matching the image
         const pdf2: any = new jsPDF({
           orientation: imgProps.width > imgProps.height ? "l" : "p",
           unit: "px",
           format: [imgProps.width, imgProps.height],
         });
         pdf2.addImage(dataUrl, "PNG", 0, 0, imgProps.width, imgProps.height);
-        pdf2.save(`ProjectE_ID_${member.full_name.trim().split(" ")[0]}.pdf`);
+        pdf2.save(`${fileName}.pdf`);
       }
     } catch (err) {
       console.error("Download failed:", err);
@@ -87,7 +79,6 @@ export default function MemberWelcomeCard({
 
   return (
     <div className="dark flex flex-col gap-4 w-full max-w-[480px] mx-auto animate-in fade-in zoom-in-95 duration-500 text-white">
-      {/* Capture Container */}
       <div
         ref={cardRef}
         className="flex flex-col items-center gap-4 w-full bg-[#0a0a0a] p-5 rounded-[32px] border border-white/5 shadow-2xl"
@@ -98,11 +89,11 @@ export default function MemberWelcomeCard({
             {title}
           </h3>
           <p className="text-[13px] text-gray-400 font-lexend">
-            {displaySubtitle}
+            Official Project-E Staff Member
           </p>
         </div>
 
-        {/* QR Card - Matching Portal Style */}
+        {/* QR Card */}
         <div className="flex flex-col items-center gap-3">
           <div className="bg-[#111111] rounded-3xl p-5 relative border border-white/5 shadow-2xl">
             <div className="rounded-tl-lg absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary"></div>
@@ -110,7 +101,7 @@ export default function MemberWelcomeCard({
             <div className="rounded-bl-lg absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-primary"></div>
             <div className="rounded-br-lg absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary"></div>
             <QRCodeSVG
-              value={`PROJE:MEM:${member.short_id}:${member.qr_token}`}
+              value={`PROJE:STAFF:${staff.short_id}:${staff.qr_token}`}
               size={110}
               level="M"
               marginSize={1}
@@ -120,7 +111,7 @@ export default function MemberWelcomeCard({
             />
           </div>
           <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] text-center">
-            Scan this for attendance
+            Scan for Staff Attendance or Authorization
           </p>
         </div>
 
@@ -129,27 +120,38 @@ export default function MemberWelcomeCard({
           <div className="flex items-center gap-2.5 pb-2 border-b border-white/5">
             <BadgeIcon className="text-primary w-4 h-4" />
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-white">
-              Account Credentials
+              Staff Credentials
             </h4>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-            {/* ID */}
+          <div className="grid grid-cols-2 gap-2.5">
             <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1.5">
                 <FingerprintIcon className="w-3.5 h-3.5 text-gray-500" />
                 <span className="text-[10px] font-lexend text-gray-400">
                   ID
                 </span>
               </div>
               <span className="text-[11px] font-bold font-lexend text-white truncate">
-                {member.short_id}
+                {staff.short_id}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
+              <div className="flex items-center gap-1.5">
+                <StaffIcon className="w-3.5 h-3.5 text-gray-500" />
+                <span className="text-[10px] font-lexend text-gray-400">
+                  Role
+                </span>
+              </div>
+              <span className="text-[11px] font-bold font-lexend text-white truncate">
+                {staff.base_role}
               </span>
             </div>
 
             {/* Password */}
             <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <LockIcon className="w-3.5 h-3.5 text-gray-500" />
                 <span className="text-[10px] font-lexend text-gray-400">
                   Password
@@ -157,11 +159,11 @@ export default function MemberWelcomeCard({
               </div>
               <div className="flex items-center gap-1.5 min-w-0 justify-end">
                 <span className="text-[11px] font-bold font-lexend text-white truncate">
-                  {showPassword ? `Member${member.short_id}` : "••••••••"}
+                  {showPassword ? `Staff${staff.short_id}` : "••••••••"}
                 </span>
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-500 hover:text-white transition-colors flex-shrink-0"
+                  className="text-gray-500 hover:text-white transition-colors shrink-0"
                 >
                   {showPassword ? (
                     <EyeClosedIcon className="w-3 h-3" />
@@ -172,40 +174,21 @@ export default function MemberWelcomeCard({
               </div>
             </div>
 
-            {/* Valid Until */}
             <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
+              <div className="flex items-center gap-1.5">
+                <BadgeIcon className="w-3.5 h-3.5 text-gray-500" />
                 <span className="text-[10px] font-lexend text-gray-400">
-                  Expires
+                  Position
                 </span>
               </div>
               <span className="text-[11px] font-bold font-lexend text-white truncate">
-                {new Date(member.valid_until).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-
-            {/* Coach */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <CoachIcon className="w-3.5 h-3.5 text-gray-500" />
-                <span className="text-[10px] font-lexend text-gray-400">
-                  Coach
-                </span>
-              </div>
-              <span className="text-[11px] font-bold font-lexend text-white truncate">
-                {member.coach_name || "None"}
+                {staff.subrole}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Download Actions */}
       <div className="grid grid-cols-2 gap-3 w-full mt-2">
         <button
           onClick={() => handleDownload("png")}

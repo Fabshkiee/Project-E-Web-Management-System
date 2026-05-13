@@ -308,15 +308,140 @@ export async function getAttendanceList(
  * Manually records an attendance log entry.
  * Uses PowerSync directly to ensure offline support and automatic sync.
  */
-export async function manualCheckIn(userId: string, status: string) {
+export async function manualCheckIn(
+  userId: string,
+  status: string,
+  role?: string,
+) {
   const db = getDb();
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
+  // Record the attendance log
   await db.execute(
     "INSERT INTO attendance_logs (id, user_id, check_in_time, status_at_scan) VALUES (?, ?, ?, ?)",
     [id, userId, now, status],
   );
+
+  // If it's a staff or admin member, update their last_active timestamp
+  // using a case-insensitive check to be safe
+  if (role?.toLowerCase() === "staff" || role?.toLowerCase() === "admin") {
+    await db.execute("UPDATE staff SET last_active = ? WHERE id = ?", [
+      now,
+      userId,
+    ]);
+  }
+
+  return true;
+}
+
+export interface StaffListItem {
+  id: string;
+  name: string;
+  staff_id: string;
+  role: "Coach" | "Receptionist" | "Maintenance" | "Admin";
+  contact: string;
+  last_active: string;
+}
+
+export interface StaffListResponse {
+  staff: StaffListItem[];
+  totalCount: number;
+}
+
+/**
+ * Fetches a paginated list of staff members
+ */
+export async function getStaffList(
+  page: number = 1,
+  itemsPerPage: number = 10,
+  searchQuery: string = "",
+  roleFilter: string = "all",
+): Promise<StaffListResponse> {
+  const supabase = createClient();
+  const offset = (page - 1) * itemsPerPage;
+
+  const { data, error } = await supabase.rpc("get_staff_management_list", {
+    p_limit: Math.floor(itemsPerPage),
+    p_offset: Math.floor(offset),
+    p_search_query: searchQuery,
+    p_role_filter: roleFilter,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    staff: (data.staff || []) as StaffListItem[],
+    totalCount: data.total_count || 0,
+  };
+}
+
+export interface CreateStaffPayload {
+  p_full_name: string;
+  p_nickname: string | null;
+  p_short_id: string | null;
+  p_contact_number: string | null;
+  p_base_role: string;
+  p_subrole: string;
+}
+
+/**
+ * Calls the RPC to create a new staff profile
+ */
+export async function createStaffProfile(payload: CreateStaffPayload) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("create_staff_profile", payload);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (data && typeof data === "object" && !data.success) {
+    throw new Error(data.error || "Failed to create staff member");
+  }
+
+  return data;
+}
+/**
+ * Calls the RPC to fetch detailed information for a single staff member
+ */
+const BASE_ROLE_OPTIONS = [
+  { label: "Staff", value: "Staff" },
+  { label: "Admin", value: "Admin" },
+];
+
+export async function getStaffDetails(userId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("get_staff_details", {
+    p_user_id: userId,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+/**
+ * Calls the RPC to update an existing staff profile
+ */
+export async function updateStaffProfile(payload: {
+  p_user_id: string;
+  p_full_name: string;
+  p_nickname: string;
+  p_contact_number: string;
+  p_role: string;
+  p_subrole: string;
+}) {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("update_staff_profile", payload);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return true;
 }

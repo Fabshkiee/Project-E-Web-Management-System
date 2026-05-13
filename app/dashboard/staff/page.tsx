@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PageTitle from "@/components/dashboard/page-title";
 import { ExportPDF, PlusIcon } from "@/components/ui/Icons";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
@@ -9,36 +9,16 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { DataTable } from "@/components/dashboard/data-table";
 import { Pagination } from "@/components/ui/Pagination";
-
-type StaffRole = "Coach" | "Receptionist" | "Maintenance";
-
-interface StaffItem {
-  id: string;
-  name: string;
-  staff_id: string;
-  role: StaffRole;
-  contact: string;
-  last_active: string;
-}
-
-const mockStaffData: StaffItem[] = [
-  { id: "1",  name: "Coach Eric",      staff_id: "#STF-001", role: "Coach",         contact: "0912-345-6789", last_active: "Today, 09:15 AM" },
-  { id: "2",  name: "Kazuya Mishima",    staff_id: "#STF-004", role: "Receptionist",  contact: "0917-987-6543", last_active: "Yesterday, 06:00 PM" },
-  { id: "3",  name: "Coach Ezekiel",      staff_id: "#STF-007", role: "Coach",         contact: "0917-007-0007", last_active: "2 days ago" },
-  { id: "4",  name: "Jin Kazama",    staff_id: "#STF-012", role: "Coach",         contact: "0922-333-4444", last_active: "Today, 08:30 AM" },
-  { id: "5",  name: "Heihachi Mishima",    staff_id: "#STF-009", role: "Maintenance",   contact: "0919-888-7777", last_active: "Yesterday, 5:00 PM" },
-  { id: "6",  name: "Anna Williams",       staff_id: "#STF-015", role: "Receptionist",  contact: "0921-111-2222", last_active: "Today, 07:45 AM" },
-  { id: "7",  name: "Armor King",    staff_id: "#STF-018", role: "Coach",         contact: "0915-222-3333", last_active: "Today, 10:00 AM" },
-  { id: "8",  name: "Paul Phoenix",    staff_id: "#STF-021", role: "Maintenance",   contact: "0918-444-5555", last_active: "3 days ago" },
-  { id: "9",  name: "Steve Fox",       staff_id: "#STF-023", role: "Coach",         contact: "0926-666-7777", last_active: "Yesterday, 08:00 AM" },
-  { id: "10", name: "Marshall Law",    staff_id: "#STF-025", role: "Receptionist",  contact: "0920-888-9999", last_active: "Today, 11:30 AM" },
-];
+import AddStaffModal from "@/components/dashboard/add-staff-modal";
+import StaffDetailsModal from "@/components/dashboard/staff-details-modal";
+import { createClient } from "@/lib/supabase/client";
+import { getStaffList, StaffListItem } from "@/lib/api/dashboard";
 
 const StaffColumns = [
   {
     header: "Staff Member",
-    className: "w-[34%]",
-    accessor: (item: StaffItem) => (
+    className: "w-[30%]",
+    accessor: (item: StaffListItem) => (
       <div className="flex items-center gap-4">
         <div className="transition-transform duration-300 group-hover:scale-110">
           <UserAvatar name={item.name} />
@@ -56,15 +36,13 @@ const StaffColumns = [
   },
   {
     header: "Role",
-    className: "w-[22%]",
-    accessor: (item: StaffItem) => (
-      <StatusTag type={item.role} />
-    ),
+    className: "w-[20%]",
+    accessor: (item: StaffListItem) => <StatusTag type={item.role} />,
   },
   {
     header: "Contact",
-    className: "w-[24%]",
-    accessor: (item: StaffItem) => (
+    className: "w-[25%]",
+    accessor: (item: StaffListItem) => (
       <span className="text-sm font-medium text-foreground font-lexend">
         {item.contact}
       </span>
@@ -72,8 +50,8 @@ const StaffColumns = [
   },
   {
     header: "Last Active",
-    className: "w-[20%]",
-    accessor: (item: StaffItem) => (
+    className: "w-[25%]",
+    accessor: (item: StaffListItem) => (
       <span className="text-sm font-medium text-secondary font-lexend">
         {item.last_active}
       </span>
@@ -82,51 +60,163 @@ const StaffColumns = [
 ];
 
 export default function Staff() {
+  const [staff, setStaff] = useState<StaffListItem[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [exporting, setExporting] = useState(false);
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const isAdmin = currentUserRole === "Admin";
   const itemsPerPage = 5;
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
+  useEffect(() => {
+    async function fetchUserRole() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+        const { data } = await supabase
+          .from('users')
+          .select('id, role')
+          .eq('auth_user_id', user.id)
+          .single();
+        if (data) {
+          setCurrentUserRole(data.role);
+          setCurrentUserId(data.id);
+        }
+      }
+    }
+    fetchUserRole();
+  }, []);
 
-  const handleRoleChange = (val: string) => {
-    setRoleFilter(val);
-    setCurrentPage(1);
-  };
+  useEffect(() => {
+    async function fetchStaff() {
+      setLoading(true);
+      try {
+        const { staff: fetchedStaff, totalCount: fetchedTotal } =
+          await getStaffList(
+            currentPage,
+            itemsPerPage,
+            searchQuery,
+            roleFilter,
+          );
+        setStaff(fetchedStaff);
+        setTotalCount(fetchedTotal);
+      } catch (error) {
+        console.error("Error fetching staff:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    const timer = setTimeout(fetchStaff, 400);
+    return () => clearTimeout(timer);
+  }, [currentPage, searchQuery, roleFilter, realtimeTrigger]);
+
+  // Set up Supabase Realtime listener
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel("staff-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "staff" },
+        () => {
+          setRealtimeTrigger((prev) => prev + 1);
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "users" },
+        () => {
+          setRealtimeTrigger((prev) => prev + 1);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
 
   const handleExport = async () => {
     try {
       setExporting(true);
-      // PDF export logic will be added later
+
+      // Dynamically load heavy PDF libraries only when needed
+      const { default: jsPDF } = await import("jspdf");
+      const { default: autoTable } = await import("jspdf-autotable");
+
+      const doc = new jsPDF();
+
+      // Report Header
+      doc.setFontSize(20);
+      doc.setTextColor(17, 24, 39);
+      doc.text("Project-E: Staff Report", 14, 22);
+
+      doc.setFontSize(11);
+      doc.setTextColor(107, 114, 128);
+      doc.text(
+        `Generated on ${new Date().toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+        14,
+        30,
+      );
+
+      // Filters Summary
+      doc.setFontSize(9);
+      doc.text(`Filters Applied - Role: ${roleFilter.toUpperCase()}`, 14, 38);
+
+      // Table Data
+      const tableData = staff.map((s) => [
+        s.name,
+        s.staff_id,
+        s.role,
+        s.contact,
+        s.last_active,
+      ]);
+
+      autoTable(doc, {
+        startY: 45,
+        head: [["Staff Name", "ID", "Role", "Contact", "Last Activity"]],
+        body: tableData,
+        theme: "grid",
+        headStyles: {
+          fillColor: [31, 41, 55],
+          textColor: [255, 255, 255],
+          fontSize: 10,
+          fontStyle: "bold",
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 4,
+        },
+        alternateRowStyles: {
+          fillColor: [249, 250, 251],
+        },
+      });
+
+      doc.save(
+        `project_e_staff_report_${new Date().toISOString().split("T")[0]}.pdf`,
+      );
     } catch (error) {
       console.error("Export failed:", error);
     } finally {
       setExporting(false);
     }
   };
-
-  const filteredData = mockStaffData.filter((staff) => {
-    const matchesSearch =
-      searchQuery === "" ||
-      staff.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      staff.staff_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      staff.role.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesRole =
-      roleFilter === "all" ||
-      staff.role.toLowerCase() === roleFilter.toLowerCase();
-
-    return matchesSearch && matchesRole;
-  });
-
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   return (
     <div className="space-y-8">
@@ -143,20 +233,28 @@ export default function Staff() {
           >
             {exporting ? "Exporting..." : "Export Staff List (PDF)"}
           </SecondaryButton>
-          <PrimaryButton icon={<PlusIcon className="w-6 h-6" />}>
-            Add New Staff
-          </PrimaryButton>
+          {isAdmin && (
+            <AddStaffModal
+              onSuccess={() => setRealtimeTrigger((prev) => prev + 1)}
+            />
+          )}
         </div>
       </header>
 
       <SearchFilter
         placeholder="Search by name, role or ID..."
-        onSearch={handleSearch}
+        onSearch={(query) => {
+          setSearchQuery(query);
+          setCurrentPage(1);
+        }}
         filters={[
           {
             label: "Role",
             value: roleFilter,
-            onChange: handleRoleChange,
+            onChange: (val) => {
+              setRoleFilter(val);
+              setCurrentPage(1);
+            },
             options: [
               { label: "All", value: "all" },
               { label: "Coach", value: "Coach" },
@@ -173,16 +271,26 @@ export default function Staff() {
           columns={StaffColumns}
           className="border-0 rounded-none h-fit"
           emptyMessage="No staff members found."
-          data={paginatedData}
+          isLoading={loading}
+          data={staff}
+          onRowClick={(item) => setSelectedStaffId(item.id)}
         />
 
         <Pagination
           currentPage={currentPage}
-          totalItems={filteredData.length}
+          totalItems={totalCount}
           itemsPerPage={itemsPerPage}
           onPageChange={setCurrentPage}
         />
       </section>
+
+      <StaffDetailsModal
+        isOpen={!!selectedStaffId}
+        onClose={() => setSelectedStaffId(null)}
+        userId={selectedStaffId}
+        currentUserRole={currentUserRole}
+        currentUserId={currentUserId}
+      />
     </div>
   );
 }

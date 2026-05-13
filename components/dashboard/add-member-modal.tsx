@@ -6,7 +6,7 @@ import { getMemberFormOptions, createMemberProfile } from "@/lib/api/dashboard";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/lib/contexts/ToastContext";
 import Modal from "../ui/Modal";
-import MemberWelcomeCard from "./MemberWelcomeCard";
+import MemberQRCard from "./MemberQRCard";
 import { Select } from "../ui/Select";
 
 interface AddMemberModalProps {
@@ -157,7 +157,7 @@ export default function AddMemberModal({
       maxWidth="max-w-2xl"
     >
       {newMember ? (
-        <MemberWelcomeCard member={newMember} onDone={handleDone} />
+        <MemberQRCard member={newMember} onDone={handleDone} />
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
