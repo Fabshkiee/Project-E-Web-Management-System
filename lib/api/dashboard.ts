@@ -380,9 +380,10 @@ export async function getStaffList(
 
 export interface CreateStaffPayload {
   p_full_name: string;
+  p_nickname: string | null;
   p_short_id: string | null;
   p_contact_number: string | null;
-  p_role: string; // 'Admin' or 'Staff'
+  p_role: string;
   p_subrole: string;
 }
 
