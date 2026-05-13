@@ -159,7 +159,7 @@ export default function StaffQRCard({
               </div>
               <div className="flex items-center gap-1.5 min-w-0 justify-end">
                 <span className="text-[11px] font-bold font-lexend text-white truncate">
-                  {showPassword ? `${staff.base_role}${staff.short_id}` : "••••••••"}
+                  {showPassword ? `Staff${staff.short_id}` : "••••••••"}
                 </span>
                 <button
                   onClick={() => setShowPassword(!showPassword)}
