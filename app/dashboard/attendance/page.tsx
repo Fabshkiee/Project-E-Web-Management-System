@@ -154,11 +154,11 @@ export default function AttendanceTracking() {
       accessor: (item: AttendanceLogItem) => (
         <div className="flex items-center gap-4">
           <UserAvatar name={item.full_name} />
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground text-sm font-lexend">
-              {toTitleCase(item.full_name)}
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-foreground text-sm font-lexend whitespace-nowrap">
+              {item.full_name}
             </span>
-            <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
+            <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-secondary/60">
               ID: {item.short_id}
             </span>
           </div>
@@ -169,7 +169,7 @@ export default function AttendanceTracking() {
       header: "Membership",
       className: "w-[25%]",
       accessor: (item: AttendanceLogItem) => (
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-0.5">
           <span className="font-medium text-foreground text-sm font-lexend">
             {item.type === "staff"
               ? toTitleCase(item.staff_subrole || "Staff")
@@ -199,13 +199,15 @@ export default function AttendanceTracking() {
         });
 
         return (
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground text-sm font-lexend">
+          <div className="flex flex-col gap-0.5">
+            <div className="text-[11px] text-secondary font-medium font-lexend">
+            <span className="opacity-60">Time: </span>
               {formattedTime}
-            </span>
-            <span className="text-[11px] font-medium uppercase tracking-wider text-secondary">
+            </div>
+            <div className="text-[11px] text-secondary font-medium font-lexend">
+            <span className="opacity-60">Date: </span>
               {dateFilter === "today" ? "Today" : formattedDate}
-            </span>
+            </div>
           </div>
         );
       },

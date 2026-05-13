@@ -39,13 +39,13 @@ const attendanceColumns = [
         <div className="flex flex-col min-w-0">
           {/* Added truncate and a title attribute for hover context */}
           <span 
-            className="font-medium text-foreground text-sm font-lexend truncate"
+            className="font-bold text-foreground text-sm font-lexend truncate"
             title={item.full_name || "Unknown Member"}
           >
             {item.full_name || "Unknown Member"}
           </span>
           {/* Added truncate here as well just in case the ID gets unexpectedly long */}
-          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary truncate">
+          <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-secondary/60 truncate">
             ID: {item.member_short_id}
           </span>
         </div>
@@ -55,18 +55,21 @@ const attendanceColumns = [
   {
     header: "Check-in Time",
     accessor: (item: RecentAttendance) => (
-      <span className="text-sm font-medium text-foreground font-lexend">
+      <div className="flex flex-col gap-0.5">
+        <div className="text-[11px] text-secondary font-medium font-lexend">
+          <span className="opacity-60">Time:</span>{" "}
         {new Date(item.check_in_time).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         })}
-      </span>
+      </div>
+      </div>
     ),
   },
   {
     header: "Membership",
     accessor: (item: RecentAttendance) => (
-      <span className="text-sm font-medium text-secondary font-lexend">
+      <span className="text-sm font-medium text-foreground font-lexend">
         {item.membershiptype}
       </span>
     ),
