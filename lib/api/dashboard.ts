@@ -94,28 +94,60 @@ export interface RecentAttendance {
  * Fetches the most recent attendance logs using the get_recent_attendance RPC.
  */
 export async function getRecentAttendance(): Promise<RecentAttendance[]> {
-  const supabase = createClient();
-  const { data, error } = await supabase.rpc("get_recent_attendance");
+  const now = Date.now();
 
-  if (error) {
-    throw new Error(error.message);
+  // 1. Return valid cached data
+  if (
+    recentAttendanceCache &&
+    now - recentAttendanceCache.timestamp < CACHE_TTL
+  ) {
+    return recentAttendanceCache.data;
   }
 
-  return data as RecentAttendance[];
+  // 2. Return in-flight promise if it exists
+  if (recentAttendanceCache?.promise) {
+    return recentAttendanceCache.promise;
+  }
+
+  // 3. Create new request
+  const fetchPromise = (async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("get_recent_attendance");
+    if (error) throw new Error(error.message);
+
+    recentAttendanceCache = { data, timestamp: Date.now(), promise: null };
+    return data;
+  })();
+
+  recentAttendanceCache = { data: null, timestamp: 0, promise: fetchPromise };
+  return fetchPromise;
 }
 
 /**
  * Fetches all member-related statistics in a single call for efficiency.
  */
 export async function getMemberCards(): Promise<MemberCardsResponse> {
-  const supabase = createClient();
-  const { data, error } = await supabase.rpc("get_members_cards");
+  const now = Date.now();
 
-  if (error) {
-    throw new Error(error.message);
+  if (memberCardsCache && now - memberCardsCache.timestamp < CACHE_TTL) {
+    return memberCardsCache.data;
   }
 
-  return data as MemberCardsResponse;
+  if (memberCardsCache?.promise) {
+    return memberCardsCache.promise;
+  }
+
+  const fetchPromise = (async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("get_members_cards");
+    if (error) throw new Error(error.message);
+
+    memberCardsCache = { data, timestamp: Date.now(), promise: null };
+    return data;
+  })();
+
+  memberCardsCache = { data: null, timestamp: 0, promise: fetchPromise };
+  return fetchPromise;
 }
 
 /**
@@ -133,32 +165,71 @@ export interface CreateMemberPayload {
   p_is_discounted: boolean;
 }
 
+// Cache settings
+const CACHE_TTL = 30000; // 30 seconds
+let memberCardsCache: {
+  data: any;
+  timestamp: number;
+  promise: Promise<any> | null;
+} | null = null;
+let recentAttendanceCache: {
+  data: any;
+  timestamp: number;
+  promise: Promise<any> | null;
+} | null = null;
+let peakHoursCache: {
+  data: any;
+  timestamp: number;
+  promise: Promise<any> | null;
+} | null = null;
+let weeklyAttendanceCache: {
+  data: any;
+  timestamp: number;
+  promise: Promise<any> | null;
+} | null = null;
+let formOptionsCache: Promise<any> | null = null;
+
+/**
+ * Clears the dashboard data cache.
+ * Use this when a Realtime update is received to ensure fresh data.
+ */
+export function clearDashboardCache() {
+  memberCardsCache = null;
+  recentAttendanceCache = null;
+  peakHoursCache = null;
+  weeklyAttendanceCache = null;
+}
+
 /**
  * Fetches dynamic options for the Add Member modal (Memberships & Coaches)
  */
 export async function getMemberFormOptions() {
-  const supabase = createClient();
+  if (formOptionsCache) return formOptionsCache;
 
-  const [mtRes, staffRes] = await Promise.all([
-    supabase.from("membership_types").select("id, name"),
-    supabase.from("staff").select(`
-        id,
-        profile:users (
-          full_name
-        )
-      `),
-  ]);
+  formOptionsCache = (async () => {
+    const supabase = createClient();
+    const [mtRes, staffRes] = await Promise.all([
+      supabase.from("membership_types").select("id, name"),
+      supabase.from("staff").select(`
+          id,
+          profile:users (
+            full_name
+          )
+        `),
+    ]);
 
-  // Flatten the coach data so the UI gets { id, full_name }
-  const coaches = (staffRes.data || []).map((s: any) => ({
-    id: s.id,
-    full_name: s.profile?.full_name || "Unknown Coach",
-  }));
+    const coaches = (staffRes.data || []).map((s: any) => ({
+      id: s.id,
+      full_name: s.profile?.full_name || "Unknown Coach",
+    }));
 
-  return {
-    membershipTypes: mtRes.data || [],
-    coaches: coaches,
-  };
+    return {
+      membershipTypes: mtRes.data || [],
+      coaches: coaches,
+    };
+  })();
+
+  return formOptionsCache;
 }
 
 /**
@@ -177,6 +248,7 @@ export async function createMemberProfile(payload: CreateMemberPayload) {
     throw new Error(data.error || "Failed to create member");
   }
 
+  clearDashboardCache();
   return data;
 }
 
@@ -213,6 +285,7 @@ export async function updateMemberProfile(payload: {
   });
 
   if (error) throw new Error(error.message);
+  clearDashboardCache();
   return data;
 }
 
@@ -232,6 +305,7 @@ export async function renewMember(payload: {
     throw new Error(error.message);
   }
 
+  clearDashboardCache();
   return true;
 }
 
@@ -247,26 +321,44 @@ export async function terminateMembership(userId: string) {
     throw new Error(data.error || "Failed to terminate membership");
   }
 
+  clearDashboardCache();
   return true;
 }
 
 export async function getPeakHours() {
+  const now = Date.now();
+  if (peakHoursCache && now - peakHoursCache.timestamp < CACHE_TTL) {
+    return peakHoursCache.data;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase.rpc("get_peak_hours");
   if (error) {
     console.error("Error fetching peak hours:", error);
     return null;
   }
+
+  peakHoursCache = { data, timestamp: now, promise: null };
   return data;
 }
 
 export async function getWeeklyAttendance() {
+  const now = Date.now();
+  if (
+    weeklyAttendanceCache &&
+    now - weeklyAttendanceCache.timestamp < CACHE_TTL
+  ) {
+    return weeklyAttendanceCache.data;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase.rpc("get_weekly_attendance_count");
   if (error) {
     console.error("Error fetching weekly attendance:", error);
     return null;
   }
+
+  weeklyAttendanceCache = { data, timestamp: now, promise: null };
   return data;
 }
 
@@ -320,6 +412,7 @@ export async function manualCheckIn(
 
   if (error) throw new Error(error.message);
 
+  clearDashboardCache();
   return true;
 }
 
@@ -390,6 +483,7 @@ export async function createStaffProfile(payload: CreateStaffPayload) {
     throw new Error(data.error || "Failed to create staff member");
   }
 
+  clearDashboardCache();
   return data;
 }
 /**
@@ -431,5 +525,6 @@ export async function updateStaffProfile(payload: {
     throw new Error(error.message);
   }
 
+  clearDashboardCache();
   return true;
 }

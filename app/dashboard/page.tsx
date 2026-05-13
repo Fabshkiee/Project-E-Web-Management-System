@@ -16,6 +16,7 @@ import {
   MemberCardsResponse,
   getRecentAttendance,
   RecentAttendance,
+  clearDashboardCache,
 } from "@/lib/api/dashboard";
 import { createClient } from "@/lib/supabase/client";
 import { DataTable } from "@/components/dashboard/data-table";
@@ -134,12 +135,18 @@ export default function Dashboard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "members" },
-        () => fetchData(),
+        () => {
+          clearDashboardCache();
+          fetchData();
+        },
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "attendance_logs" },
-        () => fetchData(),
+        () => {
+          clearDashboardCache();
+          fetchData();
+        },
       )
       .subscribe();
 
