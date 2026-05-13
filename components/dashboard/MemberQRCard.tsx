@@ -16,7 +16,7 @@ import {
   ExportPNG,
 } from "@/components/ui/Icons";
 
-interface MemberWelcomeCardProps {
+interface MemberQRCardProps {
   member: {
     full_name: string;
     nickname?: string;
@@ -32,13 +32,13 @@ interface MemberWelcomeCardProps {
   showDoneButton?: boolean;
 }
 
-export default function MemberWelcomeCard({
+export default function MemberQRCard({
   member,
   onDone,
   title = "Member Registered!",
   subtitle,
   showDoneButton = true,
-}: MemberWelcomeCardProps) {
+}: MemberQRCardProps) {
   const [showPassword, setShowPassword] = useState(false);
   const firstName = member.nickname || member.full_name.split(" ")[0];
   const displaySubtitle = subtitle || `Welcome to the family, ${firstName}`;
@@ -136,7 +136,7 @@ export default function MemberWelcomeCard({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
             {/* ID */}
             <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <FingerprintIcon className="w-3.5 h-3.5 text-gray-500" />
                 <span className="text-[10px] font-lexend text-gray-400">
                   ID
@@ -149,7 +149,7 @@ export default function MemberWelcomeCard({
 
             {/* Password */}
             <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <LockIcon className="w-3.5 h-3.5 text-gray-500" />
                 <span className="text-[10px] font-lexend text-gray-400">
                   Password
@@ -161,7 +161,7 @@ export default function MemberWelcomeCard({
                 </span>
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-500 hover:text-white transition-colors flex-shrink-0"
+                  className="text-gray-500 hover:text-white transition-colors shrink-0"
                 >
                   {showPassword ? (
                     <EyeClosedIcon className="w-3 h-3" />
@@ -174,7 +174,7 @@ export default function MemberWelcomeCard({
 
             {/* Valid Until */}
             <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
                 <span className="text-[10px] font-lexend text-gray-400">
                   Expires
@@ -191,7 +191,7 @@ export default function MemberWelcomeCard({
 
             {/* Coach */}
             <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5 gap-1.5">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <CoachIcon className="w-3.5 h-3.5 text-gray-500" />
                 <span className="text-[10px] font-lexend text-gray-400">
                   Coach

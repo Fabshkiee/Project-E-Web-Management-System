@@ -9,7 +9,7 @@ import {
   renewMember,
   terminateMembership,
 } from "@/lib/api/dashboard";
-import MemberWelcomeCard from "./MemberWelcomeCard";
+import MemberQRCard from "./MemberQRCard";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { Select } from "../ui/Select";
 import { useToast } from "@/lib/contexts/ToastContext";
@@ -26,9 +26,9 @@ export default function MemberDetailsModal({
   onClose,
   userId,
 }: MemberDetailsModalProps) {
-  const [activeTab, setActiveTab] = useState<"profile" | "qr" | "renew" | "terminate">(
-    "profile",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "qr" | "renew" | "terminate"
+  >("profile");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -259,7 +259,9 @@ export default function MemberDetailsModal({
                     <Select
                       label="Assigned Coach"
                       value={coachId || "none"}
-                      onChange={(val) => setCoachId(val === "none" ? null : val)}
+                      onChange={(val) =>
+                        setCoachId(val === "none" ? null : val)
+                      }
                       options={[
                         { label: "No Coach (Self-Guided)", value: "none" },
                         ...coachOptions.map((coach) => ({
@@ -279,7 +281,7 @@ export default function MemberDetailsModal({
               </form>
             ) : activeTab === "qr" ? (
               <div className="flex justify-center items-center py-4">
-                <MemberWelcomeCard
+                <MemberQRCard
                   member={{
                     full_name: memberData.full_name,
                     nickname: memberData.nickname,
@@ -307,7 +309,7 @@ export default function MemberDetailsModal({
                         const now = new Date();
                         const diffDays = Math.ceil(
                           (expiry.getTime() - now.getTime()) /
-                            (1000 * 60 * 60 * 24)
+                            (1000 * 60 * 60 * 24),
                         );
                         if (expiry < now)
                           return "text-[#9F1239] dark:text-[#F87171]";
@@ -332,7 +334,7 @@ export default function MemberDetailsModal({
                         const now = new Date();
                         const diffDays = Math.ceil(
                           (expiry.getTime() - now.getTime()) /
-                            (1000 * 60 * 60 * 24)
+                            (1000 * 60 * 60 * 24),
                         );
 
                         if (expiry < now) return "Expired";
