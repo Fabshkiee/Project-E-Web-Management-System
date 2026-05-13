@@ -38,11 +38,11 @@ const MembersColumn = [
         <div className="transition-transform duration-300 group-hover:scale-110">
           <UserAvatar name={item.full_name || "Unknown"} />
         </div>
-        <div className="flex flex-col min-w-0 max-w-[200px] sm:max-w-[250px]">
-          <span className="font-medium text-foreground text-sm font-lexend whitespace-nowrap truncate">
-            {toTitleCase(item.full_name || "Unknown Member")}
+        <div className="flex flex-col min-w-0">
+          <span className="font-bold text-foreground text-sm font-lexend whitespace-nowrap">
+            {item.full_name}
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary whitespace-nowrap truncate">
+          <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-secondary/60">
             ID: {item.member_id}
           </span>
         </div>
@@ -51,14 +51,14 @@ const MembersColumn = [
   },
   {
     header: "Status",
-    className: "w-[15%]",
+    className: "w-[12%]",
     accessor: (item: MemberListItem) => (
       <StatusTag type={item.member_status as any} />
     ),
   },
   {
     header: "Dates",
-    className: "w-[20%]",
+    className: "w-[18%]",
     accessor: (item: MemberListItem) => (
       <div className="flex flex-col gap-0.5">
         <div className="text-[11px] text-secondary font-medium font-lexend">
@@ -69,18 +69,8 @@ const MembersColumn = [
             year: "numeric",
           })}
         </div>
-        <div
-          className={`text-[11px] font-medium font-lexend ${
-            item.member_status === "Expired"
-              ? "text-[#9F1239] dark:text-[#F87171]"
-              : item.member_status === "Expiring"
-                ? "text-[#92400E] dark:text-[#FBBF24]"
-                : "text-secondary"
-          }`}
-        >
-          <span className="opacity-60">
-            {item.member_status === "Expired" ? "Expired:" : "Expires:"}
-          </span>{" "}
+        <div className="text-[11px] font-medium font-lexend text-secondary">
+          <span className="opacity-60">Expires:</span>{" "}
           {new Date(item.end_date).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -92,7 +82,7 @@ const MembersColumn = [
   },
   {
     header: "Membership",
-    className: "w-[20%]",
+    className: "w-[15%]",
     accessor: (item: MemberListItem) => (
       <span className="text-sm font-medium text-foreground font-lexend">
         {item.membership_type}
@@ -101,25 +91,29 @@ const MembersColumn = [
   },
   {
     header: "Contact Number",
-    className: "w-[20%]",
+    className: "w-[15%]",
     accessor: (item: MemberListItem) => (
       <span
         className={`text-sm font-medium font-lexend ${
-          item.contact_number === null ? "text-gray-400" : "text-secondary"
+          item.contact_number === null
+            ? "text-muted/40 italic"
+            : "text-secondary"
         }`}
       >
-        {item.contact_number === null ? "None" : item.contact_number}
+        {item.contact_number === null ? "No contact" : item.contact_number}
       </span>
     ),
   },
   {
     header: "Coach",
-    className: "w-[20%]",
+    className: "w-[15%]",
     accessor: (item: MemberListItem) => (
       <span
-        className={`text-sm font-medium font-lexend ${item.coach === "None" ? "text-gray-300" : "text-secondary"}`}
+        className={`text-sm font-medium font-lexend ${
+          item.coach === "None" ? "text-muted/40 italic" : "text-secondary"
+        }`}
       >
-        {item.coach === "None" ? "None" : `${toTitleCase(item.coach)}`}
+        {item.coach === "None" ? "No coach" : toTitleCase(item.coach)}
       </span>
     ),
   },
