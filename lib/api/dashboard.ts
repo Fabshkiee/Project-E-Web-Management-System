@@ -308,15 +308,29 @@ export async function getAttendanceList(
  * Manually records an attendance log entry.
  * Uses PowerSync directly to ensure offline support and automatic sync.
  */
-export async function manualCheckIn(userId: string, status: string) {
+export async function manualCheckIn(
+  userId: string,
+  status: string,
+  role?: string,
+) {
   const db = getDb();
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
+  // Record the attendance log
   await db.execute(
     "INSERT INTO attendance_logs (id, user_id, check_in_time, status_at_scan) VALUES (?, ?, ?, ?)",
     [id, userId, now, status],
   );
+
+  // If it's a staff or admin member, update their last_active timestamp
+  // using a case-insensitive check to be safe
+  if (role?.toLowerCase() === "staff" || role?.toLowerCase() === "admin") {
+    await db.execute("UPDATE staff SET last_active = ? WHERE id = ?", [
+      now,
+      userId,
+    ]);
+  }
 
   return true;
 }

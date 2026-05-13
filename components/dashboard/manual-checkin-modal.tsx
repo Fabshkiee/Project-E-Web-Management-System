@@ -108,7 +108,7 @@ export default function ManualCheckInModal({
   const handleCheckIn = async (user: SearchResult) => {
     setCheckingIn(user.id);
     try {
-      await manualCheckIn(user.id, user.status);
+      await manualCheckIn(user.id, user.status, user.role);
       showToast(`Successfully checked in ${user.full_name}`, "success");
       if (onSuccess) onSuccess();
       onClose();
