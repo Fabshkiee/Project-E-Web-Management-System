@@ -38,25 +38,15 @@ const attendanceColumns = [
         {/* Added min-w-0 to allow the flex container to shrink */}
         <div className="flex flex-col min-w-0">
           {/* Added truncate and a title attribute for hover context */}
-<<<<<<< HEAD
           <span
             className="font-medium text-foreground text-sm font-lexend truncate"
-=======
-          <span 
-            className="font-bold text-foreground text-sm font-lexend truncate"
->>>>>>> 07773bf (ADDED CHANGES TO 3 MORE TABLES)
             title={item.full_name || "Unknown Member"}
           >
             {item.full_name || "Unknown Member"}
           </span>
           {/* Added truncate here as well just in case the ID gets unexpectedly long */}
-<<<<<<< HEAD
           <span className="text-[11px] font-medium uppercase tracking-wider text-secondary truncate">
             ID: {item.member_short_id ?? item.staff_short_id}
-=======
-          <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-secondary/60 truncate">
-            ID: {item.member_short_id}
->>>>>>> 07773bf (ADDED CHANGES TO 3 MORE TABLES)
           </span>
         </div>
       </div>
@@ -79,13 +69,8 @@ const attendanceColumns = [
   {
     header: "Membership",
     accessor: (item: RecentAttendance) => (
-<<<<<<< HEAD
       <span className="text-sm font-medium text-secondary font-lexend">
         {item.membershiptype ?? item.staff_subrole}
-=======
-      <span className="text-sm font-medium text-foreground font-lexend">
-        {item.membershiptype}
->>>>>>> 07773bf (ADDED CHANGES TO 3 MORE TABLES)
       </span>
     ),
   },
