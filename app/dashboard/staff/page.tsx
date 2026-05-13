@@ -24,10 +24,10 @@ const StaffColumns = [
           <UserAvatar name={item.name} />
         </div>
         <div className="flex flex-col min-w-0 max-w-[200px] sm:max-w-[250px]">
-          <span className="font-medium text-foreground text-sm font-lexend whitespace-nowrap truncate">
+          <span className="font-bold text-foreground text-sm font-lexend whitespace-nowrap truncate">
             {item.name}
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-secondary whitespace-nowrap truncate">
+          <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-secondary/60 whitespace-nowrap truncate">
             ID: {item.staff_id}
           </span>
         </div>
@@ -43,8 +43,10 @@ const StaffColumns = [
     header: "Contact",
     className: "w-[25%]",
     accessor: (item: StaffListItem) => (
-      <span className="text-sm font-medium text-foreground font-lexend">
-        {item.contact}
+      <span className={`text-sm font-medium font-lexend ${
+        !item.contact ? "text-muted/40 italic" : "text-foreground"
+      }`}>
+        {item.contact || "No contact"}
       </span>
     ),
   },

@@ -55,12 +55,15 @@ const attendanceColumns = [
   {
     header: "Check-in Time",
     accessor: (item: RecentAttendance) => (
-      <span className="text-sm font-medium text-foreground font-lexend">
+      <div className="flex flex-col gap-0.5">
+        <div className="text-[11px] text-secondary font-medium font-lexend">
+          <span className="opacity-60">Time:</span>{" "}
         {new Date(item.check_in_time).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         })}
-      </span>
+      </div>
+      </div>
     ),
   },
   {
