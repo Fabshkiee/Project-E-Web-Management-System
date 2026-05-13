@@ -31,9 +31,9 @@ export default function Sidebar({ userProfile }: SidebarProps) {
     { label: "Dashboard", href: "/dashboard", icon: DashboardIcon },
     { label: "Members", href: "/dashboard/members", icon: MembersIcon },
     { label: "Attendance", href: "/dashboard/attendance", icon: AttendanceIcon },
+    { label: "Staff", href: "/dashboard/staff", icon: StaffIcon },
     ...(isAdmin
       ? [
-          { label: "Staff", href: "/dashboard/staff", icon: StaffIcon },
           { label: "Analytics", href: "/dashboard/analytics", icon: AnalyticsIcon },
         ]
       : []),

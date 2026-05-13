@@ -69,7 +69,30 @@ export default function Staff() {
   const [exporting, setExporting] = useState(false);
   const [realtimeTrigger, setRealtimeTrigger] = useState(0);
   const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const isAdmin = currentUserRole === "Admin";
   const itemsPerPage = 5;
+
+  useEffect(() => {
+    async function fetchUserRole() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+        const { data } = await supabase
+          .from('users')
+          .select('id, role')
+          .eq('auth_user_id', user.id)
+          .single();
+        if (data) {
+          setCurrentUserRole(data.role);
+          setCurrentUserId(data.id);
+        }
+      }
+    }
+    fetchUserRole();
+  }, []);
 
   useEffect(() => {
     async function fetchStaff() {
@@ -122,30 +145,11 @@ export default function Staff() {
     };
   }, []);
 
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    async function checkRole() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("users")
-          .select("role")
-          .eq("auth_user_id", user.id)
-          .single();
-        setIsAdmin(profile?.role === "Admin");
-      }
-    }
-    checkRole();
-  }, []);
 
   const handleExport = async () => {
     try {
       setExporting(true);
-      
+
       // Dynamically load heavy PDF libraries only when needed
       const { default: jsPDF } = await import("jspdf");
       const { default: autoTable } = await import("jspdf-autotable");
@@ -173,11 +177,7 @@ export default function Staff() {
 
       // Filters Summary
       doc.setFontSize(9);
-      doc.text(
-        `Filters Applied - Role: ${roleFilter.toUpperCase()}`,
-        14,
-        38,
-      );
+      doc.text(`Filters Applied - Role: ${roleFilter.toUpperCase()}`, 14, 38);
 
       // Table Data
       const tableData = staff.map((s) => [
@@ -208,7 +208,9 @@ export default function Staff() {
         },
       });
 
-      doc.save(`project_e_staff_report_${new Date().toISOString().split("T")[0]}.pdf`);
+      doc.save(
+        `project_e_staff_report_${new Date().toISOString().split("T")[0]}.pdf`,
+      );
     } catch (error) {
       console.error("Export failed:", error);
     } finally {
@@ -286,6 +288,8 @@ export default function Staff() {
         isOpen={!!selectedStaffId}
         onClose={() => setSelectedStaffId(null)}
         userId={selectedStaffId}
+        currentUserRole={currentUserRole}
+        currentUserId={currentUserId}
       />
     </div>
   );

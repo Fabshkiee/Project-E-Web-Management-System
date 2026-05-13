@@ -13,6 +13,8 @@ interface StaffDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string | null;
+  currentUserRole: string | null;
+  currentUserId: string | null;
 }
 
 const SUBROLE_OPTIONS = [
@@ -31,12 +33,22 @@ export default function StaffDetailsModal({
   isOpen,
   onClose,
   userId,
+  currentUserRole,
+  currentUserId,
 }: StaffDetailsModalProps) {
   const [activeTab, setActiveTab] = useState<"profile" | "qr">("profile");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [staffData, setStaffData] = useState<any>(null);
   const { showToast } = useToast();
+
+  const isOwnProfile = userId && currentUserId ? userId === currentUserId : false;
+  const isAdmin = currentUserRole === "Admin";
+  
+  // Rule: Staff can ONLY edit their own profile basic info.
+  // Admins can edit everything.
+  const isReadOnly = !isAdmin && !isOwnProfile;
+  const canEditRole = isAdmin;
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -134,19 +146,21 @@ export default function StaffDetailsModal({
                 <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
               )}
             </button>
-            <button
-              onClick={() => setActiveTab("qr")}
-              className={`pb-3 text-sm font-semibold font-lexend transition-colors relative ${
-                activeTab === "qr"
-                  ? "text-primary"
-                  : "text-gray-500 hover:text-foreground"
-              }`}
-            >
-              QR Profile
-              {activeTab === "qr" && (
-                <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
-              )}
-            </button>
+            {(isAdmin || isOwnProfile) && (
+              <button
+                onClick={() => setActiveTab("qr")}
+                className={`pb-3 text-sm font-semibold font-lexend transition-colors relative ${
+                  activeTab === "qr"
+                    ? "text-primary"
+                    : "text-gray-500 hover:text-foreground"
+                }`}
+              >
+                QR Profile
+                {activeTab === "qr" && (
+                  <span className="absolute -bottom-px left-0 w-full h-[2px] bg-primary rounded-t-full" />
+                )}
+              </button>
+            )}
           </div>
 
           <div className="flex-1">
@@ -159,7 +173,8 @@ export default function StaffDetailsModal({
                     <input
                       type="text"
                       required
-                      className={inputClass}
+                      readOnly={isReadOnly}
+                      className={`${inputClass} ${isReadOnly ? "opacity-60 cursor-not-allowed" : ""}`}
                       value={formData.fullName}
                       onKeyDown={(e) => {
                         if (
@@ -186,7 +201,8 @@ export default function StaffDetailsModal({
                     <label className={labelClass}>Nickname (Optional)</label>
                     <input
                       type="text"
-                      className={inputClass}
+                      readOnly={isReadOnly}
+                      className={`${inputClass} ${isReadOnly ? "opacity-60 cursor-not-allowed" : ""}`}
                       value={formData.nickname}
                       onKeyDown={(e) => {
                         if (
@@ -214,7 +230,8 @@ export default function StaffDetailsModal({
                     <input
                       type="tel"
                       maxLength={11}
-                      className={inputClass}
+                      readOnly={isReadOnly}
+                      className={`${inputClass} ${isReadOnly ? "opacity-60 cursor-not-allowed" : ""}`}
                       value={formData.contactNumber}
                       onKeyDown={(e) => {
                         if (
@@ -239,11 +256,11 @@ export default function StaffDetailsModal({
                     />
                   </div>
 
-                  {/* Base Role */}
                   <Select
                     label="Base Role"
                     options={BASE_ROLE_OPTIONS}
                     value={formData.baseRole}
+                    disabled={!canEditRole}
                     onChange={(val) =>
                       setFormData({ ...formData, baseRole: val })
                     }
@@ -254,6 +271,7 @@ export default function StaffDetailsModal({
                     label="Subrole"
                     options={SUBROLE_OPTIONS}
                     value={formData.subrole}
+                    disabled={!canEditRole}
                     onChange={(val) =>
                       setFormData({ ...formData, subrole: val })
                     }
@@ -261,12 +279,21 @@ export default function StaffDetailsModal({
                 </div>
 
                 <div className="flex justify-end gap-3 mt-4">
-                  <SecondaryButton type="button" onClick={onClose}>
-                    Cancel
-                  </SecondaryButton>
-                  <PrimaryButton type="submit" disabled={saving}>
-                    {saving ? "Saving..." : "Save Changes"}
-                  </PrimaryButton>
+                  {!isReadOnly && (
+                    <>
+                      <SecondaryButton type="button" onClick={onClose}>
+                        Cancel
+                      </SecondaryButton>
+                      <PrimaryButton type="submit" disabled={saving}>
+                        {saving ? "Saving..." : "Save Changes"}
+                      </PrimaryButton>
+                    </>
+                  )}
+                  {isReadOnly && (
+                    <PrimaryButton type="button" onClick={onClose}>
+                      Close
+                    </PrimaryButton>
+                  )}
                 </div>
               </form>
             ) : (
