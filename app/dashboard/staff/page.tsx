@@ -9,8 +9,9 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { DataTable } from "@/components/dashboard/data-table";
 import { Pagination } from "@/components/ui/Pagination";
-import { getStaffList, StaffListItem } from "@/lib/api/dashboard";
+import AddStaffModal from "@/components/dashboard/add-staff-modal";
 import { createClient } from "@/lib/supabase/client";
+import { getStaffList, StaffListItem } from "@/lib/api/dashboard";
 
 const StaffColumns = [
   {
@@ -119,24 +120,25 @@ export default function Staff() {
     };
   }, []);
 
-  const filteredData = staff.filter((staff) => {
-    const matchesSearch =
-      searchQuery === "" ||
-      staff.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      staff.staff_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      staff.role.toLowerCase().includes(searchQuery.toLowerCase());
+  const [isAdmin, setIsAdmin] = useState(false);
 
-    const matchesRole =
-      roleFilter === "all" ||
-      staff.role.toLowerCase() === roleFilter.toLowerCase();
-
-    return matchesSearch && matchesRole;
-  });
-
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  useEffect(() => {
+    async function checkRole() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("users")
+          .select("role")
+          .eq("auth_user_id", user.id)
+          .single();
+        setIsAdmin(profile?.role === "Admin");
+      }
+    }
+    checkRole();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -153,9 +155,11 @@ export default function Staff() {
           >
             {exporting ? "Exporting..." : "Export Staff List (PDF)"}
           </SecondaryButton>
-          <PrimaryButton icon={<PlusIcon className="w-6 h-6" />}>
-            Add New Staff
-          </PrimaryButton>
+          {isAdmin && (
+            <AddStaffModal
+              onSuccess={() => setRealtimeTrigger((prev) => prev + 1)}
+            />
+          )}
         </div>
       </header>
 

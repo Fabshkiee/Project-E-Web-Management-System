@@ -14,17 +14,30 @@ import {
   LogoutIcon,
 } from "@/components/ui/Icons";
 
-const mainMenuItems = [
-  { label: "Dashboard", href: "/dashboard", icon: DashboardIcon },
-  { label: "Members", href: "/dashboard/members", icon: MembersIcon },
-  { label: "Attendance", href: "/dashboard/attendance", icon: AttendanceIcon },
-  { label: "Staff", href: "/dashboard/staff", icon: StaffIcon },
-  { label: "Analytics", href: "/dashboard/analytics", icon: AnalyticsIcon },
-];
+interface SidebarProps {
+  userProfile: {
+    name: string;
+    role: string;
+  };
+}
 
-export default function Sidebar() {
+export default function Sidebar({ userProfile }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const isAdmin = userProfile.role === "Admin";
+
+  const mainMenuItems = [
+    { label: "Dashboard", href: "/dashboard", icon: DashboardIcon },
+    { label: "Members", href: "/dashboard/members", icon: MembersIcon },
+    { label: "Attendance", href: "/dashboard/attendance", icon: AttendanceIcon },
+    ...(isAdmin
+      ? [
+          { label: "Staff", href: "/dashboard/staff", icon: StaffIcon },
+          { label: "Analytics", href: "/dashboard/analytics", icon: AnalyticsIcon },
+        ]
+      : []),
+  ];
 
   const handleLogout = async () => {
     const supabase = createClient();
