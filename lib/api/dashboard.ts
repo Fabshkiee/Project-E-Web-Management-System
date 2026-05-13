@@ -325,7 +325,7 @@ export interface StaffListItem {
   id: string;
   name: string;
   staff_id: string;
-  role: string;
+  role: "Coach" | "Receptionist" | "Maintenance" | "Admin";
   contact: string;
   last_active: string;
 }

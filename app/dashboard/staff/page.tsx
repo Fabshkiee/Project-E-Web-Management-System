@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PageTitle from "@/components/dashboard/page-title";
 import { ExportPDF, PlusIcon } from "@/components/ui/Icons";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/ActionButton";
@@ -9,36 +9,14 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { DataTable } from "@/components/dashboard/data-table";
 import { Pagination } from "@/components/ui/Pagination";
-
-type StaffRole = "Coach" | "Receptionist" | "Maintenance";
-
-interface StaffItem {
-  id: string;
-  name: string;
-  staff_id: string;
-  role: StaffRole;
-  contact: string;
-  last_active: string;
-}
-
-const mockStaffData: StaffItem[] = [
-  { id: "1",  name: "Coach Eric",      staff_id: "#STF-001", role: "Coach",         contact: "0912-345-6789", last_active: "Today, 09:15 AM" },
-  { id: "2",  name: "Kazuya Mishima",    staff_id: "#STF-004", role: "Receptionist",  contact: "0917-987-6543", last_active: "Yesterday, 06:00 PM" },
-  { id: "3",  name: "Coach Ezekiel",      staff_id: "#STF-007", role: "Coach",         contact: "0917-007-0007", last_active: "2 days ago" },
-  { id: "4",  name: "Jin Kazama",    staff_id: "#STF-012", role: "Coach",         contact: "0922-333-4444", last_active: "Today, 08:30 AM" },
-  { id: "5",  name: "Heihachi Mishima",    staff_id: "#STF-009", role: "Maintenance",   contact: "0919-888-7777", last_active: "Yesterday, 5:00 PM" },
-  { id: "6",  name: "Anna Williams",       staff_id: "#STF-015", role: "Receptionist",  contact: "0921-111-2222", last_active: "Today, 07:45 AM" },
-  { id: "7",  name: "Armor King",    staff_id: "#STF-018", role: "Coach",         contact: "0915-222-3333", last_active: "Today, 10:00 AM" },
-  { id: "8",  name: "Paul Phoenix",    staff_id: "#STF-021", role: "Maintenance",   contact: "0918-444-5555", last_active: "3 days ago" },
-  { id: "9",  name: "Steve Fox",       staff_id: "#STF-023", role: "Coach",         contact: "0926-666-7777", last_active: "Yesterday, 08:00 AM" },
-  { id: "10", name: "Marshall Law",    staff_id: "#STF-025", role: "Receptionist",  contact: "0920-888-9999", last_active: "Today, 11:30 AM" },
-];
+import { getStaffList, StaffListItem } from "@/lib/api/dashboard";
+import { createClient } from "@/lib/supabase/client";
 
 const StaffColumns = [
   {
     header: "Staff Member",
-    className: "w-[34%]",
-    accessor: (item: StaffItem) => (
+    className: "w-[30%]",
+    accessor: (item: StaffListItem) => (
       <div className="flex items-center gap-4">
         <div className="transition-transform duration-300 group-hover:scale-110">
           <UserAvatar name={item.name} />
@@ -56,15 +34,13 @@ const StaffColumns = [
   },
   {
     header: "Role",
-    className: "w-[22%]",
-    accessor: (item: StaffItem) => (
-      <StatusTag type={item.role} />
-    ),
+    className: "w-[20%]",
+    accessor: (item: StaffListItem) => <StatusTag type={item.role} />,
   },
   {
     header: "Contact",
-    className: "w-[24%]",
-    accessor: (item: StaffItem) => (
+    className: "w-[25%]",
+    accessor: (item: StaffListItem) => (
       <span className="text-sm font-medium text-foreground font-lexend">
         {item.contact}
       </span>
@@ -72,8 +48,8 @@ const StaffColumns = [
   },
   {
     header: "Last Active",
-    className: "w-[20%]",
-    accessor: (item: StaffItem) => (
+    className: "w-[25%]",
+    accessor: (item: StaffListItem) => (
       <span className="text-sm font-medium text-secondary font-lexend">
         {item.last_active}
       </span>
@@ -82,34 +58,68 @@ const StaffColumns = [
 ];
 
 export default function Staff() {
+  const [staff, setStaff] = useState<StaffListItem[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [exporting, setExporting] = useState(false);
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
   const itemsPerPage = 5;
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
-
-  const handleRoleChange = (val: string) => {
-    setRoleFilter(val);
-    setCurrentPage(1);
-  };
-
-  const handleExport = async () => {
-    try {
-      setExporting(true);
-      // PDF export logic will be added later
-    } catch (error) {
-      console.error("Export failed:", error);
-    } finally {
-      setExporting(false);
+  useEffect(() => {
+    async function fetchStaff() {
+      setLoading(true);
+      try {
+        const { staff: fetchedStaff, totalCount: fetchedTotal } =
+          await getStaffList(
+            currentPage,
+            itemsPerPage,
+            searchQuery,
+            roleFilter,
+          );
+        setStaff(fetchedStaff);
+        setTotalCount(fetchedTotal);
+      } catch (error) {
+        console.error("Error fetching staff:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  };
 
-  const filteredData = mockStaffData.filter((staff) => {
+    const timer = setTimeout(fetchStaff, 400);
+    return () => clearTimeout(timer);
+  }, [currentPage, searchQuery, roleFilter, realtimeTrigger]);
+
+  // Set up Supabase Realtime listener
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel("staff-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "staff" },
+        () => {
+          setRealtimeTrigger((prev) => prev + 1);
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "users" },
+        () => {
+          setRealtimeTrigger((prev) => prev + 1);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const filteredData = staff.filter((staff) => {
     const matchesSearch =
       searchQuery === "" ||
       staff.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -125,7 +135,7 @@ export default function Staff() {
 
   const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   return (
@@ -137,7 +147,7 @@ export default function Staff() {
         />
         <div className="flex gap-3">
           <SecondaryButton
-            onClick={handleExport}
+            // onClick={handleExport}
             disabled={exporting}
             icon={<ExportPDF className="w-6 h-6" />}
           >
@@ -151,12 +161,18 @@ export default function Staff() {
 
       <SearchFilter
         placeholder="Search by name, role or ID..."
-        onSearch={handleSearch}
+        onSearch={(query) => {
+          setSearchQuery(query);
+          setCurrentPage(1);
+        }}
         filters={[
           {
             label: "Role",
             value: roleFilter,
-            onChange: handleRoleChange,
+            onChange: (val) => {
+              setRoleFilter(val);
+              setCurrentPage(1);
+            },
             options: [
               { label: "All", value: "all" },
               { label: "Coach", value: "Coach" },
@@ -173,12 +189,13 @@ export default function Staff() {
           columns={StaffColumns}
           className="border-0 rounded-none h-fit"
           emptyMessage="No staff members found."
-          data={paginatedData}
+          isLoading={loading}
+          data={staff}
         />
 
         <Pagination
           currentPage={currentPage}
-          totalItems={filteredData.length}
+          totalItems={totalCount}
           itemsPerPage={itemsPerPage}
           onPageChange={setCurrentPage}
         />
