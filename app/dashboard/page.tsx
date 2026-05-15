@@ -71,7 +71,9 @@ const attendanceColumns = [
     header: "Membership",
     accessor: (item: RecentAttendance) => (
       <span className="text-sm font-medium text-secondary font-lexend">
-        {item.membershiptype ?? item.staff_subrole}
+        {item.membershiptype && item.membershiptype !== "null"
+          ? item.membershiptype
+          : item.staff_subrole || "N/A"}
       </span>
     ),
   },

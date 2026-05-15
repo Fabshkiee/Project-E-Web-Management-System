@@ -143,7 +143,7 @@ export default function Members() {
     async function fetchCoaches() {
       try {
         const { coaches } = await getMemberFormOptions();
-        const options = coaches.map((c) => ({
+        const options = coaches.map((c: { full_name: string }) => ({
           label: "Coach " + c.full_name.split(" ")[0],
           value: c.full_name,
         }));
