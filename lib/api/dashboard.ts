@@ -14,6 +14,23 @@ export interface MemberCardsResponse {
   "Today Check-ins Card": MemberCardData;
 }
 
+export interface AnalyticsSummary {
+  active_members: { 
+    value: number;
+    delta: number;
+  };
+  signups: {
+    current: number;
+    last: number;
+    delta: number;
+  };
+  returning: {
+    current: number;
+    last: number;
+    delta: number;
+  };
+}
+
 export interface MemberListItem {
   id: string;
   full_name: string;
@@ -187,6 +204,11 @@ let weeklyAttendanceCache: {
   timestamp: number;
   promise: Promise<any> | null;
 } | null = null;
+let analyticsSummaryCache: {
+  data: AnalyticsSummary | null;
+  timestamp: number;
+  promise: Promise<AnalyticsSummary> | null;
+} | null = null;
 let formOptionsCache: Promise<any> | null = null;
 
 /**
@@ -198,6 +220,7 @@ export function clearDashboardCache() {
   recentAttendanceCache = null;
   peakHoursCache = null;
   weeklyAttendanceCache = null;
+  analyticsSummaryCache = null;
 }
 
 /**
@@ -538,4 +561,38 @@ export async function updateStaffProfile(payload: {
 
   clearDashboardCache();
   return true;
+}
+
+/**
+ * Fetches the analytics summary for the analytics page stat cards
+ */
+export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
+  const now = Date.now();
+
+  if (
+    analyticsSummaryCache &&
+    now - analyticsSummaryCache.timestamp < CACHE_TTL
+  ) {
+    return analyticsSummaryCache.data!;
+  }
+
+  if (analyticsSummaryCache?.promise) {
+    return analyticsSummaryCache.promise;
+  }
+
+  const fetchPromise = (async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("get_analytics_summary");
+    if (error) throw new Error(error.message);
+
+    analyticsSummaryCache = { data, timestamp: Date.now(), promise: null };
+    return data;
+  })();
+
+  analyticsSummaryCache = {
+    data: null,
+    timestamp: 0,
+    promise: fetchPromise,
+  };
+  return fetchPromise;
 }
