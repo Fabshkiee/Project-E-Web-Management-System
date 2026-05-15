@@ -62,8 +62,8 @@ export default function RevenueTrendCard() {
   const [endDate, setEndDate] = useState("");
 
   return (
-    <div className="bg-white dark:bg-surface rounded-2xl border border-stroke dark:border-white/10 p-8 shadow-sm flex flex-col min-h-[520px]">
-      <header className="flex flex-col lg:flex-row md:items-start justify-between gap-6 mb-8">
+    <div className="bg-white dark:bg-surface rounded-2xl border border-stroke dark:border-white/10 p-6 shadow-sm flex flex-col h-full min-h-[520px]">
+      <header className="flex flex-col lg:flex-row md:items-start justify-between gap-6 mb-6">
         <div className="space-y-4">
           <div className="space-y-1">
             <h3 className="text-[18px] font-bold font-teko text-foreground dark:text-white uppercase tracking-wider">
@@ -84,7 +84,7 @@ export default function RevenueTrendCard() {
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-5 min-w-[240px]">
+        <div className="flex flex-col items-end gap-5 w-full lg:w-auto lg:min-w-[240px]">
           <div className="flex items-center gap-6 text-[13px] font-lexend font-bold">
             <div className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full bg-primary" />
@@ -125,9 +125,9 @@ export default function RevenueTrendCard() {
         </div>
       </header>
 
-      <div className="flex-1 w-full -ml-6 min-h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
+      <div className="flex-1 w-full min-h-[300px] min-w-0 overflow-hidden">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+          <AreaChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorCurrent" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#F20D33" stopOpacity={0.1} />
