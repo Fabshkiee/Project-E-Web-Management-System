@@ -10,6 +10,8 @@ import {
   RefreshIcon,
 } from "@/components/ui/Icons";
 import RevenueTrendCard from "@/components/dashboard/revenue-trend-card";
+import MembershipSplitCard from "@/components/dashboard/membership-split-card";
+import PeakHoursCard from "@/components/dashboard/peak-hours-card";
 
 export default function AnalyticsPage() {
   return (
@@ -27,6 +29,7 @@ export default function AnalyticsPage() {
         </SecondaryButton>
       </header>
 
+      {/* Row 1: Stat Cards */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
           title="Active Members"
@@ -45,7 +48,7 @@ export default function AnalyticsPage() {
           color="green"
           icon={<AddMemberIcon />}
           trend={{
-            value: "↑ Growth",
+            value: "+12 from last month",
             isPositive: true,
             variant: "text",
           }}
@@ -57,17 +60,26 @@ export default function AnalyticsPage() {
           icon={<RefreshIcon />}
           trend={{
             value: "+12 from last month",
+            isPositive: true,
             variant: "text",
-            customColor: "text-blue-500",
           }}
         />
       </section>
 
-      {/* Revenue Trend Chart Section */}
-      <section className="grid grid-cols-1 gap-6">
-        <RevenueTrendCard />
-      </section>
-      
+      {/* Main Analytics Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Revenue Trend (Wider) */}
+        <div className="lg:col-span-2">
+          <RevenueTrendCard />
+        </div>
+
+        {/* Right Column: Split & Peak (Stacked) */}
+        <div className="flex flex-col gap-6">
+          <MembershipSplitCard />
+          <PeakHoursCard />
+        </div>
+      </div>
+
       {/* Additional analytics content can go here in the future */}
     </div>
   );
