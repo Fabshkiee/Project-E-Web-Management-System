@@ -14,18 +14,24 @@ import { StatusTag } from "@/components/ui/StatusTag";
 import { Select } from "../ui/Select";
 import { useToast } from "@/lib/contexts/ToastContext";
 import { PrimaryButton } from "../ui/ActionButton";
+import { createClient } from "@/lib/supabase/client";
+
 
 interface MemberDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   userId: string | null;
 }
+
 
 export default function MemberDetailsModal({
   isOpen,
   onClose,
+  onSuccess,
   userId,
 }: MemberDetailsModalProps) {
+
   const [activeTab, setActiveTab] = useState<
     "profile" | "qr" | "renew" | "terminate"
   >("profile");
@@ -45,6 +51,7 @@ export default function MemberDetailsModal({
   // Form State - Renewal
   const [membershipTypeId, setMembershipTypeId] = useState("");
   const [durationMonths, setDurationMonths] = useState(1);
+  const [isDiscounted, setIsDiscounted] = useState(false);
   const [confirmedTerminate, setConfirmedTerminate] = useState(false);
 
   const { showToast } = useToast();
@@ -66,7 +73,9 @@ export default function MemberDetailsModal({
           setNickname(memberRes.nickname || "");
           setContactNumber(memberRes.contact_number || "");
           setCoachId(memberRes.coach_id || "none");
+          setIsDiscounted(memberRes.is_discounted || false);
         }
+
 
         if (optionsRes) {
           setCoachOptions(optionsRes.coaches);
@@ -114,13 +123,36 @@ export default function MemberDetailsModal({
 
     setSaving(true);
     try {
+      const supabase = createClient();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error("You must be logged in as staff to perform this action.");
+      }
+
+      // Fetch the internal public.users.id for the log FK
+      const { data: profile, error: profileError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .single();
+
+      if (profileError || !profile) {
+        throw new Error("Staff profile not found. Please ensure you are registered as staff.");
+      }
+
       await renewMember({
         memberId: userId,
         membershipTypeId,
         durationMonths,
+        isDiscounted,
+        processedBy: profile.id,
       });
+
       showToast("Membership renewed successfully!", "success");
+      if (onSuccess) onSuccess();
       onClose();
+
     } catch (error: any) {
       showToast(error.message || "Failed to renew membership", "error");
     } finally {
@@ -136,7 +168,9 @@ export default function MemberDetailsModal({
     try {
       await terminateMembership(userId);
       showToast("Membership terminated successfully", "success");
+      if (onSuccess) onSuccess();
       onClose();
+
     } catch (error: any) {
       showToast(error.message || "Failed to terminate membership", "error");
     } finally {
@@ -297,7 +331,7 @@ export default function MemberDetailsModal({
                 />
               </div>
             ) : activeTab === "renew" ? (
-              <form onSubmit={handleRenew} className="flex flex-col gap-5">
+              <form onSubmit={handleRenew} className="flex flex-col gap-6">
                 <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 mb-2">
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-xs text-gray-500 font-lexend">
@@ -346,7 +380,7 @@ export default function MemberDetailsModal({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-1">
                     <Select
                       label="Membership Type"
                       value={membershipTypeId}
@@ -358,7 +392,7 @@ export default function MemberDetailsModal({
                     />
                   </div>
 
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-1">
                     <label className={labelBase}>Duration (Months)</label>
                     <input
                       type="text"
@@ -372,9 +406,74 @@ export default function MemberDetailsModal({
                       placeholder="Enter number of months"
                     />
                   </div>
+
+                  <div className="md:col-span-2">
+
+                    <div
+                      className="flex items-center justify-between p-4 rounded-xl border border-stroke dark:border-white/10 bg-gray-100/50 dark:bg-transparent cursor-pointer hover:bg-gray-200/50 dark:hover:bg-white/5 transition-all group"
+                      onClick={() => setIsDiscounted(!isDiscounted)}
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold font-lexend text-foreground">
+                          Student / Senior / PWD
+                        </span>
+                        <span className="text-[11px] font-lexend text-gray-500 dark:text-[#9CA3AF]">
+                          Please verify the ID before applying the discount.
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <div
+                          className={`w-11 h-6 rounded-full transition-colors duration-200 ease-in-out ${
+                            isDiscounted
+                              ? "bg-primary"
+                              : "bg-gray-300 dark:bg-white/10"
+                          }`}
+                        />
+                        <div
+                          className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform duration-200 ease-in-out ${
+                            isDiscounted ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex justify-end pt-4 mt-2 border-t border-stroke dark:border-white/10">
+                <div className="flex items-center justify-between pt-4 border-t border-stroke dark:border-white/10">
+                  <div className="flex flex-col">
+                    {membershipTypeId && durationMonths > 0 && (
+                      <div className="animate-in fade-in slide-in-from-left-2 duration-300">
+                        <span className="text-[10px] font-bold tracking-widest text-gray-400 dark:text-white/30 uppercase">
+                          Renewal Total
+                        </span>
+                        <p className="text-2xl font-bold font-lexend text-primary leading-none">
+                          ₱
+                          {(
+                            (isDiscounted
+                              ? membershipOptions.find(
+                                  (m) => m.id === membershipTypeId,
+                                )?.student_fee || 0
+                              : membershipOptions.find(
+                                  (m) => m.id === membershipTypeId,
+                                )?.monthly_fee || 0) * durationMonths
+                          ).toLocaleString()}
+                        </p>
+                        <p className="text-[10px] font-lexend text-gray-400 dark:text-white/20 mt-1 uppercase tracking-wider">
+                          ₱
+                          {(isDiscounted
+                            ? membershipOptions.find(
+                                (m) => m.id === membershipTypeId,
+                              )?.student_fee || 0
+                            : membershipOptions.find(
+                                (m) => m.id === membershipTypeId,
+                              )?.monthly_fee || 0
+                          ).toLocaleString()}{" "}
+                          × {durationMonths} Month
+                          {durationMonths > 1 ? "s" : ""}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                   <PrimaryButton type="submit" disabled={saving}>
                     {saving ? "Processing..." : "Confirm Renewal"}
                   </PrimaryButton>
