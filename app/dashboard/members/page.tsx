@@ -492,6 +492,7 @@ export default function Members() {
       <MemberDetailsModal
         isOpen={!!selectedMemberId}
         onClose={() => setSelectedMemberId(null)}
+        onSuccess={() => setRealtimeTrigger((prev) => prev + 1)}
         userId={selectedMemberId}
       />
     </div>
