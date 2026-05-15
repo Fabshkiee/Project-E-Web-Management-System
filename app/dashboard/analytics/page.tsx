@@ -12,21 +12,21 @@ import {
 import RevenueTrendCard from "@/components/dashboard/revenue-trend-card";
 import MembershipSplitCard from "@/components/dashboard/membership-split-card";
 import PeakHoursCard from "@/components/dashboard/peak-hours-card";
-import { getMemberCards, MemberCardsResponse } from "@/lib/api/dashboard";
+import { getAnalyticsSummary, AnalyticsSummary } from "@/lib/api/dashboard";
 import { useEffect, useState } from "react";
 
 export default function AnalyticsPage() {
-  const [stats, setStats] = useState<MemberCardsResponse | null>(null);
+  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
-        const data = await getMemberCards();
-        setStats(data);
+        const data = await getAnalyticsSummary();
+        setSummary(data);
       } catch (err) {
-        console.error("Error fetching analytics stats:", err);
+        console.error("Error fetching analytics summary:", err);
       } finally {
         setLoading(false);
       }
@@ -34,7 +34,12 @@ export default function AnalyticsPage() {
     fetchData();
   }, []);
 
-  const totalMembers = stats?.["Total Members Card"];
+  const formatDelta = (delta: number) => {
+    if (delta > 0) return `+${delta} from last month`;
+    if (delta < 0) return `${delta} from last month`;
+    return "No change";
+  };
+
   return (
     <div className="space-y-5 animate-in fade-in duration-500">
       <header className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -54,34 +59,37 @@ export default function AnalyticsPage() {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
           title="Active Members"
-          value={loading ? "..." : totalMembers?.value?.toString() || "0"}
+          value={summary?.active_members.value.toString() || "0"}
           color="blue"
           icon={<MembersIcon />}
+          isLoading={loading}
           trend={{
-            value: totalMembers?.trend?.label || "0%",
-            isPositive: totalMembers?.trend?.type === "up",
-            variant: "badge",
+            value: formatDelta(summary?.active_members.delta || 0),
+            isPositive: (summary?.active_members.delta || 0) >= 0,
+            variant: "text",
           }}
         />
         <StatCard
           title="New Sign-ups (Monthly)"
-          value="28"
+          value={summary?.signups.current.toString() || "0"}
           color="green"
           icon={<AddMemberIcon />}
+          isLoading={loading}
           trend={{
-            value: "+12 from last month",
-            isPositive: true,
+            value: formatDelta(summary?.signups.delta || 0),
+            isPositive: (summary?.signups.delta || 0) >= 0,
             variant: "text",
           }}
         />
         <StatCard
           title="Returning Members"
-          value="92"
+          value={summary?.returning.current.toString() || "0"}
           color="orange"
           icon={<RefreshIcon />}
+          isLoading={loading}
           trend={{
-            value: "+12 from last month",
-            isPositive: true,
+            value: formatDelta(summary?.returning.delta || 0),
+            isPositive: (summary?.returning.delta || 0) >= 0,
             variant: "text",
           }}
         />
