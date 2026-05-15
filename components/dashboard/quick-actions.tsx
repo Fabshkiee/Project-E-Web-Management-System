@@ -62,7 +62,7 @@ export default function QuickActions() {
           title="Add Member"
           subtitle="Register a new Member"
           iconBg="bg-red-50 dark:bg-red-500/10"
-          icon={<AddMemberIcon />}
+          icon={<AddMemberIcon color="red" />}
           onClick={() => setIsAddMemberOpen(true)}
         />
 
@@ -82,4 +82,3 @@ export default function QuickActions() {
     </div>
   );
 }
-
