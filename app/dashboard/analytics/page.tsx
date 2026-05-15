@@ -12,10 +12,31 @@ import {
 import RevenueTrendCard from "@/components/dashboard/revenue-trend-card";
 import MembershipSplitCard from "@/components/dashboard/membership-split-card";
 import PeakHoursCard from "@/components/dashboard/peak-hours-card";
+import { getMemberCards, MemberCardsResponse } from "@/lib/api/dashboard";
+import { useEffect, useState } from "react";
 
 export default function AnalyticsPage() {
+  const [stats, setStats] = useState<MemberCardsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const data = await getMemberCards();
+        setStats(data);
+      } catch (err) {
+        console.error("Error fetching analytics stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const totalMembers = stats?.["Total Members Card"];
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-5 animate-in fade-in duration-500">
       <header className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <PageTitle
           title="Analytics & Insights"
@@ -33,12 +54,12 @@ export default function AnalyticsPage() {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
           title="Active Members"
-          value="200"
+          value={loading ? "..." : totalMembers?.value?.toString() || "0"}
           color="blue"
           icon={<MembersIcon />}
           trend={{
-            value: "5%",
-            isPositive: true,
+            value: totalMembers?.trend?.label || "0%",
+            isPositive: totalMembers?.trend?.type === "up",
             variant: "badge",
           }}
         />
