@@ -9,6 +9,7 @@ import {
   AddMemberIcon,
   RefreshIcon,
 } from "@/components/ui/Icons";
+import RevenueTrendCard from "@/components/dashboard/revenue-trend-card";
 
 export default function AnalyticsPage() {
   return (
@@ -61,6 +62,13 @@ export default function AnalyticsPage() {
           }}
         />
       </section>
+
+      {/* Revenue Trend Chart Section */}
+      <section className="grid grid-cols-1 gap-6">
+        <RevenueTrendCard />
+      </section>
+      
+      {/* Additional analytics content can go here in the future */}
     </div>
   );
 }
