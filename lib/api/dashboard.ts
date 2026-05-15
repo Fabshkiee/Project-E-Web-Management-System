@@ -209,7 +209,8 @@ export async function getMemberFormOptions() {
   formOptionsCache = (async () => {
     const supabase = createClient();
     const [mtRes, staffRes] = await Promise.all([
-      supabase.from("membership_types").select("id, name"),
+      supabase.from("membership_types").select("id, name, monthly_fee, student_fee"),
+
       supabase.from("staff").select(`
           id,
           profile:users (
@@ -293,21 +294,31 @@ export async function renewMember(payload: {
   memberId: string;
   membershipTypeId: string | number;
   durationMonths: number;
+  isDiscounted?: boolean;
+  processedBy?: string;
 }) {
   const supabase = createClient();
-  const { error } = await supabase.rpc("renew_member_membership", {
+  const { data, error } = await supabase.rpc("renew_member", {
     p_member_id: payload.memberId,
     p_membership_type_id: Number(payload.membershipTypeId),
     p_duration_months: payload.durationMonths,
+    p_is_discounted: payload.isDiscounted ?? null,
+    p_processed_by: payload.processedBy ?? null,
   });
+
 
   if (error) {
     throw new Error(error.message);
   }
 
+  if (data && typeof data === "object" && !data.success) {
+    throw new Error(data.error || "Failed to renew membership");
+  }
+
   clearDashboardCache();
   return true;
 }
+
 
 export async function terminateMembership(userId: string) {
   const supabase = createClient();
