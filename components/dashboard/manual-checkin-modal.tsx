@@ -76,7 +76,34 @@ export default function ManualCheckInModal({
             let subtext = user.role;
 
             if (user.role === "Member" && user.members?.[0]) {
-              status = user.members[0].status || "Active";
+              const member = user.members[0];
+              const validUntilStr = member.valid_until;
+              
+              if (!validUntilStr) {
+                status = "Expired";
+              } else {
+                // Parse "YYYY-MM-DD" manually to ensure local timezone interpretation
+                const [year, month, day] = validUntilStr.split("-").map(Number);
+                const checkDate = new Date(year, month - 1, day);
+                checkDate.setHours(0, 0, 0, 0);
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (checkDate < today) {
+                  status = "Expired";
+                } else {
+                  // Expiring if within 3 days
+                  const thresholdDate = new Date(today);
+                  thresholdDate.setDate(today.getDate() + 3);
+                  
+                  if (checkDate <= thresholdDate) {
+                    status = "Expiring";
+                  } else {
+                    status = "Active";
+                  }
+                }
+              }
               subtext = `Member • ${status}`;
             } else if (user.role === "Staff" && user.staff?.[0]) {
               status = "Active";

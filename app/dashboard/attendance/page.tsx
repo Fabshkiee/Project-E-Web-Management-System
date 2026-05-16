@@ -379,6 +379,7 @@ export default function AttendanceTracking() {
             options: [
               { label: "All", value: "all" },
               { label: "Active", value: "Active" },
+              { label: "Expiring", value: "Expiring" },
               { label: "Expired", value: "Expired" },
             ],
             onChange: (val) => {

@@ -18,6 +18,7 @@ interface SelectProps {
   disabled?: boolean;
   filterLabel?: string; // For the search-filter style "Label: Value"
   id?: string;
+  icon?: React.ReactNode;
 }
 
 export const Select = ({
@@ -30,6 +31,7 @@ export const Select = ({
   disabled = false,
   filterLabel,
   id,
+  icon,
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,6 +76,7 @@ export const Select = ({
             : "hover:border-gray-300 dark:hover:border-white/20"
         }`}
       >
+        {icon && <span className="mr-3 shrink-0">{icon}</span>}
         <div className="flex-1 text-left truncate">
           {filterLabel && (
             <span className="text-gray-500 dark:text-gray-400 mr-2">

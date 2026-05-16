@@ -272,6 +272,8 @@ export default function Members() {
         apiSort,
         dateFilter,
         coachFilter,
+        startDate,
+        endDate,
       );
 
       // Dynamically load heavy PDF libraries only when needed
@@ -307,14 +309,19 @@ export default function Members() {
         38,
       );
 
-      // Table Data
+      // Helper to parse YYYY-MM-DD without UTC shift
+      const parseLocalDate = (dateStr: string) => {
+        const [y, m, d] = dateStr.split("-").map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString("en-GB");
+      };
+
       const tableData = allMembers.map((m) => [
         m.full_name,
         m.member_id,
         m.member_status,
         m.membership_type,
-        new Date(m.start_date).toLocaleDateString("en-GB"),
-        new Date(m.end_date).toLocaleDateString("en-GB"),
+        parseLocalDate(m.start_date),
+        parseLocalDate(m.end_date),
         m.coach || "None",
       ]);
 

@@ -7,6 +7,8 @@ import {
   ExportAnalyticsIcon,
 } from "@/components/ui/Icons";
 import AddMemberModal from "@/components/dashboard/add-member-modal";
+import { exportAnalyticsReport } from "@/lib/utils/exportReport";
+import { useToast } from "@/lib/contexts/ToastContext";
 
 interface ActionItemProps {
   title: string;
@@ -14,6 +16,7 @@ interface ActionItemProps {
   icon: React.ReactNode;
   iconBg: string;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 function ActionItem({
@@ -22,11 +25,13 @@ function ActionItem({
   icon,
   iconBg,
   onClick,
+  disabled,
 }: ActionItemProps) {
   return (
     <button
       onClick={onClick}
-      className="rounded-xl h-[107px] w-full flex items-center justify-between p-3 order-white/5 hover:bg-gray-50 dark:hover:bg-white/2 transition-all group activrounded-xl border border-stroke dark:be:scale-[0.98]"
+      disabled={disabled}
+      className="rounded-xl h-[107px] w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/2 transition-all group active:scale-[0.98] border border-stroke dark:border-white/5 disabled:opacity-50 disabled:pointer-events-none"
     >
       <div className="flex items-center gap-4">
         <div
@@ -50,6 +55,21 @@ function ActionItem({
 
 export default function QuickActions() {
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const { showToast } = useToast();
+
+  const handleExportReport = async () => {
+    try {
+      setExporting(true);
+      await exportAnalyticsReport("last_30");
+      showToast("Report generated successfully", "success");
+    } catch (error) {
+      console.error("Failed to generate report:", error);
+      showToast("Failed to generate report", "error");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 p-6 shadow-sm">
@@ -62,16 +82,23 @@ export default function QuickActions() {
           title="Add Member"
           subtitle="Register a new Member"
           iconBg="bg-red-50 dark:bg-red-500/10"
-          icon={<AddMemberIcon />}
+          icon={<AddMemberIcon color="red" />}
           onClick={() => setIsAddMemberOpen(true)}
         />
 
         <ActionItem
-          title="Export Analytics"
-          subtitle="Export Last Month's Analytics"
+          title={exporting ? "Generating..." : "Export Analytics"}
+          subtitle={exporting ? "Please wait..." : "Export Last Month's Analytics"}
           iconBg="bg-emerald-50 dark:bg-emerald-500/10"
-          icon={<ExportAnalyticsIcon />}
-          onClick={() => console.log("Export Analytics clicked")}
+          icon={
+            exporting ? (
+              <div className="w-5 h-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+            ) : (
+              <ExportAnalyticsIcon />
+            )
+          }
+          onClick={handleExportReport}
+          disabled={exporting}
         />
       </div>
 
@@ -82,4 +109,3 @@ export default function QuickActions() {
     </div>
   );
 }
-

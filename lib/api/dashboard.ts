@@ -14,6 +14,67 @@ export interface MemberCardsResponse {
   "Today Check-ins Card": MemberCardData;
 }
 
+export interface AnalyticsSummary {
+  active_members: { 
+    value: number;
+    delta: number;
+  };
+  signups: {
+    current: number;
+    last: number;
+    delta: number;
+  };
+  returning: {
+    current: number;
+    last: number;
+    delta: number;
+  };
+}
+
+export interface MembershipSplitData {
+  name: string;
+  value: number;
+  percentage: number;
+}
+
+export interface PeakHoursData {
+  peak_window: string;
+  breakdown: {
+    morning: number;
+    afternoon: number;
+    evening: number;
+  };
+}
+
+export interface RevenueSeries {
+  day_index: number;
+  date: string;
+  revenue: number;
+  new_members: number;
+  renewals: number;
+}
+
+export interface RevenueTrendData {
+  period: {
+    curr_start: string;
+    curr_end: string;
+    prev_start: string;
+    prev_end: string;
+  };
+  summary: {
+    current_total: number;
+    previous_total: number;
+    current_new: number;
+    previous_new: number;
+    current_renewals: number;
+    previous_renewals: number;
+    trend_pct: number;
+    trend_type: "up" | "down";
+  };
+  current_series: RevenueSeries[];
+  previous_series: RevenueSeries[];
+}
+
 export interface MemberListItem {
   id: string;
   full_name: string;
@@ -187,6 +248,22 @@ let weeklyAttendanceCache: {
   timestamp: number;
   promise: Promise<any> | null;
 } | null = null;
+let analyticsSummaryCache: {
+  data: AnalyticsSummary | null;
+  timestamp: number;
+  promise: Promise<AnalyticsSummary> | null;
+} | null = null;
+let membershipSplitCache: {
+  data: MembershipSplitData[] | null;
+  timestamp: number;
+  promise: Promise<MembershipSplitData[]> | null;
+} | null = null;
+let revenueTrendCache: {
+  data: RevenueTrendData | null;
+  timestamp: number;
+  promise: Promise<RevenueTrendData> | null;
+  key?: string;
+} | null = null;
 let formOptionsCache: Promise<any> | null = null;
 
 /**
@@ -198,6 +275,9 @@ export function clearDashboardCache() {
   recentAttendanceCache = null;
   peakHoursCache = null;
   weeklyAttendanceCache = null;
+  analyticsSummaryCache = null;
+  membershipSplitCache = null;
+  revenueTrendCache = null;
 }
 
 /**
@@ -336,7 +416,10 @@ export async function terminateMembership(userId: string) {
   return true;
 }
 
-export async function getPeakHours() {
+/**
+ * Fetches peak occupancy data for the analytics dashboard
+ */
+export async function getPeakHours(): Promise<PeakHoursData | null> {
   const now = Date.now();
   if (peakHoursCache && now - peakHoursCache.timestamp < CACHE_TTL) {
     return peakHoursCache.data;
@@ -350,7 +433,7 @@ export async function getPeakHours() {
   }
 
   peakHoursCache = { data, timestamp: now, promise: null };
-  return data;
+  return data as PeakHoursData;
 }
 
 export async function getWeeklyAttendance() {
@@ -538,4 +621,122 @@ export async function updateStaffProfile(payload: {
 
   clearDashboardCache();
   return true;
+}
+
+/**
+ * Fetches the analytics summary for the analytics page stat cards
+ */
+export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
+  const now = Date.now();
+
+  if (
+    analyticsSummaryCache &&
+    now - analyticsSummaryCache.timestamp < CACHE_TTL
+  ) {
+    return analyticsSummaryCache.data!;
+  }
+
+  if (analyticsSummaryCache?.promise) {
+    return analyticsSummaryCache.promise;
+  }
+
+  const fetchPromise = (async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("get_analytics_summary");
+    if (error) throw new Error(error.message);
+
+    analyticsSummaryCache = { data, timestamp: Date.now(), promise: null };
+    return data;
+  })();
+
+  analyticsSummaryCache = {
+    data: null,
+    timestamp: 0,
+    promise: fetchPromise,
+  };
+  return fetchPromise;
+}
+
+/**
+ * Fetches the membership plan split data for the donut chart
+ */
+export async function getMembershipSplit(): Promise<MembershipSplitData[]> {
+  const now = Date.now();
+
+  if (
+    membershipSplitCache &&
+    now - membershipSplitCache.timestamp < CACHE_TTL
+  ) {
+    return membershipSplitCache.data!;
+  }
+
+  if (membershipSplitCache?.promise) {
+    return membershipSplitCache.promise;
+  }
+
+  const fetchPromise = (async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("get_membership_split_data");
+    if (error) throw new Error(error.message);
+
+    membershipSplitCache = { data, timestamp: Date.now(), promise: null };
+    return data;
+  })();
+
+  membershipSplitCache = {
+    data: null,
+    timestamp: 0,
+    promise: fetchPromise,
+  };
+  return fetchPromise;
+}
+
+/**
+ * Fetches the revenue trend data for the line chart
+ */
+export async function getRevenueTrendData(
+  range: string = "last_30",
+  startDate?: string,
+  endDate?: string,
+): Promise<RevenueTrendData> {
+  const cacheKey = `${range}_${startDate || ""}_${endDate || ""}`;
+  const now = Date.now();
+
+  if (
+    revenueTrendCache &&
+    revenueTrendCache.key === cacheKey &&
+    now - revenueTrendCache.timestamp < CACHE_TTL
+  ) {
+    return revenueTrendCache.data!;
+  }
+
+  if (revenueTrendCache?.promise && revenueTrendCache.key === cacheKey) {
+    return revenueTrendCache.promise;
+  }
+
+  const fetchPromise = (async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("get_revenue_trend_data", {
+      p_range: range,
+      p_start_date: startDate || null,
+      p_end_date: endDate || null,
+    });
+    if (error) throw new Error(error.message);
+
+    revenueTrendCache = {
+      data,
+      timestamp: Date.now(),
+      promise: null,
+      key: cacheKey,
+    };
+    return data;
+  })();
+
+  revenueTrendCache = {
+    data: null,
+    timestamp: 0,
+    promise: fetchPromise,
+    key: cacheKey,
+  };
+  return fetchPromise;
 }

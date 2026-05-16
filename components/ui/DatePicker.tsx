@@ -6,6 +6,7 @@ interface DatePickerProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  placeholder?: string;
 }
 
 export const DatePicker = ({
@@ -13,6 +14,7 @@ export const DatePicker = ({
   value,
   onChange,
   className = "",
+  placeholder,
 }: DatePickerProps) => {
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
@@ -28,6 +30,7 @@ export const DatePicker = ({
         <input
           type="date"
           value={value}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
           className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-[#1a1a1a] border border-stroke dark:border-white/5 rounded-xl text-sm font-lexend focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all shadow-sm text-foreground [color-scheme:light] dark:[color-scheme:dark]"
         />
