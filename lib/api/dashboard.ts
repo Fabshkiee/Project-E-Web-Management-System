@@ -31,6 +31,12 @@ export interface AnalyticsSummary {
   };
 }
 
+export interface MembershipSplitData {
+  name: string;
+  value: number;
+  percentage: number;
+}
+
 export interface MemberListItem {
   id: string;
   full_name: string;
@@ -209,6 +215,11 @@ let analyticsSummaryCache: {
   timestamp: number;
   promise: Promise<AnalyticsSummary> | null;
 } | null = null;
+let membershipSplitCache: {
+  data: MembershipSplitData[] | null;
+  timestamp: number;
+  promise: Promise<MembershipSplitData[]> | null;
+} | null = null;
 let formOptionsCache: Promise<any> | null = null;
 
 /**
@@ -221,6 +232,7 @@ export function clearDashboardCache() {
   peakHoursCache = null;
   weeklyAttendanceCache = null;
   analyticsSummaryCache = null;
+  membershipSplitCache = null;
 }
 
 /**
@@ -590,6 +602,40 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   })();
 
   analyticsSummaryCache = {
+    data: null,
+    timestamp: 0,
+    promise: fetchPromise,
+  };
+  return fetchPromise;
+}
+
+/**
+ * Fetches the membership plan split data for the donut chart
+ */
+export async function getMembershipSplit(): Promise<MembershipSplitData[]> {
+  const now = Date.now();
+
+  if (
+    membershipSplitCache &&
+    now - membershipSplitCache.timestamp < CACHE_TTL
+  ) {
+    return membershipSplitCache.data!;
+  }
+
+  if (membershipSplitCache?.promise) {
+    return membershipSplitCache.promise;
+  }
+
+  const fetchPromise = (async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("get_membership_split_data");
+    if (error) throw new Error(error.message);
+
+    membershipSplitCache = { data, timestamp: Date.now(), promise: null };
+    return data;
+  })();
+
+  membershipSplitCache = {
     data: null,
     timestamp: 0,
     promise: fetchPromise,
