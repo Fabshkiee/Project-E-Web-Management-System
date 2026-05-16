@@ -7,6 +7,8 @@ import {
   ExportAnalyticsIcon,
 } from "@/components/ui/Icons";
 import AddMemberModal from "@/components/dashboard/add-member-modal";
+import { exportAnalyticsReport } from "@/lib/utils/exportReport";
+import { useToast } from "@/lib/contexts/ToastContext";
 
 interface ActionItemProps {
   title: string;
@@ -50,6 +52,21 @@ function ActionItem({
 
 export default function QuickActions() {
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const { showToast } = useToast();
+
+  const handleExportReport = async () => {
+    try {
+      setExporting(true);
+      await exportAnalyticsReport("last_30");
+      showToast("Report generated successfully", "success");
+    } catch (error) {
+      console.error("Failed to generate report:", error);
+      showToast("Failed to generate report", "error");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-stroke dark:border-white/5 p-6 shadow-sm">
@@ -67,11 +84,17 @@ export default function QuickActions() {
         />
 
         <ActionItem
-          title="Export Analytics"
-          subtitle="Export Last Month's Analytics"
+          title={exporting ? "Generating..." : "Export Analytics"}
+          subtitle={exporting ? "Please wait..." : "Export Last Month's Analytics"}
           iconBg="bg-emerald-50 dark:bg-emerald-500/10"
-          icon={<ExportAnalyticsIcon />}
-          onClick={() => console.log("Export Analytics clicked")}
+          icon={
+            exporting ? (
+              <div className="w-5 h-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+            ) : (
+              <ExportAnalyticsIcon />
+            )
+          }
+          onClick={handleExportReport}
         />
       </div>
 
