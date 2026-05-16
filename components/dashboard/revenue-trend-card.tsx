@@ -39,7 +39,7 @@ const CustomTooltip = ({ active, payload }: any) => {
               ₱{payload[0].value.toLocaleString()}
             </p>
           </div>
-          
+
           {payload[1] && (
             <div className="space-y-1 pt-2 border-t border-stroke dark:border-white/10">
               <p className="font-lexend font-bold text-[10px] text-secondary uppercase tracking-widest opacity-70">
@@ -74,7 +74,11 @@ export default function RevenueTrendCard() {
 
       try {
         setLoading(true);
-        const result = await getRevenueTrendData(dateFilter, startDate, endDate);
+        const result = await getRevenueTrendData(
+          dateFilter,
+          startDate,
+          endDate,
+        );
         setData(result);
       } catch (err) {
         console.error("Error fetching revenue trend:", err);
@@ -93,7 +97,7 @@ export default function RevenueTrendCard() {
     const maxIndex = Math.max(
       ...data.current_series.map((s) => s.day_index),
       ...data.previous_series.map((s) => s.day_index),
-      0
+      0,
     );
 
     const series = [];
@@ -175,12 +179,17 @@ export default function RevenueTrendCard() {
                 <span className="text-[54px] font-teko font-bold text-foreground dark:text-white leading-none tracking-tight">
                   ₱{data?.summary.current_total.toLocaleString() || "0"}
                 </span>
-                <div className={`px-2 py-1 rounded-lg text-[12px] font-bold border flex items-center gap-1 ${
-                  data?.summary.trend_type === 'up'
-                    ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 border-green-200 dark:border-green-500/20"
-                    : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border-red-200 dark:border-red-500/20"
-                }`}>
-                  {data?.summary.trend_pct}% <span className="text-[14px]">{data?.summary.trend_type === 'up' ? "↗" : "↘"}</span>
+                <div
+                  className={`px-2 py-1 rounded-lg text-[12px] font-bold border flex items-center gap-1 ${
+                    data?.summary.trend_type === "up"
+                      ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 border-green-200 dark:border-green-500/20"
+                      : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border-red-200 dark:border-red-500/20"
+                  }`}
+                >
+                  {data?.summary.trend_pct}%{" "}
+                  <span className="text-[14px]">
+                    {data?.summary.trend_type === "up" ? "↗" : "↘"}
+                  </span>
                 </div>
               </>
             )}
@@ -232,11 +241,11 @@ export default function RevenueTrendCard() {
         {loading && (
           <div className="absolute inset-0 z-10 bg-white/50 dark:bg-surface/50 backdrop-blur-[1px] flex items-center justify-center">
             <div className="w-full h-full p-4 flex flex-col gap-4">
-               <div className="flex-1 w-full bg-gray-100 dark:bg-white/5 rounded-2xl animate-pulse" />
+              <div className="flex-1 w-full bg-gray-100 dark:bg-white/5 rounded-2xl animate-pulse" />
             </div>
           </div>
         )}
-        
+
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <AreaChart
             data={chartData}
