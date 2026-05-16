@@ -16,6 +16,8 @@ import {
   MemberCardsResponse,
   getRecentAttendance,
   RecentAttendance,
+  getRevenueTrendData,
+  RevenueTrendData,
   clearDashboardCache,
 } from "@/lib/api/dashboard";
 import { createClient } from "@/lib/supabase/client";
@@ -89,6 +91,7 @@ const attendanceColumns = [
 export default function Dashboard() {
   const [stats, setStats] = useState<MemberCardsResponse | null>(null);
   const [attendance, setAttendance] = useState<RecentAttendance[]>([]);
+  const [revenueData, setRevenueData] = useState<RevenueTrendData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [formattedDate, setFormattedDate] = useState<string>("");
@@ -99,13 +102,15 @@ export default function Dashboard() {
       try {
         if (isInitialLoad.current) setLoading(true);
 
-        const [statsData, attendanceData] = await Promise.all([
+        const [statsData, attendanceData, revData] = await Promise.all([
           getMemberCards(),
           getRecentAttendance(),
+          getRevenueTrendData("last_30"),
         ]);
 
         setStats(statsData);
         setAttendance(attendanceData);
+        setRevenueData(revData);
         setError(false);
         setFormattedDate(
           new Date().toLocaleDateString("en-US", {
@@ -129,8 +134,6 @@ export default function Dashboard() {
 
     // 2. Set up realtime subscription
     const supabase = createClient();
-
-
 
     const channel = supabase
       .channel("dashboard-realtime")
@@ -213,13 +216,23 @@ export default function Dashboard() {
         />
         <StatsCard
           label="Monthly Revenue"
-          value="₱42.5k"
+          value={
+            revenueData
+              ? `₱${(revenueData.summary.current_total / 1000).toFixed(1)}k`
+              : "₱0"
+          }
           icon={<MoneyIcon className="w-12 h-10" />}
-          trend={{
-            label: "5%",
-            type: "up",
-            icon: <RevenueIcon className="w-3.5 h-3.5" />,
-          }}
+          isLoading={loading}
+          error={error}
+          trend={
+            revenueData
+              ? {
+                  label: `${Math.abs(revenueData.summary.trend_pct)}%`,
+                  type: revenueData.summary.trend_type,
+                  icon: <RevenueIcon className="w-3.5 h-3.5" />,
+                }
+              : undefined
+          }
         />
       </section>
 
