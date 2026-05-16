@@ -46,6 +46,29 @@ export interface PeakHoursData {
   };
 }
 
+export interface RevenueSeries {
+  day_index: number;
+  date: string;
+  revenue: number;
+}
+
+export interface RevenueTrendData {
+  period: {
+    curr_start: string;
+    curr_end: string;
+    prev_start: string;
+    prev_end: string;
+  };
+  summary: {
+    current_total: number;
+    previous_total: number;
+    trend_pct: number;
+    trend_type: "up" | "down";
+  };
+  current_series: RevenueSeries[];
+  previous_series: RevenueSeries[];
+}
+
 export interface MemberListItem {
   id: string;
   full_name: string;
@@ -229,6 +252,12 @@ let membershipSplitCache: {
   timestamp: number;
   promise: Promise<MembershipSplitData[]> | null;
 } | null = null;
+let revenueTrendCache: {
+  data: RevenueTrendData | null;
+  timestamp: number;
+  promise: Promise<RevenueTrendData> | null;
+  key?: string;
+} | null = null;
 let formOptionsCache: Promise<any> | null = null;
 
 /**
@@ -242,6 +271,7 @@ export function clearDashboardCache() {
   weeklyAttendanceCache = null;
   analyticsSummaryCache = null;
   membershipSplitCache = null;
+  revenueTrendCache = null;
 }
 
 /**
@@ -651,6 +681,56 @@ export async function getMembershipSplit(): Promise<MembershipSplitData[]> {
     data: null,
     timestamp: 0,
     promise: fetchPromise,
+  };
+  return fetchPromise;
+}
+
+/**
+ * Fetches the revenue trend data for the line chart
+ */
+export async function getRevenueTrendData(
+  range: string = "last_30",
+  startDate?: string,
+  endDate?: string,
+): Promise<RevenueTrendData> {
+  const cacheKey = `${range}_${startDate || ""}_${endDate || ""}`;
+  const now = Date.now();
+
+  if (
+    revenueTrendCache &&
+    revenueTrendCache.key === cacheKey &&
+    now - revenueTrendCache.timestamp < CACHE_TTL
+  ) {
+    return revenueTrendCache.data!;
+  }
+
+  if (revenueTrendCache?.promise && revenueTrendCache.key === cacheKey) {
+    return revenueTrendCache.promise;
+  }
+
+  const fetchPromise = (async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("get_revenue_trend_data", {
+      p_range: range,
+      p_start_date: startDate || null,
+      p_end_date: endDate || null,
+    });
+    if (error) throw new Error(error.message);
+
+    revenueTrendCache = {
+      data,
+      timestamp: Date.now(),
+      promise: null,
+      key: cacheKey,
+    };
+    return data;
+  })();
+
+  revenueTrendCache = {
+    data: null,
+    timestamp: 0,
+    promise: fetchPromise,
+    key: cacheKey,
   };
   return fetchPromise;
 }
