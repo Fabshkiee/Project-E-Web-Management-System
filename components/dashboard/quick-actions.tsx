@@ -16,6 +16,7 @@ interface ActionItemProps {
   icon: React.ReactNode;
   iconBg: string;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 function ActionItem({
@@ -24,11 +25,13 @@ function ActionItem({
   icon,
   iconBg,
   onClick,
+  disabled,
 }: ActionItemProps) {
   return (
     <button
       onClick={onClick}
-      className="rounded-xl h-[107px] w-full flex items-center justify-between p-3 order-white/5 hover:bg-gray-50 dark:hover:bg-white/2 transition-all group activrounded-xl border border-stroke dark:be:scale-[0.98]"
+      disabled={disabled}
+      className="rounded-xl h-[107px] w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/2 transition-all group active:scale-[0.98] border border-stroke dark:border-white/5 disabled:opacity-50 disabled:pointer-events-none"
     >
       <div className="flex items-center gap-4">
         <div
@@ -95,6 +98,7 @@ export default function QuickActions() {
             )
           }
           onClick={handleExportReport}
+          disabled={exporting}
         />
       </div>
 
