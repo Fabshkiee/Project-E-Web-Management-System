@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
               )
             }
             onClick={handleExportReport}
-            disabled={exporting}
+            disabled={exporting || (reportPeriod === "custom" && (!startDate || !endDate))}
           >
             {exporting ? "Generating..." : "Download Report"}
           </SecondaryButton>

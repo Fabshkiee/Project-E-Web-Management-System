@@ -92,8 +92,11 @@ export default function RevenueTrendCard() {
   const chartData = useMemo(() => {
     if (!data) return [];
 
-    const startDateObj = new Date(data.period.curr_start);
-    const prevStartDateObj = new Date(data.period.prev_start);
+    // Parse YYYY-MM-DD strings manually to avoid UTC timezone shift
+    const [cy, cm, cd] = data.period.curr_start.split("-").map(Number);
+    const startDateObj = new Date(cy, cm - 1, cd);
+    const [py, pm, pd] = data.period.prev_start.split("-").map(Number);
+    const prevStartDateObj = new Date(py, pm - 1, pd);
     const maxIndex = Math.max(
       ...data.current_series.map((s) => s.day_index),
       ...data.previous_series.map((s) => s.day_index),

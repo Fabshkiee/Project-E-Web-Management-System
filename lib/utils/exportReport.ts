@@ -39,16 +39,12 @@ export const exportAnalyticsReport = async (
       30,
     );
 
-    const start = new Date(revenueData.period.curr_start).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-    const end = new Date(revenueData.period.curr_end).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    // Parse YYYY-MM-DD strings manually to avoid UTC timezone shift
+    const [sy, sm, sd] = revenueData.period.curr_start.split("-").map(Number);
+    const [ey, em, ed] = revenueData.period.curr_end.split("-").map(Number);
+    const start = new Date(sy, sm - 1, sd).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const end = new Date(ey, em - 1, ed).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     const periodLabel = `${start} - ${end}`;
-
-
-    const formatDelta = (delta: number) => {
-      if (delta > 0) return `+${delta} from last month`;
-      if (delta < 0) return `${delta} from last month`;
-      return "No change";
-    };
 
     // 1. Executive Summary
     doc.setFontSize(14);
