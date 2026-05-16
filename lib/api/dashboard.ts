@@ -37,6 +37,15 @@ export interface MembershipSplitData {
   percentage: number;
 }
 
+export interface PeakHoursData {
+  peak_window: string;
+  breakdown: {
+    morning: number;
+    afternoon: number;
+    evening: number;
+  };
+}
+
 export interface MemberListItem {
   id: string;
   full_name: string;
@@ -371,7 +380,10 @@ export async function terminateMembership(userId: string) {
   return true;
 }
 
-export async function getPeakHours() {
+/**
+ * Fetches peak occupancy data for the analytics dashboard
+ */
+export async function getPeakHours(): Promise<PeakHoursData | null> {
   const now = Date.now();
   if (peakHoursCache && now - peakHoursCache.timestamp < CACHE_TTL) {
     return peakHoursCache.data;
@@ -385,7 +397,7 @@ export async function getPeakHours() {
   }
 
   peakHoursCache = { data, timestamp: now, promise: null };
-  return data;
+  return data as PeakHoursData;
 }
 
 export async function getWeeklyAttendance() {
