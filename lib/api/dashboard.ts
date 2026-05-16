@@ -50,6 +50,8 @@ export interface RevenueSeries {
   day_index: number;
   date: string;
   revenue: number;
+  new_members: number;
+  renewals: number;
 }
 
 export interface RevenueTrendData {
@@ -62,6 +64,10 @@ export interface RevenueTrendData {
   summary: {
     current_total: number;
     previous_total: number;
+    current_new: number;
+    previous_new: number;
+    current_renewals: number;
+    previous_renewals: number;
     trend_pct: number;
     trend_type: "up" | "down";
   };
