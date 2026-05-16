@@ -184,6 +184,40 @@ export default function MemberDetailsModal({
   const labelBase =
     "text-[11px] font-medium font-lexend uppercase tracking-wider text-gray-500 dark:text-[#9CA3AF] mb-1.5 block";
 
+  const getDateFromYmd = (value?: string) => {
+    if (!value) return null;
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) return null;
+    const date = new Date(year, month - 1, day);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const getStatusFromValidUntil = (value?: string) => {
+    const date = getDateFromYmd(value);
+    if (!date) return "Expired";
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (date < today) return "Expired";
+
+    const threshold = new Date(today);
+    threshold.setDate(today.getDate() + 3);
+
+    if (date <= threshold) return "Expiring";
+    return "Active";
+  };
+
+  const getStatusColor = (status: string) => {
+    if (status === "Expired") return "text-[#9F1239] dark:text-[#F87171]";
+    if (status === "Expiring") return "text-[#92400E] dark:text-[#FBBF24]";
+    return "text-[#166534] dark:text-[#4ADE80]";
+  };
+
+  const expiryDate = getDateFromYmd(memberData?.valid_until);
+  const expiryStatus = getStatusFromValidUntil(memberData?.valid_until);
+  const expiryColor = getStatusColor(expiryStatus);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -338,24 +372,15 @@ export default function MemberDetailsModal({
                       Current Expiration
                     </span>
                     <span
-                      className={`text-xs font-bold font-lexend ${(() => {
-                        const expiry = new Date(memberData.valid_until);
-                        const now = new Date();
-                        const diffDays = Math.ceil(
-                          (expiry.getTime() - now.getTime()) /
-                            (1000 * 60 * 60 * 24),
-                        );
-                        if (expiry < now)
-                          return "text-[#9F1239] dark:text-[#F87171]";
-                        if (diffDays <= 3)
-                          return "text-[#92400E] dark:text-[#FBBF24]";
-                        return "text-[#166534] dark:text-[#4ADE80]";
-                      })()}`}
+                      className={`text-xs font-bold font-lexend ${expiryColor}`}
                     >
-                      {new Date(memberData.valid_until).toLocaleDateString(
-                        "en-GB",
-                        { day: "2-digit", month: "short", year: "numeric" },
-                      )}
+                      {expiryDate
+                        ? expiryDate.toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -363,18 +388,7 @@ export default function MemberDetailsModal({
                       Status
                     </span>
                     <StatusTag
-                      type={(() => {
-                        const expiry = new Date(memberData.valid_until);
-                        const now = new Date();
-                        const diffDays = Math.ceil(
-                          (expiry.getTime() - now.getTime()) /
-                            (1000 * 60 * 60 * 24),
-                        );
-
-                        if (expiry < now) return "Expired";
-                        if (diffDays <= 3) return "Expiring";
-                        return "Active";
-                      })()}
+                      type={expiryStatus}
                     />
                   </div>
                 </div>
